@@ -104,7 +104,7 @@ const Hero = () => {
 
       {/* 装饰性代码片段 */}
       <div className="absolute bottom-20 left-4 md:left-8 text-xs text-primary/30 font-mono hidden md:block">
-        <div className="animate-pulse">// 持续构建中...</div>
+        <div className="animate-pulse">{'// 持续构建中...'}</div>
         <div className="ml-4">const growth = ∞</div>
       </div>
     </section>

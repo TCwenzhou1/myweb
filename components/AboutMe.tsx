@@ -76,7 +76,7 @@ const AboutMe = () => {
               </p>
               <p className="text-lg leading-relaxed text-muted-foreground mt-4">
                 我更关注{' '}
-                <span className="text-accent font-medium">"把想法做成系统"</span>，希望通过长期积累项目与输出，形成真正可落地的技术能力。
+                <span className="text-accent font-medium">「把想法做成系统」</span>，希望通过长期积累项目与输出，形成真正可落地的技术能力。
               </p>
             </div>
 
