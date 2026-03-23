@@ -70,7 +70,7 @@ const Contact = () => {
     {
       icon: Mail,
       title: '邮箱',
-      value: 'hello@tcwenzhou.com',
+      value: 'hello@tcwenzhou.site',
       color: 'from-blue-500 to-cyan-500',
     },
     {

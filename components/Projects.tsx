@@ -31,8 +31,8 @@ const Projects = () => {
       icon: Cpu,
       tags: ['Python', 'PyTorch', 'RL/MCTS', 'OpenAI Gym'],
       links: {
-        github: 'https://github.com/tcwenzhou/sgs-ai',
-        demo: 'https://github.com/tcwenzhou/sgs-ai',
+        github: 'https://github.com/TCwenzhou1/sgs-ai',
+        demo: 'https://github.com/TCwenzhou1/sgs-ai',
       },
       color: 'from-blue-500 to-cyan-500',
     },
@@ -42,8 +42,8 @@ const Projects = () => {
       icon: Mail,
       tags: ['Next.js', 'TypeScript', 'LangChain', 'PostgreSQL'],
       links: {
-        github: 'https://github.com/tcwenzhou/ai-mail-system',
-        demo: 'https://github.com/tcwenzhou/ai-mail-system',
+        github: 'https://github.com/TCwenzhou1/ai-mail-system',
+        demo: 'https://github.com/TCwenzhou1/ai-mail-system',
       },
       color: 'from-purple-500 to-pink-500',
     },
@@ -53,8 +53,8 @@ const Projects = () => {
       icon: Globe,
       tags: ['Next.js 14', 'TypeScript', 'Tailwind', 'Vercel'],
       links: {
-        github: 'https://github.com/tcwenzhou/portfolio',
-        demo: 'https://tcwenzhou.com',
+        github: 'https://github.com/TCwenzhou1/myweb',
+        demo: 'https://www.tcwenzhou.site',
       },
       color: 'from-green-500 to-emerald-500',
     },
@@ -160,7 +160,7 @@ const Projects = () => {
                 查看全部项目
               </button>
               <a
-                href="https://github.com/tcwenzhou"
+                href="https://github.com/TCwenzhou1"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 bg-secondary hover:bg-primary/10 text-foreground rounded-full border border-border hover:border-primary/30 transition-all duration-300 hover:scale-105 flex items-center space-x-2"

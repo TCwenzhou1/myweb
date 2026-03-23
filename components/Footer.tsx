@@ -3,9 +3,9 @@ import Link from 'next/link'
 
 const Footer = () => {
   const socialLinks = [
-    { icon: Github, href: 'https://github.com/tcwenzhou', label: 'GitHub' },
+    { icon: Github, href: 'https://github.com/TCwenzhou1', label: 'GitHub' },
     { icon: Linkedin, href: 'https://linkedin.com/in/tcwenzhou', label: 'LinkedIn' },
-    { icon: Mail, href: 'mailto:hello@tcwenzhou.com', label: 'Email' },
+    { icon: Mail, href: 'mailto:hello@tcwenzhou.site', label: 'Email' },
   ]
 
   const quickLinks = [
@@ -60,7 +60,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-primary">联系方式</h3>
             <ul className="space-y-2">
               <li className="text-sm text-muted-foreground">
-                <span className="font-medium">邮箱:</span> hello@tcwenzhou.com
+                <span className="font-medium">邮箱:</span> hello@tcwenzhou.site
               </li>
               <li className="text-sm text-muted-foreground">
                 <span className="font-medium">微信:</span> tcwenzhou
