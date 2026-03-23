@@ -22,7 +22,7 @@ export default function AboutPage() {
           <h2 className="text-base font-semibold text-foreground mb-3">现在在做什么</h2>
           <p>
             计算机工程方向的学生。主要精力放在 AI 项目实践和系统工程上，同时对游戏开发保持长期兴趣。
-            不追求"全栈样样通"，更注重在具体问题上把事情做深、做清楚。
+            不追求「全栈样样通」，更注重在具体问题上把事情做深、做清楚。
           </p>
         </section>
 
