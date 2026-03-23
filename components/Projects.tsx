@@ -26,32 +26,32 @@ const Projects = () => {
 
   const projects = [
     {
-      title: '三国杀 AI 系统',
-      description: '基于强化学习的智能卡牌游戏AI，能够模拟人类玩家策略，实现多智能体对战与决策优化。',
+      title: 'AI 智能卡牌游戏系统',
+      description: '使用强化学习和自注意力机制实现卡牌游戏AI。包含MCTS搜索树、特征工程和多智能体对战系统，在自玩训练中达到竞技水平。',
       icon: Cpu,
-      tags: ['Python', 'PyTorch', '强化学习', '游戏AI'],
+      tags: ['Python', 'PyTorch', 'RL/MCTS', 'OpenAI Gym'],
       links: {
         github: 'https://github.com/tcwenzhou/sgs-ai',
-        demo: 'https://sgs-ai.tcwenzhou.com',
+        demo: 'https://github.com/tcwenzhou/sgs-ai',
       },
       color: 'from-blue-500 to-cyan-500',
     },
     {
-      title: 'AI 自动化邮件回复系统',
-      description: '使用自然语言处理技术自动分类和回复邮件，支持智能模板生成和情感分析。',
+      title: 'AI 邮件智能处理系统',
+      description: '集成 LLM 的企业级邮件处理平台。支持邮件自动分类、智能回复生成、情感分析和模板学习，减少60%的手动处理时间。',
       icon: Mail,
-      tags: ['TypeScript', 'Next.js', 'OpenAI API', 'NLP'],
+      tags: ['Next.js', 'TypeScript', 'LangChain', 'PostgreSQL'],
       links: {
-        github: 'https://github.com/tcwenzhou/ai-mail-responder',
-        demo: 'https://mail-ai.tcwenzhou.com',
+        github: 'https://github.com/tcwenzhou/ai-mail-system',
+        demo: 'https://github.com/tcwenzhou/ai-mail-system',
       },
       color: 'from-purple-500 to-pink-500',
     },
     {
-      title: '个人网站 / 实验主页',
-      description: '使用Next.js构建的现代化个人作品集网站，包含博客系统、项目展示和实验功能。',
+      title: '现代个人作品集网站',
+      description: '使用 Next.js 14、Tailwind CSS 和现代前端实践构建的响应式作品集。包含深色设计系统、流畅动画和性能优化，Vercel 部署。',
       icon: Globe,
-      tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+      tags: ['Next.js 14', 'TypeScript', 'Tailwind', 'Vercel'],
       links: {
         github: 'https://github.com/tcwenzhou/portfolio',
         demo: 'https://tcwenzhou.com',

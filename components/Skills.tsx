@@ -141,18 +141,18 @@ const Skills = () => {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              title: '系统化学习',
-              description: '注重知识体系的完整性与系统性',
-              icon: '🔍',
+              title: '深度 vs 广度',
+              description: '既追求技术深度，也注重知识广度的全面发展',
+              icon: '🎯',
             },
             {
-              title: '实践驱动',
-              description: '通过项目实践巩固和验证技能',
-              icon: '⚡',
+              title: '实战驱动',
+              description: '通过项目实践验证技能，在做中学',
+              icon: '⚙️',
             },
             {
-              title: '持续更新',
-              description: '跟踪技术发展，保持技能与时俱进',
+              title: '持续迭代',
+              description: '跟踪技术发展，定期更新技能树',
               icon: '🔄',
             },
           ].map((item, index) => (
@@ -169,13 +169,13 @@ const Skills = () => {
 
         {/* 学习资源推荐 */}
         <div className="mt-12 glass-effect p-6 rounded-2xl border border-border">
-          <h3 className="text-xl font-semibold mb-4 text-primary">当前学习资源</h3>
+          <h3 className="text-xl font-semibold mb-4 text-primary">当前学习方向</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              '深入理解计算机系统',
-              '设计数据密集型应用',
-              '机器学习实战项目',
-              '现代Web开发最佳实践',
+              '大规模系统设计与架构',
+              '分布式系统与云原生',
+              '深度学习模型优化',
+              'Web 3 & 区块链应用',
             ].map((resource) => (
               <div
                 key={resource}

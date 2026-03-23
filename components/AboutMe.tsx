@@ -82,13 +82,13 @@ const AboutMe = () => {
 
             {/* 个人理念 */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-primary">个人理念</h3>
+              <h3 className="text-xl font-semibold text-primary">核心价值观</h3>
               <ul className="space-y-3">
                 {[
-                  '技术为解决问题而存在',
-                  '持续学习是最好的投资',
-                  '代码质量体现工程思维',
-                  '开源与分享推动进步',
+                  '化繁为简 - 用工程思维解决复杂问题',
+                  '知行合一 - 学习与实践紧密结合',
+                  '系统思维 - 构建完整的技术知识体系',
+                  '长期主义 - 相信持续积累的力量',
                 ].map((item, index) => (
                   <li key={index} className="flex items-start space-x-3">
                     <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>

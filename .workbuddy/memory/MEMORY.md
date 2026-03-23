@@ -1,7 +1,106 @@
-# 项目工作流程技能使用策略
+# 项目工作流程技能使用策略和技术经验库
 
 ## 🎯 核心目标
 确保每次做项目时都能充分利用所有可用技能，提高效率和质量。
+
+---
+
+## 🐛 常见问题修复经验
+
+### Next.js 项目常见错误
+
+#### 1. ESLint 错误: react/no-unescaped-entities
+**症状**: JSX 中的特殊字符（双引号等）导致构建失败
+```
+Error: react/no-unescaped-entities
+./components/AboutMe.tsx:79:39
+```
+
+**根本原因**: JSX 文本中的英文字符需要转义或替换
+
+**解决方案**:
+- 使用中文括号 `「」` 替换英文双引号 `""`
+- 或使用 HTML 实体 `&quot;`
+- 或用花括号包装 `{'}'}`
+
+**示例修复**:
+```jsx
+// ❌ 错误
+<span>"把想法做成系统"</span>
+
+// ✅ 正确
+<span>「把想法做成系统」</span>
+```
+
+**适用场景**: 中文内容中需要引用符号
+
+---
+
+#### 2. ESLint 错误: react/jsx-no-comment-textnodes
+**症状**: JSX 子节点中的 `//` 被识别为注释
+```
+Error: react/jsx-no-comment-textnodes
+./components/Hero.tsx:107:10
+```
+
+**根本原因**: JSX 中直接写 `//` 会被识别为 JavaScript 注释
+
+**解决方案**:
+- 用花括号包装文本 `{'// 内容'}`
+- 这样 JavaScript 解析器会正确处理它为字符串
+
+**示例修复**:
+```jsx
+// ❌ 错误 - // 被识别为注释
+<div>// 持续构建中...</div>
+
+// ✅ 正确 - 显式的 JavaScript 表达式
+<div>{'// 持续构建中...'}</div>
+```
+
+**适用场景**: 需要在 JSX 中显示代码片段或注释符号
+
+---
+
+#### 3. Vercel 构建失败: Module not found
+**症状**: Vercel 构建时找不到依赖模块
+```
+Type error: Cannot find module 'clsx' or its corresponding type declarations.
+./lib/utils.ts:1:39
+```
+
+**根本原因**: 
+- 代码中导入了依赖包
+- 但 `package.json` 的 `dependencies` 中未声明
+- 本地可能已安装 (node_modules)，但 Vercel 构建时无法找到
+
+**解决方案**:
+1. 检查代码中导入了哪些包
+2. 在 `package.json` 的 `dependencies` 中明确添加
+3. 注意区分 `dependencies`(生产) vs `devDependencies`(开发)
+
+**示例修复**:
+```json
+// 在 package.json 中补充缺失的包
+"dependencies": {
+  "clsx": "^2.0.0",
+  "tailwind-merge": "^2.2.0"
+}
+```
+
+**适用场景**: 任何本地能运行但 Vercel 构建失败的项目
+
+---
+
+### 修复最佳实践
+
+1. **最小化改动**: 只改必要的部分，保持整体设计
+2. **遵循规则**: 完全遵守 ESLint 和 React 最佳实践
+3. **版本管理**: 使用 semver 版本号，确保兼容性
+4. **文档记录**: 详细记录修复过程，便于日后参考
+5. **分阶段验证**: 本地验证→Git 提交→Vercel 验证
+
+---
 
 ## 📋 可用技能分类
 

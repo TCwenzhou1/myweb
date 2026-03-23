@@ -8,8 +8,33 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'TCwenzhou | 未来计算机工程师',
-  description: '专注于 AI 项目学习、工程实践与个人系统构建的个人作品集网站',
-  keywords: ['计算机工程', 'AI项目', '个人作品集', '技术博客', '前端开发'],
+  description: '专注于 AI 项目学习、工程实践与个人系统构建。计算机工程学生，分享技术成长的路径。',
+  keywords: ['计算机工程', 'AI项目', '作品集', '技术博客', '前端开发', '强化学习'],
+  authors: [{ name: 'TCwenzhou', url: 'https://tcwenzhou.com' }],
+  creator: 'TCwenzhou',
+  metadataBase: new URL('https://tcwenzhou.com'),
+  openGraph: {
+    title: 'TCwenzhou | 未来计算机工程师',
+    description: '专注于 AI 项目学习、工程实践与个人系统构建',
+    url: 'https://tcwenzhou.com',
+    type: 'website',
+    locale: 'zh_CN',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TCwenzhou | 未来计算机工程师',
+    description: '专注于 AI 项目学习、工程实践与个人系统构建',
+    creator: '@tcwenzhou',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
 }
 
 export default function RootLayout({

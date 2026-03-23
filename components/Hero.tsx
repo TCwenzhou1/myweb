@@ -85,10 +85,10 @@ const Hero = () => {
         {/* 数据统计 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-2xl mx-auto">
           {[
-            { label: '项目完成', value: '12+' },
-            { label: '技能掌握', value: '15+' },
-            { label: '学习时长', value: '2000h+' },
-            { label: '代码提交', value: '500+' },
+            { label: '完成项目', value: '8+' },
+            { label: '技术深度', value: '10+' },
+            { label: '学习时长', value: '3000h+' },
+            { label: '代码提交', value: '800+' },
           ].map((stat, index) => (
             <div 
               key={stat.label}

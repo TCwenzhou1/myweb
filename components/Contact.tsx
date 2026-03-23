@@ -70,13 +70,13 @@ const Contact = () => {
     {
       icon: Mail,
       title: '邮箱',
-      value: 'tcwenzhou@example.com',
+      value: 'hello@tcwenzhou.com',
       color: 'from-blue-500 to-cyan-500',
     },
     {
       icon: Phone,
-      title: '电话',
-      value: '+86 138-XXXX-XXXX',
+      title: '微信',
+      value: 'tcwenzhou',
       color: 'from-green-500 to-emerald-500',
     },
     {
@@ -257,7 +257,7 @@ const Contact = () => {
               {/* 隐私声明 */}
               <p className="text-xs text-muted-foreground text-center mt-6">
                 提交此表单即表示您同意我根据隐私政策处理您的个人信息。
-                您的信息仅用于回复您的留言，不会用于其他目的。
+                您的信息仅用于回复您的留言，不会用于任何其他目的。
               </p>
             </form>
 
@@ -265,19 +265,19 @@ const Contact = () => {
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
-                  title: '直接邮件',
-                  description: '发送邮件至 tcwenzhou@example.com',
-                  action: '复制邮箱',
-                },
-                {
-                  title: '项目合作',
-                  description: '技术项目合作与咨询',
-                  action: '查看项目',
+                  title: '发送邮件',
+                  description: '邮件回复通常在24小时内',
+                  action: '发送邮件',
                 },
                 {
                   title: '技术交流',
-                  description: '加入技术社区讨论',
-                  action: '加入社群',
+                  description: '讨论项目与技术方案',
+                  action: '微信联系',
+                },
+                {
+                  title: '项目合作',
+                  description: '感兴趣的合作项目',
+                  action: '了解详情',
                 },
               ].map((item) => (
                 <div key={item.title} className="glass-effect p-4 rounded-xl border border-border hover:border-primary/30 transition-colors">

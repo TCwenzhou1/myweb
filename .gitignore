@@ -1,4 +1,37 @@
+# Dependencies
 node_modules
-.next
+.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next
+/out
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+.env*.local
 .vercel
-.workbuddy/settings.local.json
+.idea
+*.swp
+*.swo
+
+# Development tools
+.vscode/settings.json
+.workbuddy/
+skill-helper.js
+**/skills-quick-reference.md
+
+# Build and deployment related docs (generated during development)
+BUILD-FIX-REPORT.md
+DEPLOYMENT-ACTION-GUIDE.md
+DEPLOYMENT-FIX-SUMMARY.md
+FIX-SUMMARY.md
+VERCEL-FIX-NOTES.md
+preview.html

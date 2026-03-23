@@ -5,7 +5,7 @@ const Footer = () => {
   const socialLinks = [
     { icon: Github, href: 'https://github.com/tcwenzhou', label: 'GitHub' },
     { icon: Linkedin, href: 'https://linkedin.com/in/tcwenzhou', label: 'LinkedIn' },
-    { icon: Mail, href: 'mailto:tcwenzhou@example.com', label: 'Email' },
+    { icon: Mail, href: 'mailto:hello@tcwenzhou.com', label: 'Email' },
   ]
 
   const quickLinks = [
@@ -60,13 +60,13 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-primary">联系方式</h3>
             <ul className="space-y-2">
               <li className="text-sm text-muted-foreground">
-                <span className="font-medium">邮箱:</span> tcwenzhou@example.com
+                <span className="font-medium">邮箱:</span> hello@tcwenzhou.com
               </li>
               <li className="text-sm text-muted-foreground">
-                <span className="font-medium">位置:</span> 中国
+                <span className="font-medium">微信:</span> tcwenzhou
               </li>
               <li className="text-sm text-muted-foreground">
-                <span className="font-medium">状态:</span> 学习中 / 可合作
+                <span className="font-medium">状态:</span> 📚 学习中 / 可合作
               </li>
             </ul>
           </div>
