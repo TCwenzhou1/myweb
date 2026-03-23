@@ -4,23 +4,31 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 65%;
-    --border: 216 34% 17%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --background: 0 0% 99%;
+    --foreground: 220 15% 10%;
+    --primary: 220 90% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 15% 25%;
+    --accent: 260 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 50%;
+    --border: 220 13% 88%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 10%;
+    --ring: 220 90% 45%;
+    /* card shadow token */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+    --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.08);
   }
 
   * {
     @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -28,21 +36,18 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* 自定义滚动条 */
+  /* 简洁滚动条 */
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 6px;
   }
-
   ::-webkit-scrollbar-track {
-    @apply bg-secondary;
+    background: transparent;
   }
-
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/50 rounded-full;
+    @apply bg-border rounded-full;
   }
-
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary;
+    @apply bg-muted-foreground/40;
   }
 }
 
@@ -51,81 +56,66 @@
     text-wrap: balance;
   }
 
-  .neon-text {
-    text-shadow: 0 0 5px theme('colors.primary.DEFAULT'),
-                 0 0 10px theme('colors.primary.DEFAULT'),
-                 0 0 15px theme('colors.primary.DEFAULT');
-  }
-
-  .neon-border {
-    box-shadow: 0 0 5px theme('colors.primary.DEFAULT'),
-                inset 0 0 5px theme('colors.primary.DEFAULT');
-  }
-
-  .gradient-bg {
-    background: linear-gradient(135deg, 
-      hsl(var(--background)) 0%,
-      hsl(222 47% 15%) 50%,
-      hsl(222 47% 11%) 100%
-    );
-  }
-
-  .glass-effect {
-    background: hsla(222, 47%, 11%, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid hsla(216, 34%, 17%, 0.5);
-  }
-
+  /* 布局工具 */
   .section-padding {
     @apply px-4 md:px-8 lg:px-16 xl:px-24;
   }
 
-  /* 渐变动画 */
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 8s ease infinite;
+  .container-max {
+    @apply max-w-6xl mx-auto;
   }
 
-  @keyframes gradient {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
+  /* 卡牌核心样式 */
+  .card-base {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
   }
 
-  /* 悬停提升效果 */
-  .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  .card-hover {
+    cursor: pointer;
   }
 
-  /* 霓虹光晕效果 */
-  .neon-glow {
-    position: relative;
+  .card-hover:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-4px);
   }
-  
-  .neon-glow::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(45deg, 
-      theme('colors.primary.DEFAULT'),
-      theme('colors.accent.DEFAULT'),
-      theme('colors.primary.DEFAULT')
-    );
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+
+  /* 玻璃磨砂效果（浅色版） */
+  .glass-light {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
   }
-  
-  .neon-glow:hover::after {
-    opacity: 0.3;
+
+  /* 导航栏毛玻璃 */
+  .nav-blur {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  /* 微妙背景 */
+  .page-bg {
+    background: hsl(var(--background));
+    background-image: radial-gradient(circle at 20% 10%, rgba(220,230,255,0.25) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(240,220,255,0.18) 0%, transparent 50%);
+  }
+
+  /* 点缀色文字 */
+  .text-accent-blue {
+    color: hsl(var(--primary));
+  }
+
+  /* 标签样式 */
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
   }
 }

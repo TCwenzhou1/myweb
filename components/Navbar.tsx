@@ -1,98 +1,99 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Menu, X, Code2 } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Games', href: '/games' },
+  { label: 'Lab', href: '/lab' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+]
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 16)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navItems = [
-    { label: '首页', href: '#home' },
-    { label: '关于我', href: '#about' },
-    { label: '项目', href: '#projects' },
-    { label: '技能', href: '#skills' },
-    { label: '成长', href: '#growth' },
-    { label: '作品', href: '#gallery' },
-    { label: '联系', href: '#contact' },
-  ]
+  // close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? 'glass-effect py-3' : 'bg-transparent py-4'
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
+      scrolled ? 'nav-blur shadow-sm' : 'bg-transparent'
     }`}>
-      <div className="section-padding max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
+      <div className="section-padding max-w-6xl mx-auto">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            href="/" 
-            className="flex items-center space-x-2 group"
+          <Link
+            href="/"
+            className="text-[15px] font-semibold tracking-tight text-foreground hover:text-primary transition-colors duration-200"
           >
-            <div className="relative">
-              <Code2 className="h-8 w-8 text-primary animate-float" />
-              <div className="absolute -inset-2 bg-primary/20 rounded-full blur-lg group-hover:blur-xl transition-all duration-300"></div>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              TCwenzhou
-            </span>
+            TCwenzhou
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300 relative group"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary group-hover:w-4/5 group-hover:left-1/10 transition-all duration-300"></span>
-              </a>
-            ))}
-            <button className="ml-6 px-6 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-full border border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(14,165,233,0.3)]">
-              联系我
-            </button>
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3.5 py-1.5 text-sm rounded-lg transition-colors duration-150 ${
+                    isActive
+                      ? 'text-primary font-medium bg-primary/8'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
+            className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
           >
-            {isOpen ? (
-              <X className="h-6 w-6 text-primary" />
-            ) : (
-              <Menu className="h-6 w-6 text-primary" />
-            )}
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile menu */}
         {isOpen && (
-          <div className="md:hidden mt-4 glass-effect rounded-xl border border-border p-4 animate-slide-up">
-            <div className="space-y-2">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="block px-4 py-3 text-sm text-muted-foreground hover:text-primary hover:bg-secondary/50 rounded-lg transition-colors duration-300"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
-              <button className="w-full mt-4 px-6 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-full border border-primary/30 hover:border-primary/50 transition-all duration-300">
-                联系我
-              </button>
+          <div className="md:hidden pb-4 animate-slide-up">
+            <div className="glass-light rounded-2xl border border-border p-2 space-y-0.5">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block px-4 py-2.5 text-sm rounded-xl transition-colors duration-150 ${
+                      isActive
+                        ? 'text-primary font-medium bg-primary/8'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}
