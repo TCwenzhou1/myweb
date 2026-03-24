@@ -52,10 +52,10 @@ const Navbar = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3.5 py-1.5 text-sm rounded-lg transition-colors duration-150 ${
+                  className={`px-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 ${
                     isActive
-                      ? 'text-primary font-medium bg-primary/8'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                      ? 'text-foreground font-medium'
+                      : 'text-muted-foreground/70 hover:text-foreground hover:bg-secondary'
                   }`}
                 >
                   {item.label}
@@ -84,11 +84,11 @@ const Navbar = () => {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`block px-4 py-2.5 text-sm rounded-xl transition-colors duration-150 ${
-                      isActive
-                        ? 'text-primary font-medium bg-primary/8'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                    }`}
+                  className={`block px-4 py-2.5 text-[13px] rounded-xl transition-colors duration-150 ${
+                    isActive
+                      ? 'text-foreground font-medium'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  }`}
                   >
                     {item.label}
                   </Link>
