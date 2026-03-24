@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ─── 牌组数据 ─────────────────────────────────────────────────────────────────
+// ─── 牌组数据 ───────────────────────────────────────────────────────────────
 
 const CARDS = [
   { rank: '10', suit: '♠', label: 'Projects', sub: 'AI Systems',   href: '/projects' },
@@ -13,29 +13,24 @@ const CARDS = [
   { rank: 'A',  suit: '♠', label: 'Contact',  sub: 'Get in Touch', href: '/contact'  },
 ]
 
-// ─── 扇形几何 ─────────────────────────────────────────────────────────────────
+// ─── 扇形几何参数 ─────────────────────────────────────────────────────────────
 //
-// 构图目标：向右上打开的扇形牌花
-// K♠ 作为参考竖直牌（接近 0°），整体向右展开
+// 策略：以"牌底中心"为旋转锚点，统一转动 rotate(θ)
+// transformOrigin: '50% 100%'  ← 以牌底中心为扇形圆心
 //
-// 角度定义：0° = 朝正上方，正值顺时针
-// 扇形从 10♠(-30°) 到 A♠(+10°)，整体偏左，向右上展开
+// 角度 0° = 牌面朝上（竖直），正值 = 顺时针
+// 10♠(-30°) … A♠(+10°)，整体偏左，向右展开
 //
-const FAN_DEG  = [-30, -20, -10, 0, 10]    // 10 J Q K A
-const RADIUS   = 680                        // 牌底中心到圆心的距离（px）
-const CARD_W   = 340
-const CARD_H   = 500
+const FAN_ANGLES = [-30, -20, -10, 0, 10]  // 10 J Q K A
 
-// 极坐标转直角，以"圆心"为原点，0° = 向上
-function polar(deg: number, r: number) {
-  const rad = (deg * Math.PI) / 180
-  return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }
-}
+// 单牌尺寸（桌面端）
+const CARD_W = 360
+const CARD_H = 520
 
 const EASE_DEAL  = 'cubic-bezier(0.16, 1, 0.30, 1)'
 const EASE_HOVER = 'cubic-bezier(0.34, 1.56, 0.64, 1)'
 
-// ─── 单张牌组件 ───────────────────────────────────────────────────────────────
+// ─── 单张牌 ──────────────────────────────────────────────────────────────────
 
 interface CardProps {
   card: typeof CARDS[number]
@@ -56,53 +51,49 @@ function PokerCard({
   const isRoyal = ['J', 'Q', 'K', 'A'].includes(rank)
   const is10    = rank === '10'
 
-  const deg         = FAN_DEG[index]
-  const { x, y }   = polar(deg, RADIUS)
+  const angle = FAN_ANGLES[index]
 
-  // hover: 沿牌面朝向再抽出 72px
-  const sinD = Math.sin((deg * Math.PI) / 180)
-  const cosD = Math.cos((deg * Math.PI) / 180)
-  const pullX = hovered ? sinD * 72 : 0
-  const pullY = hovered ? -cosD * 72 : 0
+  // hover 时沿牌面朝向抽出 60px（沿旋转方向上方）
+  const rad   = (angle * Math.PI) / 180
+  const pullX = hovered ? Math.sin(rad) * 60 : 0
+  const pullY = hovered ? -Math.cos(rad) * 60 : 0
 
-  // z-index
-  const zBase  = 10 - Math.abs(index - 3) * 2  // K(index=3) 最高
-  const zIndex = hovered ? 30 : (clickedIdx === index ? 25 : zBase)
-
-  // scale / opacity
+  // z-index：K 在最前，两侧递减；hover 时最高
+  const zBase  = 20 - Math.abs(index - 3) * 3
   const myClicked    = clickedIdx === index
   const otherClicked = clickedIdx !== null && !myClicked
-  const scale = (myClicked ? 1.06 : otherClicked ? 0.88 : 1) *
-                (anyHovered && !hovered ? 0.95 : 1)
-  const opacity = anyHovered && !hovered ? 0.48 : 1
+  const zIndex = hovered ? 50 : (myClicked ? 40 : zBase)
 
-  // 阴影
+  const scale = (myClicked ? 1.05 : otherClicked ? 0.88 : 1) *
+                (anyHovered && !hovered ? 0.94 : 1)
+  const opacity = anyHovered && !hovered ? 0.45 : 1
+
   const shadow = hovered
-    ? '0 48px 100px rgba(0,0,0,0.20), 0 16px 40px rgba(0,0,0,0.12)'
-    : '0 14px 40px rgba(0,0,0,0.10), 0 32px 80px rgba(0,0,0,0.07)'
+    ? '0 60px 120px rgba(0,0,0,0.22), 0 20px 50px rgba(0,0,0,0.14)'
+    : '0 18px 48px rgba(0,0,0,0.11), 0 36px 90px rgba(0,0,0,0.08)'
 
-  // 展开位置
-  const tx = revealed ? x + pullX : 0
-  const ty = revealed ? y + pullY : 0
-  const tr = revealed ? deg : 0
+  // 展开时：以牌底为圆心旋转到目标角度，再施加 hover 偏移
+  const tr = revealed ? angle : 0
+  const tx = revealed ? pullX : 0
+  const ty = revealed ? pullY : 0
 
-  const delay = index * 140  // 0/140/280/420/560ms
+  const delay = index * 145  // 0/145/290/435/580ms
 
   const transition = revealed
-    ? `transform 0.26s ${EASE_HOVER}, opacity 0.18s ease, box-shadow 0.22s ease`
-    : `transform 0.82s ${EASE_DEAL} ${delay}ms, opacity 0.55s ease ${delay}ms`
+    ? `transform 0.28s ${EASE_HOVER}, opacity 0.20s ease, box-shadow 0.24s ease`
+    : `transform 0.85s ${EASE_DEAL} ${delay}ms, opacity 0.6s ease ${delay}ms`
 
   return (
     <div
       style={{
         position: 'absolute',
-        // 牌底中心对齐圆心（容器 50%/50% 处）
-        left:  `calc(50% - ${CARD_W / 2}px)`,
-        top:   `calc(50% - ${CARD_H}px)`,
+        // 所有牌底部中心对齐容器底部中心（扇形圆心）
+        left:   `calc(50% - ${CARD_W / 2}px)`,
+        bottom: '0',
         width:  `${CARD_W}px`,
         height: `${CARD_H}px`,
         zIndex,
-        transformOrigin: '50% 100%',   // 以牌底中心旋转
+        transformOrigin: '50% 100%',  // 以牌底中心为旋转轴
         transform: `translateX(${tx}px) translateY(${ty}px) rotate(${tr}deg) scale(${scale})`,
         opacity: revealed ? opacity : 0,
         transition,
@@ -117,157 +108,172 @@ function PokerCard({
       {/* ══ 牌面 ══ */}
       <div style={{
         width: '100%', height: '100%',
-        borderRadius: '22px',
-        // 双层边框
-        border:        '1.5px solid rgba(0,0,0,0.075)',
-        outline:       '1px solid rgba(255,255,255,0.70)',
-        outlineOffset: '-4.5px',
-        // 偏暖白渐变
-        background: `linear-gradient(
-          150deg,
-          hsl(44, 40%, 99.5%)  0%,
-          hsl(40, 24%, 97.4%) 40%,
-          hsl(36, 16%, 95.0%) 100%
-        )`,
+        borderRadius: '20px',
+        // 双层边框：外框极淡黑、内框极淡白
+        border:        '1.5px solid rgba(0,0,0,0.08)',
+        outline:       '1.5px solid rgba(255,255,255,0.75)',
+        outlineOffset: '-5px',
+        // 偏暖白渐变：左上最亮，右下微暗
+        background: `
+          linear-gradient(
+            155deg,
+            hsl(45, 45%, 99.5%)  0%,
+            hsl(40, 25%, 97.5%) 45%,
+            hsl(35, 15%, 95.2%) 100%
+          )
+        `,
         boxShadow: shadow,
-        transition: 'box-shadow 0.26s ease',
+        transition: 'box-shadow 0.28s ease',
         position: 'relative',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: `${is10 ? 26 : 28}px 26px`,
+        padding: `${is10 ? 24 : 28}px 26px`,
         boxSizing: 'border-box',
       }}>
 
-        {/* 纸张压纹：极淡菱形纹理 */}
+        {/* 纸纹：极淡菱形网格 */}
         <div aria-hidden style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           backgroundImage: `
-            repeating-linear-gradient( 45deg, rgba(0,0,0,0.007) 0, rgba(0,0,0,0.007) 1px, transparent 1px, transparent 24px),
-            repeating-linear-gradient(-45deg, rgba(0,0,0,0.007) 0, rgba(0,0,0,0.007) 1px, transparent 1px, transparent 24px)
+            repeating-linear-gradient( 45deg, rgba(0,0,0,0.006) 0, rgba(0,0,0,0.006) 1px, transparent 1px, transparent 22px),
+            repeating-linear-gradient(-45deg, rgba(0,0,0,0.006) 0, rgba(0,0,0,0.006) 1px, transparent 1px, transparent 22px)
           `,
         }} />
 
-        {/* 背景大图腾（超淡） */}
+        {/* 中央黑桃图腾（超淡，不抢主位） */}
         <div aria-hidden style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '300px', lineHeight: 1,
-          color: 'rgba(0,0,0,0.016)',
+          fontSize: '280px', lineHeight: 1,
+          color: 'rgba(0,0,0,0.018)',
           fontFamily: 'serif', userSelect: 'none',
         }}>♠</div>
 
-        {/* 皇家牌：四角菱形装饰 */}
+        {/* 皇家牌四角菱形装饰 */}
         {isRoyal && [
-          { top: '34px',  left: '30px'  },
-          { top: '34px',  right: '30px' },
-          { bottom: '34px', left: '30px'  },
-          { bottom: '34px', right: '30px' },
+          { top: '32px',    left: '28px'   },
+          { top: '32px',    right: '28px'  },
+          { bottom: '32px', left: '28px'   },
+          { bottom: '32px', right: '28px'  },
         ].map((pos, ki) => (
           <div key={ki} aria-hidden style={{
             position: 'absolute', ...pos,
-            width: '10px', height: '10px',
-            border: '0.75px solid rgba(0,0,0,0.065)',
+            width: '9px', height: '9px',
+            border: '0.75px solid rgba(0,0,0,0.07)',
             transform: 'rotate(45deg)', pointerEvents: 'none',
           }} />
         ))}
 
-        {/* 皇家牌：中央十字细线 */}
+        {/* 皇家牌中央十字细线 */}
         {isRoyal && (
           <div aria-hidden style={{
             position: 'absolute', top: '50%', left: '50%',
             transform: 'translate(-50%,-50%)',
-            width: '72px', height: '72px', pointerEvents: 'none',
+            width: '68px', height: '68px', pointerEvents: 'none',
           }}>
-            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:'0.5px', background:'rgba(0,0,0,0.06)', transform:'translateY(-50%)' }} />
-            <div style={{ position:'absolute', left:'50%', top:0, bottom:0, width:'0.5px', background:'rgba(0,0,0,0.06)', transform:'translateX(-50%)' }} />
+            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:'0.5px', background:'rgba(0,0,0,0.055)', transform:'translateY(-50%)' }} />
+            <div style={{ position:'absolute', left:'50%', top:0, bottom:0, width:'0.5px', background:'rgba(0,0,0,0.055)', transform:'translateX(-50%)' }} />
           </div>
         )}
 
-        {/* 左上角 */}
+        {/* ── 左上角：牌面数字 + 花色 ── */}
         <div style={{
           display: 'flex', flexDirection: 'column', gap: '5px',
-          color: 'rgba(12,12,18,0.78)', position: 'relative', zIndex: 1,
+          color: 'rgba(10,10,16,0.80)', position: 'relative', zIndex: 2,
         }}>
           <span style={{
-            fontSize: is10 ? '36px' : '42px',
+            fontSize: is10 ? '38px' : '44px',
             fontWeight: 700,
             fontFamily: '"Palatino Linotype", Palatino, Georgia, serif',
             letterSpacing: '-0.03em', lineHeight: 1,
           }}>{rank}</span>
-          <span style={{ fontSize: '22px', lineHeight: 1, color: 'rgba(12,12,18,0.72)' }}>{suit}</span>
+          <span style={{
+            fontSize: '24px', lineHeight: 1,
+            color: 'rgba(10,10,16,0.75)',
+            fontFamily: 'serif',
+          }}>{suit}</span>
         </div>
 
-        {/* 中央区域 */}
+        {/* ── 中央区域：大黑桃 + label ── */}
         <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
-          position: 'relative', zIndex: 1,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
+          position: 'relative', zIndex: 2,
         }}>
-          <div style={{ width: '40px', height: '0.75px', background: 'rgba(0,0,0,0.08)' }} />
+          <div style={{ width: '44px', height: '0.75px', background: 'rgba(0,0,0,0.07)' }} />
           <span style={{
-            fontSize: '120px', lineHeight: 1,
-            color: 'rgba(8,8,16,0.38)', fontFamily: 'serif',
+            fontSize: '130px', lineHeight: 1,
+            color: 'rgba(6,6,14,0.36)',
+            fontFamily: 'serif',
           }}>♠</span>
           <span style={{
             fontSize: '11px', fontWeight: 700,
-            letterSpacing: '0.24em', textTransform: 'uppercase',
-            color: 'rgba(0,0,0,0.18)', fontFamily: 'system-ui, sans-serif',
+            letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: 'rgba(0,0,0,0.16)',
+            fontFamily: 'system-ui, sans-serif',
           }}>{label}</span>
-          <div style={{ width: '40px', height: '0.75px', background: 'rgba(0,0,0,0.08)' }} />
+          <div style={{ width: '44px', height: '0.75px', background: 'rgba(0,0,0,0.07)' }} />
         </div>
 
-        {/* 右下角（倒置） */}
+        {/* ── 右下角（倒置） ── */}
         <div style={{
           display: 'flex', flexDirection: 'column', gap: '5px',
-          color: 'rgba(12,12,18,0.78)',
+          color: 'rgba(10,10,16,0.80)',
           alignSelf: 'flex-end', transform: 'rotate(180deg)',
-          position: 'relative', zIndex: 1,
+          position: 'relative', zIndex: 2,
         }}>
           <span style={{
-            fontSize: is10 ? '36px' : '42px',
+            fontSize: is10 ? '38px' : '44px',
             fontWeight: 700,
             fontFamily: '"Palatino Linotype", Palatino, Georgia, serif',
             letterSpacing: '-0.03em', lineHeight: 1,
           }}>{rank}</span>
-          <span style={{ fontSize: '22px', lineHeight: 1, color: 'rgba(12,12,18,0.72)' }}>{suit}</span>
+          <span style={{
+            fontSize: '24px', lineHeight: 1,
+            color: 'rgba(10,10,16,0.75)',
+            fontFamily: 'serif',
+          }}>{suit}</span>
         </div>
 
-        {/* hover 顶部高亮细线 */}
+        {/* hover 顶部光线 */}
         <div style={{
-          position: 'absolute', top: 0, left: '20%', right: '20%',
+          position: 'absolute', top: 0, left: '18%', right: '18%',
           height: '1.5px',
-          background: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.18), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent)',
           opacity: hovered ? 1 : 0,
-          transition: 'opacity 0.18s ease',
+          transition: 'opacity 0.20s ease',
+          pointerEvents: 'none',
         }} />
 
         {/* hover 增亮层 */}
         <div style={{
-          position: 'absolute', inset: 0, borderRadius: '22px',
-          background: 'rgba(255,255,255,0.08)',
+          position: 'absolute', inset: 0, borderRadius: '20px',
+          background: 'rgba(255,255,255,0.07)',
           opacity: hovered ? 1 : 0,
-          transition: 'opacity 0.18s ease', pointerEvents: 'none',
+          transition: 'opacity 0.20s ease', pointerEvents: 'none',
         }} />
       </div>
 
-      {/* hover 底部标签 */}
+      {/* hover 底部 label（牌下方显示） */}
       <div style={{
-        position: 'absolute', bottom: '-70px', left: '50%',
+        position: 'absolute', bottom: '-66px', left: '50%',
         transform: 'translateX(-50%)',
         whiteSpace: 'nowrap', textAlign: 'center',
         opacity: hovered ? 1 : 0,
-        transition: 'opacity 0.18s ease',
+        transition: 'opacity 0.20s ease',
         pointerEvents: 'none',
       }}>
         <div style={{
-          fontSize: '13px', fontWeight: 700,
+          fontSize: '12px', fontWeight: 700,
           letterSpacing: '0.18em', textTransform: 'uppercase',
-          color: 'rgba(0,0,0,0.58)', fontFamily: 'system-ui, sans-serif',
+          color: 'rgba(0,0,0,0.52)',
+          fontFamily: 'system-ui, sans-serif',
         }}>{label}</div>
         <div style={{
-          fontSize: '11px', color: 'rgba(0,0,0,0.30)',
-          marginTop: '4px', fontFamily: 'system-ui, sans-serif',
+          fontSize: '11px', color: 'rgba(0,0,0,0.26)',
+          marginTop: '4px',
+          fontFamily: 'system-ui, sans-serif',
         }}>{sub}</div>
       </div>
     </div>
@@ -276,24 +282,24 @@ function PokerCard({
 
 // ─── 主组件 ──────────────────────────────────────────────────────────────────
 
-type Phase = 'prelude' | 'reveal' | 'settle'
+type Phase = 'stack' | 'reveal' | 'settle'
 
 export default function HeroCards() {
-  const router               = useRouter()
-  const sectionRef           = useRef<HTMLElement>(null)
-  const [phase, setPhase]    = useState<Phase>('prelude')
+  const router                = useRouter()
+  const [phase, setPhase]     = useState<Phase>('stack')
   const [revealedCount, setR] = useState(0)
-  const [textIn, setTextIn]  = useState(false)
-  const [hovered, setHovered]   = useState<number | null>(null)
-  const [clicked, setClicked]   = useState<number | null>(null)
+  const [textIn, setTextIn]   = useState(false)
+  const [hovered, setHovered] = useState<number | null>(null)
+  const [clicked, setClicked] = useState<number | null>(null)
 
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
+    // 600ms 后开始逐张展开
     t.push(setTimeout(() => setPhase('reveal'), 600))
     for (let i = 0; i < 5; i++) {
-      t.push(setTimeout(() => setR(i + 1), 700 + i * 140))
+      t.push(setTimeout(() => setR(i + 1), 700 + i * 145))
     }
-    // 700 + 4×140 = 1260ms, +500ms = 1760ms → settle + 文字入场
+    // 最后一张展开 700+4×145=1280ms，再等 480ms 落定 → 1760ms
     t.push(setTimeout(() => { setPhase('settle'); setTextIn(true) }, 1760))
     return () => t.forEach(clearTimeout)
   }, [])
@@ -303,184 +309,183 @@ export default function HeroCards() {
     setTimeout(() => router.push(href), 360)
   }
 
-  // 背景渐变用 CSS，不在 JS 里计算
-
   return (
     <section
-      ref={sectionRef}
       style={{
         position: 'relative',
         width: '100%',
-        // 首屏铺满，减去 navbar 高度（64px）
         height: 'calc(100vh - 64px)',
-        minHeight: '600px',
+        minHeight: '620px',
         overflow: 'hidden',
-        // 偏暖白舞台背景
         background: 'hsl(40, 20%, 97%)',
         backgroundImage: [
-          // 左侧牌花区域：暖灰聚光
-          'radial-gradient(ellipse 65% 80% at 32% 55%, rgba(195,183,162,0.17) 0%, rgba(195,183,162,0.06) 50%, transparent 75%)',
-          // 右侧文字区域：极淡
-          'radial-gradient(ellipse 45% 55% at 72% 48%, rgba(210,205,195,0.08) 0%, transparent 60%)',
-          // 底部地面阴影
-          'linear-gradient(to top, rgba(160,150,135,0.10) 0%, transparent 18%)',
+          // 牌花区域：左侧暖灰聚光（增强舞台感）
+          'radial-gradient(ellipse 70% 85% at 28% 75%, rgba(190,178,158,0.20) 0%, rgba(190,178,158,0.08) 50%, transparent 75%)',
+          // 文字区域：极淡暖光
+          'radial-gradient(ellipse 45% 55% at 75% 50%, rgba(210,206,196,0.09) 0%, transparent 60%)',
+          // 底部地面感
+          'linear-gradient(to top, rgba(155,145,130,0.12) 0%, transparent 16%)',
         ].join(','),
       }}
     >
-      {/* ── 超大背景 ♠ 水印，服务于整体氛围 ── */}
+      {/* ── 背景 ♠ 水印（极淡，仅营造氛围，不能代替扑克牌） ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        // 水印居于牌花区左侧，不要正中
-        left: '-8vw', top: '50%',
-        transform: 'translateY(-50%)',
-        fontSize: '75vw', lineHeight: 1,
-        color: 'rgba(0,0,0,0.010)',
+        left: '-5vw', bottom: '-8vh',
+        fontSize: '70vw', lineHeight: 1,
+        color: 'rgba(0,0,0,0.009)',
         fontFamily: 'serif',
         pointerEvents: 'none', userSelect: 'none',
-        whiteSpace: 'nowrap',
       }}>♠</div>
 
-      {/* ── Prelude 标签：进场前出现 ── */}
+      {/* ── Prelude 预告文字（进场前短暂出现） ── */}
       <div style={{
         position: 'absolute',
-        top: '8%',
-        left: 'clamp(32px, 5vw, 80px)',
-        opacity: phase === 'prelude' ? 0.40 : 0,
-        transition: 'opacity 0.9s ease',
+        top: '7%',
+        left: 'clamp(28px, 4.5vw, 72px)',
+        opacity: phase === 'stack' ? 0.38 : 0,
+        transition: 'opacity 1.0s ease',
         pointerEvents: 'none',
       }}>
         <span style={{
           fontSize: '11px', fontWeight: 600,
-          letterSpacing: '0.34em', textTransform: 'uppercase',
-          color: 'rgba(0,0,0,0.36)',
+          letterSpacing: '0.36em', textTransform: 'uppercase',
+          color: 'rgba(0,0,0,0.30)',
           fontFamily: 'system-ui, sans-serif',
-        }}>Royal Flush &nbsp;·&nbsp; ♠</span>
+        }}>Royal Flush &nbsp;·&nbsp; ♠ Spades</span>
       </div>
 
       {/*
         ── 扇形牌花容器 ──
-        策略：圆心放在视口下方（section 底部以下），
-        这样 R=680px 的牌向上伸展后，牌顶出现在视口中上部。
+        构图：圆心（扇形旋转轴）放在容器底部中央
+        容器定位：left = 视口左侧约 20%，bottom = 视口高 8%
+        这样牌展开后：
+          - K（0°）竖直朝上，牌顶在容器顶部
+          - 10（-30°）偏左
+          - A（+10°）偏右
+          - 整组牌花占据左侧约 55% 首屏区域
 
-        圆心位置：左 38% × 视口宽，高 = section高度 + 120px（圆心在底部以下）
-        容器尺寸需要覆盖所有牌的展开范围：宽1200px / 高1100px
-        容器中心 = 圆心位置
+        容器宽度：覆盖所有牌展开后的横向范围
+        CARD_W=360, CARD_H=520, 最大角度 ±30°
+        横向最大偏移 ≈ 520 × sin(30°) = 260px，两侧各 360/2+260 ≈ 440px
+        → 容器宽 ≈ 880px，高 ≈ CARD_H + 额外空间 ≈ 600px
       */}
-      <div style={{
-        position: 'absolute',
-        left:   'calc(38vw - 600px)',
-        bottom: '-120px',
-        width:  '1200px',
-        height: '1100px',
-        pointerEvents: 'none',
-      }}>
-        <div style={{ position: 'relative', width: '100%', height: '100%', pointerEvents: 'none' }}>
-          {CARDS.map((card, i) => (
-            <PokerCard
-              key={card.rank}
-              card={card}
-              index={i}
-              revealed={revealedCount > i}
-              hovered={hovered === i}
-              anyHovered={hovered !== null}
-              clickedIdx={clicked}
-              onHover={setHovered}
-              onClick={handleClick}
-            />
-          ))}
-        </div>
+      <div
+        className="hero-fan"
+        style={{
+          position: 'absolute',
+          // 容器圆心（底部中点）横向位置 = 视口 32% 处
+          left: 'calc(32vw - 440px)',
+          // 容器底部距视口底部
+          bottom: '6%',
+          width:  '880px',
+          height: '580px',
+          // 不要在这里设 pointerEvents:none，牌本身需要交互
+        }}
+      >
+        {CARDS.map((card, i) => (
+          <PokerCard
+            key={card.rank}
+            card={card}
+            index={i}
+            revealed={revealedCount > i}
+            hovered={hovered === i}
+            anyHovered={hovered !== null}
+            clickedIdx={clicked}
+            onHover={setHovered}
+            onClick={handleClick}
+          />
+        ))}
       </div>
 
       {/*
         ── 展签式文字区 ──
-        右侧，垂直 45%~55% 之间（与牌花顶端同高区域）
-        maxWidth 400px，文字右对齐
+        右侧，垂直居中，贴近牌花顶端区域
+        right: 4~6vw，top: 48%（稍偏上，与 K 牌顶端同高区域）
       */}
-      <div style={{
-        position: 'absolute',
-        right:  'clamp(24px, 5vw, 80px)',
-        top:    '50%',
-        transform: textIn
-          ? 'translateY(-50%)'
-          : 'translateY(-42%)',
-        maxWidth: '400px',
-        opacity: textIn ? 1 : 0,
-        transition: 'opacity 1.0s ease, transform 1.0s ease',
-        textAlign: 'right',
-      }}>
-
-        {/* 顶部细竖线 */}
+      <div
+        className="hero-text"
+        style={{
+          position: 'absolute',
+          right:  'clamp(20px, 5vw, 80px)',
+          top:    '50%',
+          transform: textIn ? 'translateY(-52%)' : 'translateY(-44%)',
+          maxWidth: '400px',
+          opacity: textIn ? 1 : 0,
+          transition: 'opacity 1.1s ease, transform 1.1s ease',
+          textAlign: 'right',
+        }}
+      >
+        {/* 顶部竖线装饰 */}
         <div style={{
-          width: '1px', height: '36px',
+          width: '1px', height: '40px',
           background: 'rgba(0,0,0,0.10)',
           marginLeft: 'auto',
-          marginBottom: '20px',
+          marginBottom: '22px',
         }} />
 
         {/* 小标题 */}
         <p style={{
           fontSize: '12px', fontWeight: 600,
-          letterSpacing: '0.28em', textTransform: 'uppercase',
-          color: 'rgba(0,0,0,0.24)',
+          letterSpacing: '0.30em', textTransform: 'uppercase',
+          color: 'rgba(0,0,0,0.22)',
           fontFamily: 'system-ui, sans-serif',
-          marginBottom: '18px',
+          marginBottom: '16px',
         }}>Royal Flush · Spades</p>
 
         {/* 主标题 */}
         <h1 style={{
-          fontSize: 'clamp(64px, 6.5vw, 88px)',
+          fontSize: 'clamp(62px, 6.2vw, 86px)',
           fontWeight: 700,
           fontFamily: '"Palatino Linotype", Palatino, Georgia, serif',
-          letterSpacing: '-0.045em', lineHeight: 0.95,
-          color: 'rgba(8,8,14,0.88)',
-          marginBottom: '20px',
+          letterSpacing: '-0.046em', lineHeight: 0.93,
+          color: 'rgba(7,7,13,0.88)',
+          marginBottom: '18px',
         }}>TCwenzhou</h1>
 
         {/* 一句副标题 */}
         <p style={{
           fontSize: '14px',
-          color: 'rgba(0,0,0,0.34)',
+          color: 'rgba(0,0,0,0.32)',
           fontFamily: 'system-ui, sans-serif',
-          lineHeight: 1.6,
-          letterSpacing: '0.01em',
-          marginBottom: '36px',
+          lineHeight: 1.65,
+          letterSpacing: '0.015em',
+          marginBottom: '34px',
         }}>
           计算机工程 · 以系统思维探索 AI 与游戏
         </p>
 
         {/* 按钮组 */}
         <div style={{
-          display: 'flex', gap: '12px',
+          display: 'flex', gap: '10px',
           justifyContent: 'flex-end',
-          flexWrap: 'wrap',
           alignItems: 'center',
+          flexWrap: 'wrap',
         }}>
-          {/* 主按钮 */}
           <a
             href="/projects"
             style={{
               display: 'inline-flex', alignItems: 'center',
               height: '52px', padding: '0 32px',
-              borderRadius: '6px',
-              background: 'rgba(8,8,14,0.84)',
-              color: 'rgba(255,255,255,0.93)',
-              fontSize: '12px', fontWeight: 600,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
+              borderRadius: '5px',
+              background: 'rgba(7,7,13,0.84)',
+              color: 'rgba(255,255,255,0.92)',
+              fontSize: '11px', fontWeight: 600,
+              letterSpacing: '0.10em', textTransform: 'uppercase',
               textDecoration: 'none',
               fontFamily: 'system-ui, sans-serif',
+              transition: 'background 0.18s ease',
             }}
           >进入展厅</a>
-
-          {/* 次按钮 */}
           <a
             href="/about"
             style={{
               display: 'inline-flex', alignItems: 'center',
-              height: '52px', padding: '0 26px',
-              borderRadius: '6px',
+              height: '52px', padding: '0 24px',
+              borderRadius: '5px',
               background: 'transparent',
-              color: 'rgba(0,0,0,0.36)',
-              fontSize: '12px', fontWeight: 500,
+              color: 'rgba(0,0,0,0.34)',
+              fontSize: '11px', fontWeight: 500,
               letterSpacing: '0.04em',
               textDecoration: 'none',
               fontFamily: 'system-ui, sans-serif',
@@ -489,36 +494,49 @@ export default function HeroCards() {
           >关于我</a>
         </div>
 
-        {/* 极淡引导语，settle 后延迟出现 */}
+        {/* 极淡引导语 */}
         <p style={{
           fontSize: '11px',
-          color: 'rgba(0,0,0,0.16)',
-          marginTop: '22px',
+          color: 'rgba(0,0,0,0.15)',
+          marginTop: '20px',
           fontFamily: 'system-ui, sans-serif',
           letterSpacing: '0.04em',
           opacity: textIn ? 1 : 0,
-          transition: 'opacity 0.8s ease 1.4s',
+          transition: 'opacity 0.9s ease 1.6s',
         }}>
-          ← hover 任意一张牌
+          ← hover 任意一张牌探索
         </p>
       </div>
 
-      {/* 手机端适配：牌花缩放 */}
+      {/* 响应式适配 */}
       <style>{`
-        @media (max-width: 900px) {
-          /* 在窄屏上整体缩小并竖排 */
-          section .hero-fan {
-            transform: scale(0.6) !important;
+        /* 中等屏幕（平板/小桌面）缩小牌花 */
+        @media (max-width: 1100px) {
+          .hero-fan {
+            transform: scale(0.78) !important;
             transform-origin: bottom center !important;
           }
         }
-        @media (max-width: 640px) {
-          section .hero-text {
-            right: 16px !important;
-            max-width: 100% !important;
-            bottom: 24px !important;
+        @media (max-width: 820px) {
+          .hero-fan {
+            transform: scale(0.58) !important;
+            transform-origin: bottom center !important;
+            left: calc(50% - 440px) !important;
+          }
+          .hero-text {
+            right: 50% !important;
+            transform: translateX(50%) translateY(0) !important;
             top: auto !important;
-            transform: none !important;
+            bottom: 16px !important;
+            text-align: center !important;
+            max-width: 360px !important;
+          }
+        }
+        @media (max-width: 540px) {
+          .hero-fan {
+            transform: scale(0.46) !important;
+            transform-origin: bottom center !important;
+            left: calc(50% - 440px) !important;
           }
         }
       `}</style>
