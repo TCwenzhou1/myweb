@@ -1,10 +1,15 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant',
+})
 
 export const metadata: Metadata = {
   title: 'TCwenzhou | 个人主页',
@@ -39,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${inter.className} page-bg min-h-screen`}>
+      <body className={`${inter.variable} ${cormorant.variable} ${inter.className} page-bg min-h-screen`}>
         <Navbar />
         <main className="pt-16">
           {children}
