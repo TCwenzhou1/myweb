@@ -25,12 +25,12 @@ const FAN_ANGLES = [-54, -32, -14, 6, 24]
 // 10:3  J:8  Q:13  K:20  A:15
 const Z_BASE = [3, 8, 13, 20, 15]
 
-// 单牌尺寸（基准）
-const CARD_W = 358
-const CARD_H = 528
+// 单牌尺寸（基准）：缩小约 20%（358→286，528→422）
+const CARD_W = 286
+const CARD_H = 422
 
-// K 牌比其他牌大 8%
-const K_SCALE = 1.08
+// K 牌仅比其他牌大 2%（从 1.08 降到 1.02，不再像挡板）
+const K_SCALE = 1.02
 
 // 花色色值：偏墨灰
 const INK     = 'rgba(18,14,22,0.76)'
@@ -64,10 +64,10 @@ function PokerCard({
   const angle = FAN_ANGLES[index]
   const baseScale = isK ? K_SCALE : 1.0
 
-  // hover：沿牌面朝向抽出 60px
+  // hover：沿牌面朝向抽出 48px（牌缩小后相应缩小抽出距离）
   const rad   = (angle * Math.PI) / 180
-  const pullX = hovered ? Math.sin(rad) * 60 : 0
-  const pullY = hovered ? -Math.cos(rad) * 60 : 0
+  const pullX = hovered ? Math.sin(rad) * 48 : 0
+  const pullY = hovered ? -Math.cos(rad) * 48 : 0
 
   const myClicked    = clickedIdx === index
   const otherClicked = clickedIdx !== null && !myClicked
@@ -352,20 +352,20 @@ export default function HeroCards() {
       }}>♠</div>
 
       {/*
-        ── 扇形牌花容器（第一处）──
-        几何：圆心 = 视口 32% 横坐标（偏左），底部上 8%（★上移了）
-        容器宽 1060px，高 650px
-        left = 32vw - 530px
-        ★ bottom 从 4% 改为 8%，整体上移约 60~90px
+        ── 扇形牌花容器 ──
+        ★ 整体缩小约 20%（容器 850×520px，原 1060×650）
+        ★ 向左移动 75px（left: calc(28vw - 425px)，原 32vw-530px）
+        ★ 向下移动 40px（bottom: 5%，原 8%）
+        牌花视觉中心约在视口左侧 30~32% 附近
       */}
       <div
         className="hero-fan"
         style={{
           position: 'absolute',
-          left:   'calc(32vw - 530px)',
-          bottom: '8%',
-          width:  '1060px',
-          height: '650px',
+          left:   'calc(28vw - 425px)',
+          bottom: '5%',
+          width:  '850px',
+          height: '520px',
           zIndex: 2,
         }}
       >
@@ -375,12 +375,12 @@ export default function HeroCards() {
         */}
         <div aria-hidden style={{
           position: 'absolute',
-          bottom: '-18px',
+          bottom: '-14px',
           left:   '50%',
           transform: 'translateX(-50%)',
-          width:  '680px',
-          height: '48px',
-          background: 'radial-gradient(ellipse 100% 100% at 50% 100%, rgba(80,60,40,0.18) 0%, rgba(80,60,40,0.07) 50%, transparent 72%)',
+          width:  '540px',
+          height: '38px',
+          background: 'radial-gradient(ellipse 100% 100% at 50% 100%, rgba(80,60,40,0.16) 0%, rgba(80,60,40,0.06) 50%, transparent 72%)',
           pointerEvents: 'none',
           zIndex: 1,
         }} />
@@ -401,21 +401,19 @@ export default function HeroCards() {
       </div>
 
       {/*
-        ── 展签式文字区（第二处）──
-        ★ 右侧位置收紧：right 从 5vw → 3.5vw
-        ★ top 从 50% → 52%（向下压一点，更靠近牌花重心）
-        ★ translateY 微调，让整体更贴近牌组
-        maxWidth 400px（从 420px 略收）
-        删除 hover 引导语
+        ── 展签式文字区 ──
+        ★ right 从 3.5vw 拉回至 clamp(32px, 5.5vw, 88px)，恢复右侧安全边距
+        ★ maxWidth 从 400px 收至 360px，防主标题溢出
+        ★ top 保持 50%，translateY -52%（竖向居中偏上）
       */}
       <div
         className="hero-text"
         style={{
           position: 'absolute',
-          right:  'clamp(16px, 3.5vw, 60px)',
-          top:    '52%',
+          right:  'clamp(32px, 5.5vw, 88px)',
+          top:    '50%',
           transform: textIn ? 'translateY(-52%)' : 'translateY(-44%)',
-          maxWidth: '400px',
+          maxWidth: '360px',
           opacity: textIn ? 1 : 0,
           transition: 'opacity 1.3s cubic-bezier(0.16,1,0.30,1), transform 1.3s cubic-bezier(0.16,1,0.30,1)',
           textAlign: 'right',
@@ -439,9 +437,9 @@ export default function HeroCards() {
           marginBottom: '12px',
         }}>Royal Flush &nbsp;·&nbsp; Spades</p>
 
-        {/* 主标题 */}
+        {/* 主标题：字号收至 clamp(58px,5.8vw,82px)，确保完整显示 */}
         <h1 style={{
-          fontSize: 'clamp(68px, 7.0vw, 96px)',
+          fontSize: 'clamp(58px, 5.8vw, 82px)',
           fontWeight: 700,
           fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif',
           letterSpacing: '-0.048em', lineHeight: 0.90,
@@ -511,15 +509,15 @@ export default function HeroCards() {
       <style>{`
         @media (max-width: 1200px) {
           .hero-fan {
-            transform: scale(0.80) !important;
+            transform: scale(0.82) !important;
             transform-origin: bottom center !important;
           }
         }
         @media (max-width: 960px) {
           .hero-fan {
-            transform: scale(0.60) !important;
+            transform: scale(0.64) !important;
             transform-origin: bottom center !important;
-            left: calc(50% - 530px) !important;
+            left: calc(50% - 425px) !important;
           }
           .hero-text {
             right: 50% !important;
@@ -527,16 +525,16 @@ export default function HeroCards() {
             top: auto !important;
             bottom: 16px !important;
             text-align: center !important;
-            max-width: 360px !important;
+            max-width: 340px !important;
           }
         }
         @media (max-width: 580px) {
           .hero-fan {
-            transform: scale(0.44) !important;
+            transform: scale(0.48) !important;
             transform-origin: bottom center !important;
-            left: calc(50% - 530px) !important;
+            left: calc(50% - 425px) !important;
           }
-          .hero-text h1 { font-size: 54px !important; }
+          .hero-text h1 { font-size: 48px !important; }
           .hero-text p  { white-space: normal !important; }
         }
       `}</style>
