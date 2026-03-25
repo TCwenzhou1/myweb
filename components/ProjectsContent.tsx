@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { ExternalLink, Github } from 'lucide-react'
-import { CinematicSection, PageHeader, C, FONTS } from '@/components/CinematicUI'
+import { CinematicSection, PageHeader, C, FONTS, EASE } from '@/components/CinematicUI'
 
 interface Project {
   title: string
@@ -158,23 +158,25 @@ export default function ProjectsContent() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px',
             }}
           >
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: '13px', // 放大：8px → 13px
                 fontWeight: 300,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 color: C.inkFaint,
-                opacity: 0.5,
+                opacity: 0.6,
               }}
             >
               02 — 03
             </span>
 
             {/* 场景导航 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
               <NavLink href="/lab" label="Lab" />
               <NavLink href="/games" label="Games" />
               <NavLink href="/about" label="About" />
@@ -183,11 +185,11 @@ export default function ProjectsContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: '12px', // 放大：8px → 12px
                 fontWeight: 300,
-                letterSpacing: '0.15em',
+                letterSpacing: '0.12em',
                 color: C.gold,
-                opacity: 0.4,
+                opacity: 0.5,
               }}
             >
               Scene 02 · Archive
@@ -205,29 +207,29 @@ function NavLink({ href, label }: { href: string; label: string }) {
       href={href}
       style={{
         fontFamily: FONTS.body,
-        fontSize: '8px',
+        fontSize: '13px', // 放大：8px → 13px
         fontWeight: 400,
-        letterSpacing: '0.15em',
-        color: C.inkFaint,
+        letterSpacing: '0.12em',
+        color: C.inkDim,
         textDecoration: 'none',
         textTransform: 'uppercase',
-        opacity: 0.6,
-        transition: 'all 0.25s ease',
+        opacity: 0.7,
+        transition: `all 0.3s ${EASE.focus}`,
         display: 'flex',
         alignItems: 'center',
-        gap: '6px',
+        gap: '8px',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.color = C.inkMid
         e.currentTarget.style.opacity = '1'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.color = C.inkFaint
-        e.currentTarget.style.opacity = '0.6'
+        e.currentTarget.style.color = C.inkDim
+        e.currentTarget.style.opacity = '0.7'
       }}
     >
       {label}
-      <span style={{ fontSize: '10px' }}>→</span>
+      <span style={{ fontSize: '14px', opacity: 0.6 }}>→</span>
     </a>
   )
 }
@@ -264,13 +266,13 @@ function ProjectCard({
         background: C.cardIvory,
         border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
         borderRadius: isFeatured ? '16px' : '12px',
-        padding: isFeatured ? 'clamp(32px, 4vw, 48px)' : 'clamp(20px, 2.5vw, 28px)',
-        opacity: hovered ? 1 : 0.95,
-        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
+        padding: isFeatured ? 'clamp(32px, 4vw, 48px)' : 'clamp(24px, 3vw, 32px)',
+        opacity: hovered ? 1 : 0.98,
+        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         boxShadow: hovered
           ? `0 16px 48px rgba(0,0,0,0.1), 0 0 0 0.5px ${C.goldChamp}40`
           : `0 2px 8px rgba(0,0,0,0.04)`,
-        transition: 'all 0.5s cubic-bezier(0.12,1,0.24,1)',
+        transition: `all 0.5s ${EASE.standard}`,
         overflow: 'hidden',
         cursor: 'pointer',
       }}
@@ -286,7 +288,7 @@ function ProjectCard({
           bottom: 0,
           background: `radial-gradient(circle at ${mouseX}% 30%, rgba(212,188,138,0.08) 0%, transparent 50%)`,
           opacity: hovered ? 1 : 0,
-          transition: 'opacity 0.4s ease',
+          transition: `opacity 0.5s ${EASE.standard}`,
           pointerEvents: 'none',
         }}
       />
@@ -300,7 +302,7 @@ function ProjectCard({
           border: `0.5px solid ${C.goldPale}`,
           borderRadius: isFeatured ? '8px' : '6px',
           opacity: hovered ? 0.5 : 0.15,
-          transition: 'opacity 0.5s ease',
+          transition: `opacity 0.5s ${EASE.standard}`,
           pointerEvents: 'none',
         }}
       />
@@ -326,16 +328,16 @@ function ProjectCard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            marginBottom: isFeatured ? '20px' : '14px',
+            marginBottom: isFeatured ? '20px' : '16px',
             flexWrap: 'wrap',
             gap: '12px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <h2
               style={{
                 fontFamily: FONTS.display,
-                fontSize: isFeatured ? 'clamp(22px, 2.5vw, 28px)' : 'clamp(16px, 1.8vw, 20px)',
+                fontSize: isFeatured ? 'clamp(24px, 2.8vw, 32px)' : 'clamp(18px, 2vw, 24px)', // 放大
                 fontWeight: 400,
                 letterSpacing: '-0.01em',
                 color: C.ink,
@@ -346,14 +348,14 @@ function ProjectCard({
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '7px',
+                fontSize: '11px', // 放大：7px → 11px
                 fontWeight: 500,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 color: status.color,
-                padding: '3px 8px',
+                padding: '4px 10px',
                 borderRadius: '4px',
-                background: `${status.color}12`,
+                background: `${status.color}15`,
                 border: `0.5px solid ${status.color}30`,
               }}
             >
@@ -362,7 +364,7 @@ function ProjectCard({
           </div>
 
           {/* 操作按钮 */}
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             {project.github && (
               <a
                 href={project.github}
@@ -372,13 +374,13 @@ function ProjectCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: isFeatured ? '36px' : '30px',
-                  height: isFeatured ? '36px' : '30px',
+                  width: isFeatured ? '38px' : '32px',
+                  height: isFeatured ? '38px' : '32px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
-                  color: C.inkFaint,
+                  color: C.inkDim,
                   textDecoration: 'none',
-                  transition: 'all 0.25s ease',
+                  transition: `all 0.3s ${EASE.focus}`,
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = C.goldChamp
@@ -386,11 +388,11 @@ function ProjectCard({
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = C.goldPale
-                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.color = C.inkDim
                 }}
                 aria-label="GitHub"
               >
-                <Github size={isFeatured ? 15 : 13} />
+                <Github size={isFeatured ? 16 : 14} />
               </a>
             )}
             {project.demo && (
@@ -402,13 +404,13 @@ function ProjectCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: isFeatured ? '36px' : '30px',
-                  height: isFeatured ? '36px' : '30px',
+                  width: isFeatured ? '38px' : '32px',
+                  height: isFeatured ? '38px' : '32px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
-                  color: C.inkFaint,
+                  color: C.inkDim,
                   textDecoration: 'none',
-                  transition: 'all 0.25s ease',
+                  transition: `all 0.3s ${EASE.focus}`,
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = C.goldChamp
@@ -416,45 +418,45 @@ function ProjectCard({
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = C.goldPale
-                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.color = C.inkDim
                 }}
                 aria-label="Demo"
               >
-                <ExternalLink size={isFeatured ? 15 : 13} />
+                <ExternalLink size={isFeatured ? 16 : 14} />
               </a>
             )}
           </div>
         </div>
 
-        {/* 描述 */}
+        {/* 描述 - 放大可读性 */}
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: isFeatured ? 'clamp(14px, 1.4vw, 16px)' : 'clamp(12px, 1.2vw, 14px)',
+            fontSize: isFeatured ? 'clamp(15px, 1.5vw, 17px)' : 'clamp(14px, 1.3vw, 15px)', // 放大
             fontWeight: 300,
-            lineHeight: 1.85,
+            lineHeight: 1.8,
             color: C.inkDim,
-            marginBottom: isFeatured ? '24px' : '16px',
+            marginBottom: isFeatured ? '24px' : '18px',
             maxWidth: isFeatured ? '720px' : '100%',
           }}
         >
           {project.description}
         </p>
 
-        {/* 标签 */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        {/* 标签 - 放大可读性 */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {project.tags.map((tag) => (
             <span
               key={tag}
               style={{
                 fontFamily: FONTS.body,
-                fontSize: isFeatured ? '9px' : '8px',
+                fontSize: isFeatured ? '12px' : '11px', // 放大：8-9px → 11-12px
                 fontWeight: 400,
-                letterSpacing: '0.12em',
+                letterSpacing: '0.08em',
                 color: C.inkDim,
-                padding: isFeatured ? '5px 12px' : '4px 10px',
+                padding: isFeatured ? '6px 14px' : '5px 12px',
                 borderRadius: '4px',
-                background: `${C.bgDeep}80`,
+                background: `${C.bgDeep}90`,
                 border: `0.5px solid rgba(200,190,168,0.4)`,
               }}
             >

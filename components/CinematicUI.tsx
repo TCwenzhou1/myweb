@@ -27,10 +27,23 @@ const FONTS = {
   body:    '"Jost", "Inter", system-ui, sans-serif',
 }
 
+// ─── 电影级缓动曲线 ─────────────────────────────────────────────────────────────────
+// 这些曲线让动画更像电影运镜：柔和启动、流畅推进、自然落稳
+const EASE = {
+  // 标准推进 - 用于大多数元素进入
+  standard: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  // 柔和进入 - 用于标题和重要元素
+  gentle: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  // 快速对焦 - 用于hover响应
+  focus: 'cubic-bezier(0.33, 1, 0.68, 1)',
+  // 丝滑退出 - 用于元素离开
+  exit: 'cubic-bezier(0.55, 0, 1, 0.45)',
+}
+
 // ─── 场景编号 Props ─────────────────────────────────────────────────────────────────
 interface SceneLabel {
-  chapter: string   // e.g. "01"
-  title: string    // e.g. "Projects"
+  chapter: string
+  title: string
   subtitle?: string
 }
 
@@ -39,11 +52,8 @@ interface CinematicSectionProps {
   children: React.ReactNode
   className?: string
   style?: React.CSSProperties
-  /** 场景编号（可选） */
   scene?: SceneLabel
-  /** 延迟进入（毫秒），默认 0 */
   delay?: number
-  /** 滚动触发视角，默认 '10%' */
   triggerOnce?: boolean
 }
 
@@ -57,6 +67,7 @@ export function CinematicSection({
 }: CinematicSectionProps) {
   const ref = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
+  const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
     const el = ref.current
@@ -65,18 +76,22 @@ export function CinematicSection({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true)
+          // 延迟触发，让上一个元素先进入
+          setTimeout(() => {
+            setVisible(true)
+            setHasAnimated(true)
+          }, delay)
           if (triggerOnce) observer.unobserve(el)
-        } else if (!triggerOnce) {
+        } else if (!triggerOnce && hasAnimated) {
           setVisible(false)
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -5% 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -3% 0px' }
     )
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [triggerOnce])
+  }, [delay, triggerOnce, hasAnimated])
 
   return (
     <section
@@ -85,11 +100,15 @@ export function CinematicSection({
       style={{
         ...style,
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(32px)',
-        transition: `opacity 0.9s cubic-bezier(0.12,1,0.24,1) ${delay}ms, transform 0.9s cubic-bezier(0.12,1,0.24,1) ${delay}ms`,
+        transform: visible ? 'translateY(0)' : 'translateY(40px)',
+        filter: visible ? 'blur(0px)' : 'blur(4px)',
+        transition: `
+          opacity 1.0s ${EASE.gentle},
+          transform 1.1s ${EASE.standard},
+          filter 0.8s ${EASE.gentle}
+        `,
       }}
     >
-      {/* 场景编号装饰 */}
       {scene && (
         <SceneLabelUI scene={scene} visible={visible} delay={delay} />
       )}
@@ -105,33 +124,33 @@ function SceneLabelUI({ scene, visible, delay }: { scene: SceneLabel; visible: b
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        marginBottom: '24px',
+        gap: '14px',
+        marginBottom: '20px',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateX(0)' : 'translateX(-16px)',
-        transition: `opacity 0.7s ease ${delay + 200}ms, transform 0.7s ease ${delay + 200}ms`,
+        transform: visible ? 'translateX(0)' : 'translateX(-12px)',
+        transition: `opacity 0.8s ${EASE.standard} ${delay + 150}ms, transform 0.8s ${EASE.standard} ${delay + 150}ms`,
       }}
     >
       <span
         style={{
           fontFamily: FONTS.body,
-          fontSize: '8px',
-          fontWeight: 500,
-          letterSpacing: '0.3em',
+          fontSize: '13px', // 放大：8px → 13px
+          fontWeight: 600,
+          letterSpacing: '0.2em',
           color: C.gold,
           textTransform: 'uppercase',
         }}
       >
         {scene.chapter}
       </span>
-      <div style={{ width: '24px', height: '0.5px', background: `linear-gradient(to right, ${C.gold}, transparent)`, opacity: 0.6 }} />
+      <div style={{ width: '28px', height: '0.5px', background: `linear-gradient(to right, ${C.gold}, transparent)`, opacity: 0.7 }} />
       <span
         style={{
           fontFamily: FONTS.body,
-          fontSize: '8px',
+          fontSize: '13px', // 放大：8px → 13px
           fontWeight: 400,
-          letterSpacing: '0.25em',
-          color: C.inkFaint,
+          letterSpacing: '0.18em',
+          color: C.inkDim,
           textTransform: 'uppercase',
         }}
       >
@@ -139,13 +158,13 @@ function SceneLabelUI({ scene, visible, delay }: { scene: SceneLabel; visible: b
       </span>
       {scene.subtitle && (
         <>
-          <div style={{ width: '1px', height: '10px', background: C.inkFaint, opacity: 0.3 }} />
+          <div style={{ width: '1px', height: '12px', background: C.inkFaint, opacity: 0.3 }} />
           <span
             style={{
               fontFamily: FONTS.body,
-              fontSize: '8px',
+              fontSize: '12px', // 放大：8px → 12px
               fontWeight: 300,
-              letterSpacing: '0.15em',
+              letterSpacing: '0.12em',
               color: C.inkFaint,
             }}
           >
@@ -180,7 +199,7 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
           observer.unobserve(el)
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -190,10 +209,10 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
     <div
       ref={ref}
       style={{
-        marginBottom: 'clamp(40px, 6vh, 64px)',
+        marginBottom: 'clamp(40px, 6vh, 56px)',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 1.0s cubic-bezier(0.12,1,0.24,1) ${delay}ms, transform 1.0s cubic-bezier(0.12,1,0.24,1) ${delay}ms`,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: `opacity 1.0s ${EASE.gentle} ${delay}ms, transform 1.0s ${EASE.gentle} ${delay}ms`,
       }}
     >
       {/* 场景编号 */}
@@ -203,10 +222,10 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
       <h1
         style={{
           fontFamily: FONTS.display,
-          fontSize: 'clamp(40px, 6vw, 72px)',
+          fontSize: 'clamp(44px, 7vw, 80px)', // 稍微调大
           fontWeight: 400,
           lineHeight: 1.0,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.025em',
           color: C.ink,
           marginBottom: subtitle || description ? '20px' : '0',
         }}
@@ -214,15 +233,15 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
         {title}
       </h1>
 
-      {/* 副标题 */}
+      {/* 副标题 - 放大可读性 */}
       {subtitle && (
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: 'clamp(13px, 1.4vw, 16px)',
+            fontSize: 'clamp(15px, 1.6vw, 18px)', // 放大：13-16px → 15-18px
             fontWeight: 300,
-            letterSpacing: '0.08em',
-            color: C.inkDim,
+            letterSpacing: '0.04em',
+            color: C.inkMid,
             marginBottom: description ? '16px' : '0',
           }}
         >
@@ -230,16 +249,16 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
         </p>
       )}
 
-      {/* 描述 */}
+      {/* 描述 - 放大可读性 */}
       {description && (
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: 'clamp(13px, 1.4vw, 15px)',
+            fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大：13-15px → 14-16px
             fontWeight: 300,
-            lineHeight: 1.8,
+            lineHeight: 1.75,
             color: C.inkDim,
-            maxWidth: '520px',
+            maxWidth: '560px',
           }}
         >
           {description}
@@ -249,7 +268,7 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
       {/* 标题下方装饰线 */}
       <div
         style={{
-          marginTop: '24px',
+          marginTop: '20px',
           display: 'flex',
           flexDirection: 'column',
           gap: '4px',
@@ -259,7 +278,7 @@ export function PageHeader({ title, subtitle, description, scene, delay = 0 }: P
           style={{
             height: '0.5px',
             background: `linear-gradient(to right, ${C.goldChamp}, ${C.goldPale})`,
-            opacity: 0.5,
+            opacity: 0.6,
             width: '48px',
           }}
         />
@@ -316,21 +335,21 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
         ...style,
         position: 'relative',
         background: C.cardIvory,
-        border: `0.5px solid ${hovered ? C.goldPale : 'rgba(200,190,168,0.5)'}`,
+        border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
         borderRadius: '12px',
         padding: 'clamp(24px, 3vw, 36px)',
         opacity: visible ? 1 : 0,
         transform: visible
-          ? `translateY(${hovered ? '-4px' : '0'})`
+          ? `translateY(${hovered ? '-3px' : '0'})`
           : 'translateY(24px)',
         boxShadow: hovered
-          ? `0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), 0 0 0 0.5px ${C.goldPale}40`
+          ? `0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), 0 0 0 0.5px ${C.goldPale}40`
           : `0 2px 8px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)`,
         transition: `
-          opacity 0.9s cubic-bezier(0.12,1,0.24,1) ${delay}ms,
-          transform 0.9s cubic-bezier(0.12,1,0.24,1) ${delay}ms,
-          box-shadow 0.35s ease,
-          border-color 0.35s ease
+          opacity 0.9s ${EASE.standard} ${delay}ms,
+          transform 0.9s ${EASE.standard} ${delay}ms,
+          box-shadow 0.4s ${EASE.focus},
+          border-color 0.4s ${EASE.focus}
         `,
         cursor: hoverable ? 'pointer' : 'default',
       }}
@@ -344,7 +363,7 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
           border: `0.5px solid ${C.goldPale}`,
           borderRadius: '6px',
           opacity: hovered ? 0.5 : 0.2,
-          transition: 'opacity 0.35s ease',
+          transition: `opacity 0.4s ${EASE.focus}`,
           pointerEvents: 'none',
         }}
       />
@@ -368,4 +387,4 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
 }
 
 // ─── 导出统一配色和字体 ─────────────────────────────────────────────────────────────────
-export { C, FONTS }
+export { C, FONTS, EASE }

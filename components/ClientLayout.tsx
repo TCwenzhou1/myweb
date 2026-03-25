@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -11,22 +11,31 @@ const C = {
   goldChamp:    '#D4BC8A',
   goldPale:     '#E8DCC4',
   gold:         '#A88B55',
+  inkDim:       '#5C585E',
+}
+
+// 电影级缓动
+const EASE = {
+  dissolve: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  rackFocus: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  cameraMove: 'cubic-bezier(0.16, 1, 0.3, 1)',
 }
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isHome = pathname === '/'
   const [mounted, setMounted] = useState(false)
-  const [transitioning, setTransitioning] = useState(false)
+  const [transitionState, setTransitionState] = useState<'idle' | 'exiting' | 'entering'>('idle')
   const [displayChildren, setDisplayChildren] = useState(children)
   const prevPathnameRef = useRef(pathname)
   const isFirstRender = useRef(true)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // 处理页面切换转场
+  // 处理页面切换转场 - 电影级 dissolve 效果
   useEffect(() => {
     if (!mounted) return
 
@@ -44,35 +53,35 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const prevPath = prevPathnameRef.current
     prevPathnameRef.current = pathname
 
-    // 开始转场：先淡出
-    setTransitioning(true)
+    // 开始转场：dissolve fade
+    setTransitionState('exiting')
 
-    // 300ms 后更新内容并淡入
-    const timeout = setTimeout(() => {
+    // 400ms 后淡入新内容（电影级慢淡）
+    const exitTimeout = setTimeout(() => {
       setDisplayChildren(children)
-      window.scrollTo({ top: 0, behavior: 'instant' })
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+      setTransitionState('entering')
 
-      // 短暂停顿后淡入
-      const fadeInTimeout = setTimeout(() => {
-        setTransitioning(false)
-      }, 50)
+      // 淡入完成
+      const enterTimeout = setTimeout(() => {
+        setTransitionState('idle')
+      }, 450)
 
-      return () => clearTimeout(fadeInTimeout)
-    }, 300)
+      return () => clearTimeout(enterTimeout)
+    }, 400)
 
-    return () => {
-      clearTimeout(timeout)
-    }
+    return () => clearTimeout(exitTimeout)
   }, [pathname, children, mounted])
 
-  // 确保组件卸载时重置状态
-  useEffect(() => {
-    return () => {
-      setTransitioning(false)
-    }
-  }, [])
-
   if (!mounted) return null
+
+  // 计算内容透明度 - 用于rack focus效果
+  const contentOpacity = transitionState === 'idle' ? 1 : 0
+  const contentTransform = transitionState === 'exiting'
+    ? 'scale(1.01) translateY(8px)' // 轻微后退感
+    : transitionState === 'entering'
+    ? 'scale(0.99) translateY(-4px)' // 轻微前进感
+    : 'scale(1) translateY(0)'
 
   return (
     <>
@@ -84,73 +93,72 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           top: 0,
           left: 0,
           right: 0,
-          height: '0.5px',
+          height: '1px',
           background: `linear-gradient(to right, transparent 5%, ${C.goldChamp}30 30%, ${C.goldChamp}50 50%, ${C.goldChamp}30 70%, transparent 95%)`,
           zIndex: 100,
           pointerEvents: 'none',
         }}
       />
 
-      {/* 转场遮罩层 */}
+      {/* 转场遮罩层 - 电影级淡入淡出 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
-          background: `linear-gradient(135deg, rgba(248,245,238,0.97) 0%, rgba(232,220,196,0.95) 50%, rgba(248,245,238,0.97) 100%)`,
+          background: `linear-gradient(160deg, rgba(248,245,238,0.98) 0%, rgba(240,235,225,0.97) 50%, rgba(248,245,238,0.98) 100%)`,
           zIndex: 99,
-          pointerEvents: transitioning ? 'none' : 'none', // 始终不拦截点击
-          opacity: transitioning ? 1 : 0,
-          transition: 'opacity 0.35s cubic-bezier(0.12,1,0.24,1)',
+          pointerEvents: 'none',
+          opacity: transitionState === 'idle' ? 0 : 1,
+          transition: `opacity 450ms ${EASE.dissolve}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          visibility: transitioning ? 'visible' : 'hidden', // 控制可见性
         }}
       >
-        {/* 转场中央装饰 */}
+        {/* 转场中央装饰 - 类似电影场记板 */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '16px',
-            opacity: transitioning ? 1 : 0,
-            transform: transitioning ? 'scale(1)' : 'scale(0.95)',
-            transition: 'opacity 0.3s ease, transform 0.3s ease',
+            gap: '20px',
+            opacity: transitionState === 'idle' ? 0 : 1,
+            transform: transitionState === 'idle' ? 'scale(1)' : 'scale(0.96)',
+            transition: `opacity 350ms ${EASE.dissolve} 50ms, transform 350ms ${EASE.cameraMove} 50ms`,
           }}
         >
+          {/* 装饰圆点 */}
           <div
             style={{
-              width: '8px',
-              height: '8px',
+              width: '10px',
+              height: '10px',
               borderRadius: '50%',
               background: `linear-gradient(135deg, ${C.goldChamp}, ${C.gold})`,
-              boxShadow: `0 0 12px 3px rgba(196,162,101,0.4)`,
+              boxShadow: `0 0 20px 4px rgba(196,162,101,0.35), 0 0 40px 8px rgba(196,162,101,0.15)`,
             }}
           />
-          <span
+          {/* 装饰线 */}
+          <div
             style={{
-              fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '8px',
-              fontWeight: 400,
-              letterSpacing: '0.4em',
-              color: C.gold,
-              textTransform: 'uppercase',
-              opacity: 0.7,
+              width: '40px',
+              height: '0.5px',
+              background: `linear-gradient(to right, transparent, ${C.goldChamp}60, transparent)`,
             }}
-          >
-            Loading
-          </span>
+          />
         </div>
       </div>
 
-      {/* 页面内容容器 */}
+      {/* 页面内容容器 - rack focus 效果 */}
       <div
+        ref={contentRef}
         style={{
-          opacity: transitioning ? 0 : 1,
-          transform: transitioning ? 'translateY(6px)' : 'translateY(0)',
-          transition: 'opacity 0.4s ease, transform 0.4s ease',
+          opacity: contentOpacity,
+          transform: contentTransform,
+          transition: `
+            opacity 500ms ${EASE.rackFocus},
+            transform 600ms ${EASE.cameraMove}
+          `,
         }}
       >
         {!isHome && <Navbar />}
