@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ExternalLink, Github } from 'lucide-react'
 import { CinematicSection, PageHeader, C, FONTS } from '@/components/CinematicUI'
 
@@ -12,6 +12,7 @@ interface Project {
   github?: string
   demo?: string
   year?: string
+  featured?: boolean
 }
 
 const projects: Project[] = [
@@ -23,6 +24,7 @@ const projects: Project[] = [
     status: 'wip',
     github: 'https://github.com/TCwenzhou1/sgs-ai',
     year: '2024',
+    featured: true,
   },
   {
     title: 'AI 自动化邮件回复系统',
@@ -61,27 +63,48 @@ export default function ProjectsContent() {
         overflow: 'hidden',
       }}
     >
-      {/* 背景氛围 */}
+      {/* 背景氛围 - 更强的聚光感 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
           background: `
-            radial-gradient(ellipse 60% 40% at 85% 10%, rgba(212,188,138,0.06) 0%, transparent 50%),
-            radial-gradient(ellipse 40% 30% at 15% 90%, rgba(248,245,238,0.8) 0%, transparent 50%)
+            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,252,244,0.9) 0%, transparent 50%),
+            radial-gradient(ellipse 50% 40% at 85% 15%, rgba(212,188,138,0.08) 0%, transparent 45%),
+            radial-gradient(ellipse 40% 30% at 15% 85%, rgba(248,245,238,0.6) 0%, transparent 50%)
           `,
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
 
+      {/* 大型 ♠ 水印 - 背景装饰 */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          right: '-10vw',
+          top: '30vh',
+          fontSize: 'clamp(250px, 40vw, 500px)',
+          color: 'transparent',
+          fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
+          WebkitTextStroke: '0.5px rgba(168,139,85,0.04)',
+          pointerEvents: 'none',
+          zIndex: 0,
+          letterSpacing: '-0.04em',
+          lineHeight: 1,
+        }}
+      >
+        ♠
+      </div>
+
       {/* 主内容 */}
       <div
         style={{
           position: 'relative',
           zIndex: 1,
-          maxWidth: '1100px',
+          maxWidth: '1200px',
           margin: '0 auto',
           padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
         }}
@@ -91,23 +114,42 @@ export default function ProjectsContent() {
           title="项目"
           subtitle="主线展开"
           description="正在做和做过的东西。偏工程实践方向，不追求完美，追求能跑、能验证想法、能持续迭代。"
-          scene={{ chapter: '02', title: 'Projects', subtitle: 'Archive' }}
+          scene={{ chapter: '02', title: 'Projects', subtitle: 'Collected Works' }}
         />
 
-        {/* 项目列表 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {projects.map((project, index) => {
-            const status = statusMap[project.status]
-            return (
-              <CinematicSection key={project.title} delay={index * 100}>
-                <ProjectCard project={project} status={status} />
+        {/* 档案馆布局 - 3个项目，1大2小 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* 第一个项目 - 特色档案卡（更大） */}
+          <CinematicSection delay={100}>
+            <ProjectCard
+              project={projects[0]}
+              status={statusMap[projects[0].status]}
+              variant="featured"
+            />
+          </CinematicSection>
+
+          {/* 第二、三个项目 - 横向排列 */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '20px',
+            }}
+          >
+            {projects.slice(1).map((project, index) => (
+              <CinematicSection key={project.title} delay={(index + 2) * 120}>
+                <ProjectCard
+                  project={project}
+                  status={statusMap[project.status]}
+                  variant="standard"
+                />
               </CinematicSection>
-            )
-          })}
+            ))}
+          </div>
         </div>
 
-        {/* 底部场景编号 */}
-        <CinematicSection delay={400}>
+        {/* 底部场景编号与导航 */}
+        <CinematicSection delay={500}>
           <div
             style={{
               marginTop: 'clamp(60px, 8vh, 80px)',
@@ -130,6 +172,14 @@ export default function ProjectsContent() {
             >
               02 — 03
             </span>
+
+            {/* 场景导航 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <NavLink href="/lab" label="Lab" />
+              <NavLink href="/games" label="Games" />
+              <NavLink href="/about" label="About" />
+            </div>
+
             <span
               style={{
                 fontFamily: FONTS.body,
@@ -140,7 +190,7 @@ export default function ProjectsContent() {
                 opacity: 0.4,
               }}
             >
-              Projects · Archive
+              Scene 02 · Archive
             </span>
           </div>
         </CinematicSection>
@@ -149,37 +199,108 @@ export default function ProjectsContent() {
   )
 }
 
-function ProjectCard({ project, status }: { project: Project; status: { label: string; color: string } }) {
+function NavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      style={{
+        fontFamily: FONTS.body,
+        fontSize: '8px',
+        fontWeight: 400,
+        letterSpacing: '0.15em',
+        color: C.inkFaint,
+        textDecoration: 'none',
+        textTransform: 'uppercase',
+        opacity: 0.6,
+        transition: 'all 0.25s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.color = C.inkMid
+        e.currentTarget.style.opacity = '1'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.color = C.inkFaint
+        e.currentTarget.style.opacity = '0.6'
+      }}
+    >
+      {label}
+      <span style={{ fontSize: '10px' }}>→</span>
+    </a>
+  )
+}
+
+function ProjectCard({
+  project,
+  status,
+  variant = 'standard',
+}: {
+  project: Project
+  status: { label: string; color: string }
+  variant?: 'featured' | 'standard'
+}) {
   const [hovered, setHovered] = useState(false)
+  const [mouseX, setMouseX] = useState(50)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    setMouseX(((e.clientX - rect.left) / rect.width) * 100)
+  }
+
+  const isFeatured = variant === 'featured'
 
   return (
     <div
+      ref={cardRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onMouseMove={handleMouseMove}
       style={{
         position: 'relative',
         background: C.cardIvory,
-        border: `0.5px solid ${hovered ? C.goldPale : 'rgba(200,190,168,0.5)'}`,
-        borderRadius: '12px',
-        padding: 'clamp(24px, 3vw, 36px)',
+        border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
+        borderRadius: isFeatured ? '16px' : '12px',
+        padding: isFeatured ? 'clamp(32px, 4vw, 48px)' : 'clamp(20px, 2.5vw, 28px)',
         opacity: hovered ? 1 : 0.95,
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
         boxShadow: hovered
-          ? `0 12px 40px rgba(0,0,0,0.08), 0 0 0 0.5px ${C.goldPale}30`
+          ? `0 16px 48px rgba(0,0,0,0.1), 0 0 0 0.5px ${C.goldChamp}40`
           : `0 2px 8px rgba(0,0,0,0.04)`,
-        transition: 'all 0.4s cubic-bezier(0.12,1,0.24,1)',
+        transition: 'all 0.5s cubic-bezier(0.12,1,0.24,1)',
+        overflow: 'hidden',
+        cursor: 'pointer',
       }}
     >
+      {/* 聚光效果 - 随鼠标移动 */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `radial-gradient(circle at ${mouseX}% 30%, rgba(212,188,138,0.08) 0%, transparent 50%)`,
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity 0.4s ease',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* 内层双线 */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          inset: '10px',
+          inset: isFeatured ? '14px' : '10px',
           border: `0.5px solid ${C.goldPale}`,
-          borderRadius: '6px',
-          opacity: hovered ? 0.45 : 0.15,
-          transition: 'opacity 0.4s ease',
+          borderRadius: isFeatured ? '8px' : '6px',
+          opacity: hovered ? 0.5 : 0.15,
+          transition: 'opacity 0.5s ease',
           pointerEvents: 'none',
         }}
       />
@@ -190,9 +311,9 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
         style={{
           position: 'absolute',
           inset: 0,
-          borderRadius: '12px',
+          borderRadius: isFeatured ? '16px' : '12px',
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
-          opacity: 0.5,
+          opacity: 0.6,
           pointerEvents: 'none',
         }}
       />
@@ -205,7 +326,7 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            marginBottom: '16px',
+            marginBottom: isFeatured ? '20px' : '14px',
             flexWrap: 'wrap',
             gap: '12px',
           }}
@@ -214,7 +335,7 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
             <h2
               style={{
                 fontFamily: FONTS.display,
-                fontSize: 'clamp(18px, 2vw, 22px)',
+                fontSize: isFeatured ? 'clamp(22px, 2.5vw, 28px)' : 'clamp(16px, 1.8vw, 20px)',
                 fontWeight: 400,
                 letterSpacing: '-0.01em',
                 color: C.ink,
@@ -225,7 +346,7 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: '7px',
                 fontWeight: 500,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
@@ -251,8 +372,8 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '32px',
-                  height: '32px',
+                  width: isFeatured ? '36px' : '30px',
+                  height: isFeatured ? '36px' : '30px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
                   color: C.inkFaint,
@@ -269,7 +390,7 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
                 }}
                 aria-label="GitHub"
               >
-                <Github size={14} />
+                <Github size={isFeatured ? 15 : 13} />
               </a>
             )}
             {project.demo && (
@@ -281,8 +402,8 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '32px',
-                  height: '32px',
+                  width: isFeatured ? '36px' : '30px',
+                  height: isFeatured ? '36px' : '30px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
                   color: C.inkFaint,
@@ -299,7 +420,7 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
                 }}
                 aria-label="Demo"
               >
-                <ExternalLink size={14} />
+                <ExternalLink size={isFeatured ? 15 : 13} />
               </a>
             )}
           </div>
@@ -309,12 +430,12 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: 'clamp(13px, 1.3vw, 14px)',
+            fontSize: isFeatured ? 'clamp(14px, 1.4vw, 16px)' : 'clamp(12px, 1.2vw, 14px)',
             fontWeight: 300,
             lineHeight: 1.85,
             color: C.inkDim,
-            marginBottom: '20px',
-            maxWidth: '680px',
+            marginBottom: isFeatured ? '24px' : '16px',
+            maxWidth: isFeatured ? '720px' : '100%',
           }}
         >
           {project.description}
@@ -327,11 +448,11 @@ function ProjectCard({ project, status }: { project: Project; status: { label: s
               key={tag}
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '9px',
+                fontSize: isFeatured ? '9px' : '8px',
                 fontWeight: 400,
                 letterSpacing: '0.12em',
                 color: C.inkDim,
-                padding: '4px 10px',
+                padding: isFeatured ? '5px 12px' : '4px 10px',
                 borderRadius: '4px',
                 background: `${C.bgDeep}80`,
                 border: `0.5px solid rgba(200,190,168,0.4)`,

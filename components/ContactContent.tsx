@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { Github, Mail } from 'lucide-react'
-import { CinematicSection, PageHeader, C, FONTS } from '@/components/CinematicUI'
+import { CinematicSection, C, FONTS } from '@/components/CinematicUI'
 
 export default function ContactContent() {
   return (
@@ -13,14 +14,14 @@ export default function ContactContent() {
         overflow: 'hidden',
       }}
     >
-      {/* 背景氛围 */}
+      {/* 背景氛围 - 片尾字幕的光感 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
           background: `
-            radial-gradient(ellipse 60% 50% at 50% 40%, rgba(212,188,138,0.06) 0%, transparent 55%),
+            radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,188,138,0.07) 0%, transparent 55%),
             radial-gradient(ellipse 50% 40% at 80% 90%, rgba(248,245,238,0.7) 0%, transparent 50%)
           `,
           pointerEvents: 'none',
@@ -28,17 +29,17 @@ export default function ContactContent() {
         }}
       />
 
-      {/* 大型 ♠ 水印 */}
+      {/* 大型 ♠ 水印 - 底部 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
-          left: '-8vw',
-          bottom: '15vh',
-          fontSize: 'clamp(280px, 40vw, 550px)',
+          left: '-12vw',
+          bottom: '10vh',
+          fontSize: 'clamp(280px, 40vw, 500px)',
           color: 'transparent',
           fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-          WebkitTextStroke: '0.5px rgba(168,139,85,0.05)',
+          WebkitTextStroke: '0.5px rgba(168,139,85,0.04)',
           pointerEvents: 'none',
           zIndex: 0,
           letterSpacing: '-0.04em',
@@ -53,55 +54,83 @@ export default function ContactContent() {
         style={{
           position: 'relative',
           zIndex: 1,
-          maxWidth: '640px',
+          maxWidth: '560px',
           margin: '0 auto',
           padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
         }}
       >
-        {/* 页头 */}
-        <PageHeader
-          title="联系"
-          subtitle="片尾字幕"
-          description="有想法聊聊，或者有合适的项目想一起做，都可以找我。"
-          scene={{ chapter: '06', title: 'Contact', subtitle: 'Credits' }}
-        />
-
-        {/* 联系卡片 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <CinematicSection delay={100}>
-            <ContactCard
-              icon={<Mail size={18} />}
-              label="邮箱"
-              value="hello@tcwenzhou.site"
-              href="mailto:hello@tcwenzhou.site"
-            />
-          </CinematicSection>
-
-          <CinematicSection delay={180}>
-            <ContactCard
-              icon={<Github size={18} />}
-              label="GitHub"
-              value="github.com/TCwenzhou1"
-              href="https://github.com/TCwenzhou1"
-            />
-          </CinematicSection>
-        </div>
-
-        {/* 片尾字幕风格 */}
-        <CinematicSection delay={300}>
+        {/* 顶部装饰 */}
+        <CinematicSection delay={0}>
           <div
             style={{
-              marginTop: 'clamp(80px, 10vh, 120px)',
-              paddingTop: '32px',
-              borderTop: '0.5px solid rgba(200,190,168,0.4)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: '16px',
-              textAlign: 'center',
+              marginBottom: 'clamp(48px, 8vh, 72px)',
             }}
           >
-            {/* 金色细线装饰 */}
+            {/* 场景标签 */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 500,
+                  letterSpacing: '0.3em',
+                  color: C.gold,
+                  textTransform: 'uppercase',
+                }}
+              >
+                06
+              </span>
+              <div
+                style={{
+                  width: '24px',
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.gold}, transparent)`,
+                  opacity: 0.6,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.25em',
+                  color: C.inkFaint,
+                  textTransform: 'uppercase',
+                }}
+              >
+                End Credits
+              </span>
+            </div>
+
+            {/* 主标题 */}
+            <h1
+              style={{
+                fontFamily: FONTS.display,
+                fontSize: 'clamp(36px, 5vw, 52px)',
+                fontWeight: 400,
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                color: C.ink,
+                textAlign: 'center',
+              }}
+            >
+              联系
+            </h1>
+
+            {/* 装饰 */}
             <div
               style={{
                 display: 'flex',
@@ -134,34 +163,189 @@ export default function ContactContent() {
               />
             </div>
 
-            {/* 档案编号 */}
-            <span
+            {/* 描述 */}
+            <p
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: 'clamp(13px, 1.4vw, 15px)',
                 fontWeight: 300,
-                letterSpacing: '0.3em',
-                color: C.gold,
-                opacity: 0.5,
-                textTransform: 'uppercase',
+                lineHeight: 1.8,
+                color: C.inkDim,
+                textAlign: 'center',
+                maxWidth: '380px',
               }}
             >
-              Archive · End Credits
-            </span>
+              有想法聊聊，或者有合适的项目想一起做，都可以找我。
+            </p>
+          </div>
+        </CinematicSection>
 
-            {/* 年份 */}
-            <span
+        {/* 联系卡片 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            marginBottom: 'auto',
+          }}
+        >
+          <CinematicSection delay={100}>
+            <ContactCard
+              icon={<Mail size={18} />}
+              label="邮箱"
+              value="hello@tcwenzhou.site"
+              href="mailto:hello@tcwenzhou.site"
+            />
+          </CinematicSection>
+
+          <CinematicSection delay={180}>
+            <ContactCard
+              icon={<Github size={18} />}
+              label="GitHub"
+              value="github.com/TCwenzhou1"
+              href="https://github.com/TCwenzhou1"
+            />
+          </CinematicSection>
+        </div>
+
+        {/* 片尾字幕区 */}
+        <CinematicSection delay={300}>
+          <div
+            style={{
+              marginTop: 'auto',
+              paddingTop: 'clamp(60px, 8vh, 80px)',
+            }}
+          >
+            {/* 装饰线 */}
+            <div
               style={{
-                fontFamily: FONTS.body,
-                fontSize: '9px',
-                fontWeight: 300,
-                letterSpacing: '0.2em',
-                color: C.inkFaint,
-                opacity: 0.4,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                marginBottom: '32px',
               }}
             >
-              © {new Date().getFullYear()} TCwenzhou
-            </span>
+              <div
+                style={{
+                  width: '60px',
+                  height: '0.5px',
+                  background: `linear-gradient(to right, transparent, ${C.goldChamp})`,
+                  opacity: 0.4,
+                }}
+              />
+              <div
+                style={{
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  background: C.gold,
+                  opacity: 0.5,
+                }}
+              />
+              <div
+                style={{
+                  width: '60px',
+                  height: '0.5px',
+                  background: `linear-gradient(to left, transparent, ${C.goldChamp})`,
+                  opacity: 0.4,
+                }}
+              />
+            </div>
+
+            {/* Archive 标注 */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                textAlign: 'center',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.4em',
+                  color: C.gold,
+                  opacity: 0.5,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Director&apos;s Cut · Archive
+              </span>
+
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 300,
+                  letterSpacing: '0.2em',
+                  color: C.inkFaint,
+                  opacity: 0.4,
+                }}
+              >
+                © {new Date().getFullYear()} TCwenzhou
+              </span>
+
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '7px',
+                  fontWeight: 300,
+                  letterSpacing: '0.15em',
+                  color: C.inkFaint,
+                  opacity: 0.3,
+                }}
+              >
+                tcwenzhou.site
+              </span>
+            </div>
+
+            {/* 导航回首页 */}
+            <div
+              style={{
+                marginTop: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <a
+                href="/"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '9px',
+                  fontWeight: 400,
+                  letterSpacing: '0.2em',
+                  color: C.inkFaint,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  opacity: 0.5,
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  border: `0.5px solid ${C.goldPale}40`,
+                  borderRadius: '6px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = C.inkMid
+                  e.currentTarget.style.opacity = '1'
+                  e.currentTarget.style.borderColor = C.goldChamp
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.opacity = '0.5'
+                  e.currentTarget.style.borderColor = `${C.goldPale}40`
+                }}
+              >
+                <span style={{ fontSize: '12px' }}>←</span>
+                回到开场
+              </a>
+            </div>
           </div>
         </CinematicSection>
       </div>
@@ -195,14 +379,14 @@ function ContactCard({
         gap: '20px',
         padding: 'clamp(20px, 2.5vw, 28px)',
         background: C.cardIvory,
-        border: `0.5px solid ${hovered ? C.goldPale : 'rgba(200,190,168,0.5)'}`,
+        border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
         borderRadius: '12px',
         textDecoration: 'none',
         transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
         boxShadow: hovered
-          ? `0 8px 24px rgba(0,0,0,0.06), 0 0 0 0.5px ${C.goldPale}30`
+          ? `0 12px 32px rgba(0,0,0,0.08), 0 0 0 0.5px ${C.goldChamp}30`
           : `0 2px 8px rgba(0,0,0,0.04)`,
-        transition: 'all 0.35s cubic-bezier(0.12,1,0.24,1)',
+        transition: 'all 0.4s cubic-bezier(0.12,1,0.24,1)',
       }}
     >
       {/* 图标 */}
@@ -229,9 +413,9 @@ function ContactCard({
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: '10px',
+            fontSize: '9px',
             fontWeight: 500,
-            letterSpacing: '0.2em',
+            letterSpacing: '0.25em',
             textTransform: 'uppercase',
             color: C.gold,
             marginBottom: '4px',
@@ -261,7 +445,7 @@ function ContactCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: hovered ? 0.6 : 0.3,
+          opacity: hovered ? 0.7 : 0.3,
           transition: 'opacity 0.25s ease',
         }}
       >
@@ -278,6 +462,3 @@ function ContactCard({
     </a>
   )
 }
-
-// 导入 useState
-import { useState } from 'react'

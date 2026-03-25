@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -10,6 +10,7 @@ const C = {
   bg:           '#F8F5EE',
   goldChamp:    '#D4BC8A',
   goldPale:     '#E8DCC4',
+  gold:         '#A88B55',
 }
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -18,23 +19,28 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [mounted, setMounted] = useState(false)
   const [transitioning, setTransitioning] = useState(false)
   const [displayChildren, setDisplayChildren] = useState(children)
+  const [prevPath, setPrevPath] = useState(pathname)
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   useEffect(() => {
-    // 页面切换时先淡出
-    setTransitioning(true)
-    const timer = setTimeout(() => {
-      setDisplayChildren(children)
-      // 滚动到顶部
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-      // 淡入
-      setTimeout(() => setTransitioning(false), 50)
-    }, 200)
-    return () => clearTimeout(timer)
-  }, [pathname, children])
+    if (pathname !== prevPath) {
+      // 页面切换时先淡出（带金色微光过渡）
+      setTransitioning(true)
+      setPrevPath(pathname)
+
+      const timer = setTimeout(() => {
+        setDisplayChildren(children)
+        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+        // 短暂停顿后淡入
+        setTimeout(() => setTransitioning(false), 50)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [pathname, children, prevPath])
 
   if (!mounted) return null
 
@@ -55,12 +61,65 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         }}
       />
 
+      {/* 转场遮罩层 */}
+      <div
+        ref={overlayRef}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: `linear-gradient(135deg, rgba(248,245,238,0.97) 0%, rgba(232,220,196,0.95) 50%, rgba(248,245,238,0.97) 100%)`,
+          zIndex: 99,
+          pointerEvents: transitioning ? 'all' : 'none',
+          opacity: transitioning ? 1 : 0,
+          transition: 'opacity 0.35s cubic-bezier(0.12,1,0.24,1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* 转场中央装饰 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+            opacity: transitioning ? 1 : 0,
+            transform: transitioning ? 'scale(1)' : 'scale(0.95)',
+            transition: 'opacity 0.3s ease, transform 0.3s ease',
+          }}
+        >
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${C.goldChamp}, ${C.gold})`,
+              boxShadow: `0 0 12px 3px rgba(196,162,101,0.4)`,
+            }}
+          />
+          <span
+            style={{
+              fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+              fontSize: '8px',
+              fontWeight: 400,
+              letterSpacing: '0.4em',
+              color: C.gold,
+              textTransform: 'uppercase',
+              opacity: 0.7,
+            }}
+          >
+            Loading
+          </span>
+        </div>
+      </div>
+
       {/* 页面内容容器 */}
       <div
         style={{
           opacity: transitioning ? 0 : 1,
-          transform: transitioning ? 'translateY(8px)' : 'translateY(0)',
-          transition: 'opacity 0.35s ease, transform 0.35s ease',
+          transform: transitioning ? 'translateY(6px)' : 'translateY(0)',
+          transition: 'opacity 0.4s ease, transform 0.4s ease',
         }}
       >
         {!isHome && <Navbar />}

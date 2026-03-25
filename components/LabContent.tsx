@@ -1,6 +1,6 @@
 'use client'
 
-import { CinematicSection, PageHeader, C, FONTS } from '@/components/CinematicUI'
+import { CinematicSection, C, FONTS } from '@/components/CinematicUI'
 
 export default function LabContent() {
   return (
@@ -12,18 +12,35 @@ export default function LabContent() {
         overflow: 'hidden',
       }}
     >
-      {/* 背景氛围 */}
+      {/* 背景氛围 - 工作台氛围 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
           background: `
-            radial-gradient(ellipse 60% 40% at 20% 15%, rgba(212,188,138,0.06) 0%, transparent 50%),
-            radial-gradient(ellipse 40% 35% at 75% 85%, rgba(232,196,160,0.05) 0%, transparent 50%)
+            radial-gradient(ellipse 60% 40% at 25% 20%, rgba(212,188,138,0.06) 0%, transparent 50%),
+            radial-gradient(ellipse 50% 40% at 70% 85%, rgba(232,196,160,0.05) 0%, transparent 50%)
           `,
           pointerEvents: 'none',
           zIndex: 0,
+        }}
+      />
+
+      {/* 装饰性网格线 - 工作台感 */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundImage: `
+            linear-gradient(${C.goldPale}08 1px, transparent 1px),
+            linear-gradient(90deg, ${C.goldPale}08 1px, transparent 1px)
+          `,
+          backgroundSize: '80px 80px',
+          pointerEvents: 'none',
+          zIndex: 0,
+          opacity: 0.5,
         }}
       />
 
@@ -38,25 +55,133 @@ export default function LabContent() {
         }}
       >
         {/* 页头 */}
-        <PageHeader
-          title="实验室"
-          subtitle="幕后制作"
-          description="还没做完的东西、还没想清楚的想法、纯粹用来试验的 Demo。不追求完整，只追求有趣。"
-          scene={{ chapter: '03', title: 'Lab', subtitle: 'Workshop' }}
-        />
+        <CinematicSection delay={0}>
+          <div style={{ marginBottom: 'clamp(40px, 6vh, 64px)' }}>
+            {/* 场景标签 */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                marginBottom: '20px',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 500,
+                  letterSpacing: '0.3em',
+                  color: C.gold,
+                  textTransform: 'uppercase',
+                }}
+              >
+                03
+              </span>
+              <div
+                style={{
+                  width: '24px',
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.gold}, transparent)`,
+                  opacity: 0.6,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.25em',
+                  color: C.inkFaint,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Workshop
+              </span>
+            </div>
 
-        {/* 实验项目区 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <CinematicSection delay={100}>
-            <PlaceholderDemo
-              title="空位预留中"
-              description="会在这里放一些正在实验的东西。"
-              status="待填充"
-            />
-          </CinematicSection>
-        </div>
+            {/* 主标题 */}
+            <h1
+              style={{
+                fontFamily: FONTS.display,
+                fontSize: 'clamp(36px, 5vw, 56px)',
+                fontWeight: 400,
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                color: C.ink,
+                marginBottom: '16px',
+              }}
+            >
+              实验室
+            </h1>
 
-        {/* 底部场景编号 */}
+            {/* 副标题 */}
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: 'clamp(13px, 1.4vw, 16px)',
+                fontWeight: 300,
+                letterSpacing: '0.04em',
+                color: C.inkDim,
+                marginBottom: '20px',
+              }}
+            >
+              幕后制作
+            </p>
+
+            {/* 装饰线 */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+              }}
+            >
+              <div
+                style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.goldChamp}, ${C.goldPale})`,
+                  opacity: 0.5,
+                  width: '40px',
+                }}
+              />
+              <div
+                style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.ink}, transparent)`,
+                  opacity: 0.06,
+                  width: '100%',
+                }}
+              />
+            </div>
+
+            {/* 描述 */}
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: 'clamp(13px, 1.4vw, 15px)',
+                fontWeight: 300,
+                lineHeight: 1.8,
+                color: C.inkDim,
+                maxWidth: '480px',
+                marginTop: '20px',
+              }}
+            >
+              还没做完的东西、还没想清楚的想法、纯粹用来试验的 Demo。不追求完整，只追求有趣。
+            </p>
+          </div>
+        </CinematicSection>
+
+        {/* 空位预留 - 工作台风格 */}
+        <CinematicSection delay={150}>
+          <PlaceholderDemo
+            title="空位预留中"
+            description="会在这里放一些正在实验的东西。"
+            status="待填充"
+          />
+        </CinematicSection>
+
+        {/* 底部场景编号与导航 */}
         <CinematicSection delay={300}>
           <div
             style={{
@@ -80,6 +205,65 @@ export default function LabContent() {
             >
               03 — 04
             </span>
+
+            {/* 导航 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <a
+                href="/projects"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.15em',
+                  color: C.inkFaint,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  opacity: 0.6,
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = C.inkMid
+                  e.currentTarget.style.opacity = '1'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.opacity = '0.6'
+                }}
+              >
+                ← Projects
+              </a>
+              <a
+                href="/games"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.15em',
+                  color: C.inkFaint,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  opacity: 0.6,
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = C.inkMid
+                  e.currentTarget.style.opacity = '1'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.opacity = '0.6'
+                }}
+              >
+                Games →
+              </a>
+            </div>
+
             <span
               style={{
                 fontFamily: FONTS.body,

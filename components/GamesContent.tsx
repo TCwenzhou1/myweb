@@ -1,19 +1,6 @@
 'use client'
 
-import { CinematicSection, PageHeader, C, FONTS } from '@/components/CinematicUI'
-
-// 统一配色
-const GameC = {
-  cardBg:     '#FAF8F3',
-  goldChamp:  '#D4BC8A',
-  goldPale:   '#E8DCC4',
-  gold:       '#A88B55',
-  ink:        '#0F0E10',
-  inkDim:     '#5C585E',
-  inkFaint:   '#9A9599',
-  bg:         '#F8F5EE',
-  bgDeep:     '#E8E2D6',
-}
+import { CinematicSection, C, FONTS } from '@/components/CinematicUI'
 
 export default function GamesContent() {
   return (
@@ -25,14 +12,14 @@ export default function GamesContent() {
         overflow: 'hidden',
       }}
     >
-      {/* 背景氛围 */}
+      {/* 背景氛围 - 更有活力但不张扬 */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
           background: `
-            radial-gradient(ellipse 50% 40% at 50% 20%, rgba(212,188,138,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse 50% 40% at 50% 15%, rgba(212,188,138,0.08) 0%, transparent 55%),
             radial-gradient(ellipse 60% 50% at 80% 80%, rgba(248,245,238,0.6) 0%, transparent 50%)
           `,
           pointerEvents: 'none',
@@ -45,12 +32,12 @@ export default function GamesContent() {
         aria-hidden
         style={{
           position: 'fixed',
-          right: '-5vw',
-          top: '20vh',
-          fontSize: 'clamp(300px, 45vw, 600px)',
+          right: '-8vw',
+          top: '25vh',
+          fontSize: 'clamp(280px, 42vw, 550px)',
           color: 'transparent',
           fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-          WebkitTextStroke: '0.5px rgba(168,139,85,0.06)',
+          WebkitTextStroke: '0.5px rgba(168,139,85,0.05)',
           pointerEvents: 'none',
           zIndex: 0,
           letterSpacing: '-0.04em',
@@ -71,15 +58,131 @@ export default function GamesContent() {
         }}
       >
         {/* 页头 */}
-        <PageHeader
-          title="游戏"
-          subtitle="节奏变化"
-          description="对游戏开发有长期兴趣，这里是可以直接试玩或查看的内容。目前还在早期阶段，会陆续补充。"
-          scene={{ chapter: '04', title: 'Games', subtitle: 'Playable' }}
-        />
+        <CinematicSection delay={0}>
+          <div style={{ marginBottom: 'clamp(40px, 6vh, 64px)' }}>
+            {/* 场景标签 */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                marginBottom: '20px',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 500,
+                  letterSpacing: '0.3em',
+                  color: C.gold,
+                  textTransform: 'uppercase',
+                }}
+              >
+                04
+              </span>
+              <div
+                style={{
+                  width: '24px',
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.gold}, transparent)`,
+                  opacity: 0.6,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.25em',
+                  color: C.inkFaint,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Playable
+              </span>
+            </div>
+
+            {/* 主标题 */}
+            <h1
+              style={{
+                fontFamily: FONTS.display,
+                fontSize: 'clamp(36px, 5vw, 56px)',
+                fontWeight: 400,
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                color: C.ink,
+                marginBottom: '16px',
+              }}
+            >
+              游戏
+            </h1>
+
+            {/* 副标题 */}
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: 'clamp(13px, 1.4vw, 16px)',
+                fontWeight: 300,
+                letterSpacing: '0.04em',
+                color: C.inkDim,
+                marginBottom: '20px',
+              }}
+            >
+              节奏变化
+            </p>
+
+            {/* 装饰线 */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+              }}
+            >
+              <div
+                style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.goldChamp}, ${C.goldPale})`,
+                  opacity: 0.5,
+                  width: '40px',
+                }}
+              />
+              <div
+                style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.ink}, transparent)`,
+                  opacity: 0.06,
+                  width: '100%',
+                }}
+              />
+            </div>
+
+            {/* 描述 */}
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: 'clamp(13px, 1.4vw, 15px)',
+                fontWeight: 300,
+                lineHeight: 1.8,
+                color: C.inkDim,
+                maxWidth: '480px',
+                marginTop: '20px',
+              }}
+            >
+              对游戏开发有长期兴趣，这里是可以直接试玩或查看的内容。目前还在早期阶段，会陆续补充。
+            </p>
+          </div>
+        </CinematicSection>
 
         {/* 游戏卡片区 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
           <CinematicSection delay={100}>
             <PlaceholderGame
               title="即将到来"
@@ -89,7 +192,7 @@ export default function GamesContent() {
           </CinematicSection>
         </div>
 
-        {/* 底部场景编号 */}
+        {/* 底部场景编号与导航 */}
         <CinematicSection delay={300}>
           <div
             style={{
@@ -113,6 +216,65 @@ export default function GamesContent() {
             >
               04 — 05
             </span>
+
+            {/* 导航 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <a
+                href="/lab"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.15em',
+                  color: C.inkFaint,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  opacity: 0.6,
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = C.inkMid
+                  e.currentTarget.style.opacity = '1'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.opacity = '0.6'
+                }}
+              >
+                ← Lab
+              </a>
+              <a
+                href="/about"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '8px',
+                  fontWeight: 400,
+                  letterSpacing: '0.15em',
+                  color: C.inkFaint,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  opacity: 0.6,
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = C.inkMid
+                  e.currentTarget.style.opacity = '1'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = C.inkFaint
+                  e.currentTarget.style.opacity = '0.6'
+                }}
+              >
+                About →
+              </a>
+            </div>
+
             <span
               style={{
                 fontFamily: FONTS.body,
@@ -123,7 +285,7 @@ export default function GamesContent() {
                 opacity: 0.4,
               }}
             >
-              Games · Playable Chapter
+              Games · Playable
             </span>
           </div>
         </CinematicSection>
@@ -137,7 +299,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
     <div
       style={{
         position: 'relative',
-        background: GameC.cardBg,
+        background: C.cardIvory,
         border: `0.5px solid rgba(200,190,168,0.5)`,
         borderRadius: '12px',
         padding: 'clamp(48px, 6vw, 72px)',
@@ -156,7 +318,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
         style={{
           position: 'absolute',
           inset: '16px',
-          border: `0.5px solid ${GameC.goldPale}`,
+          border: `0.5px solid ${C.goldPale}`,
           borderRadius: '8px',
           opacity: 0.2,
           pointerEvents: 'none',
@@ -182,7 +344,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           width: '48px',
           height: '48px',
           borderRadius: '12px',
-          border: `1px dashed ${GameC.goldChamp}`,
+          border: `1px dashed ${C.goldChamp}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -194,7 +356,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           style={{
             fontFamily: '"Bodoni Moda", serif',
             fontSize: '24px',
-            color: GameC.gold,
+            color: C.gold,
             opacity: 0.4,
           }}
         >
@@ -208,7 +370,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           fontFamily: FONTS.display,
           fontSize: 'clamp(18px, 2.5vw, 24px)',
           fontWeight: 400,
-          color: GameC.ink,
+          color: C.ink,
           marginBottom: '8px',
           letterSpacing: '-0.01em',
         }}
@@ -222,7 +384,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           fontFamily: FONTS.body,
           fontSize: '13px',
           fontWeight: 300,
-          color: GameC.inkDim,
+          color: C.inkDim,
           marginBottom: '16px',
         }}
       >
@@ -237,11 +399,11 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           fontWeight: 500,
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
-          color: GameC.gold,
+          color: C.gold,
           padding: '4px 12px',
           borderRadius: '4px',
-          border: `0.5px solid ${GameC.goldChamp}50`,
-          background: `${GameC.goldChamp}10`,
+          border: `0.5px solid ${C.goldChamp}50`,
+          background: `${C.goldChamp}10`,
         }}
       >
         {status}
