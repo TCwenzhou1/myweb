@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -19,28 +19,58 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [mounted, setMounted] = useState(false)
   const [transitioning, setTransitioning] = useState(false)
   const [displayChildren, setDisplayChildren] = useState(children)
-  const [prevPath, setPrevPath] = useState(pathname)
-  const overlayRef = useRef<HTMLDivElement>(null)
+  const prevPathnameRef = useRef(pathname)
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // 处理页面切换转场
   useEffect(() => {
-    if (pathname !== prevPath) {
-      // 页面切换时先淡出（带金色微光过渡）
-      setTransitioning(true)
-      setPrevPath(pathname)
+    if (!mounted) return
 
-      const timer = setTimeout(() => {
-        setDisplayChildren(children)
-        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-        // 短暂停顿后淡入
-        setTimeout(() => setTransitioning(false), 50)
-      }, 300)
-      return () => clearTimeout(timer)
+    // 首次渲染不触发转场
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      prevPathnameRef.current = pathname
+      setDisplayChildren(children)
+      return
     }
-  }, [pathname, children, prevPath])
+
+    // 路径没变化，不处理
+    if (pathname === prevPathnameRef.current) return
+
+    const prevPath = prevPathnameRef.current
+    prevPathnameRef.current = pathname
+
+    // 开始转场：先淡出
+    setTransitioning(true)
+
+    // 300ms 后更新内容并淡入
+    const timeout = setTimeout(() => {
+      setDisplayChildren(children)
+      window.scrollTo({ top: 0, behavior: 'instant' })
+
+      // 短暂停顿后淡入
+      const fadeInTimeout = setTimeout(() => {
+        setTransitioning(false)
+      }, 50)
+
+      return () => clearTimeout(fadeInTimeout)
+    }, 300)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [pathname, children, mounted])
+
+  // 确保组件卸载时重置状态
+  useEffect(() => {
+    return () => {
+      setTransitioning(false)
+    }
+  }, [])
 
   if (!mounted) return null
 
@@ -63,18 +93,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       {/* 转场遮罩层 */}
       <div
-        ref={overlayRef}
+        aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
           background: `linear-gradient(135deg, rgba(248,245,238,0.97) 0%, rgba(232,220,196,0.95) 50%, rgba(248,245,238,0.97) 100%)`,
           zIndex: 99,
-          pointerEvents: transitioning ? 'all' : 'none',
+          pointerEvents: transitioning ? 'none' : 'none', // 始终不拦截点击
           opacity: transitioning ? 1 : 0,
           transition: 'opacity 0.35s cubic-bezier(0.12,1,0.24,1)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          visibility: transitioning ? 'visible' : 'hidden', // 控制可见性
         }}
       >
         {/* 转场中央装饰 */}
