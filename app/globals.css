@@ -4,17 +4,17 @@
 
 @layer base {
   :root {
-    /* 华丽编辑美学暖象牙 #F5F2EC */
-    --background: 38 12% 94.5%;
+    /* 暖象牙白底 - Royal Archive 核心色 */
+    --background: 38 18% 95%;
     --foreground: 250 8% 6%;
     /* 深灰主色，无蓝色 */
     --primary: 250 5% 8%;
-    --primary-foreground: 38 12% 94.5%;
-    --secondary: 38 10% 88%;
+    --primary-foreground: 38 18% 95%;
+    --secondary: 38 12% 90%;
     --secondary-foreground: 250 5% 18%;
-    /* 暖金色点缀 */
+    /* 古典金点缀 */
     --accent: 38 45% 50%;
-    --accent-foreground: 38 12% 94.5%;
+    --accent-foreground: 38 18% 95%;
     --muted: 38 10% 88%;
     --muted-foreground: 38 8% 46%;
     --border: 38 10% 82%;
@@ -36,11 +36,13 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* 奢华纸本质感 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.012'/%3E%3C/svg%3E");
   }
 
   /* 简洁滚动条 */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -108,11 +110,6 @@
                       radial-gradient(circle at 80% 80%, rgba(240,220,255,0.18) 0%, transparent 50%);
   }
 
-  /* 点缀色文字 */
-  .text-accent-blue {
-    color: hsl(var(--primary));
-  }
-
   /* 标签样式 */
   .tag {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
@@ -120,4 +117,25 @@
     color: hsl(var(--secondary-foreground));
     border: 1px solid hsl(var(--border));
   }
+}
+
+/* 全局页面切换动画 */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.12,1,0.24,1), transform 0.6s cubic-bezier(0.12,1,0.24,1);
+}
+
+/* 统一 hover 光标效果 */
+.cinematic-hover {
+  transition: all 0.35s cubic-bezier(0.12,1,0.24,1);
+}
+
+.cinematic-hover:hover {
+  transform: translateY(-2px);
 }
