@@ -24,6 +24,11 @@ const C = {
   goldPale:     '#E8DCC4',
 }
 
+// 电影级缓动
+const EASE = {
+  focus: 'cubic-bezier(0.33, 1, 0.68, 1)',
+}
+
 const Footer = () => {
   return (
     <footer
@@ -91,7 +96,7 @@ const Footer = () => {
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '12px',
+                fontSize: '13px', // 放大：12px → 13px
                 fontWeight: 300,
                 lineHeight: 1.7,
                 color: C.inkDim,
@@ -109,9 +114,9 @@ const Footer = () => {
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '8px',
+                fontSize: '11px', // 放大：8px → 11px
                 fontWeight: 500,
-                letterSpacing: '0.35em',
+                letterSpacing: '0.3em',
                 color: C.gold,
                 textTransform: 'uppercase',
                 marginBottom: '16px',
@@ -119,19 +124,19 @@ const Footer = () => {
             >
               Archive
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '12px',
+                    fontSize: '13px', // 放大：12px → 13px
                     fontWeight: 300,
-                    letterSpacing: '0.08em',
+                    letterSpacing: '0.06em',
                     color: C.inkFaint,
                     textDecoration: 'none',
-                    transition: 'color 0.25s ease',
+                    transition: `color 0.3s ${EASE.focus}`,
                   }}
                   onMouseEnter={e => (e.currentTarget.style.color = C.inkMid)}
                   onMouseLeave={e => (e.currentTarget.style.color = C.inkFaint)}
@@ -147,9 +152,9 @@ const Footer = () => {
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '8px',
+                fontSize: '11px', // 放大：8px → 11px
                 fontWeight: 500,
-                letterSpacing: '0.35em',
+                letterSpacing: '0.3em',
                 color: C.gold,
                 textTransform: 'uppercase',
                 marginBottom: '16px',
@@ -157,7 +162,7 @@ const Footer = () => {
             >
               Connect
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <a
                 href="https://github.com/TCwenzhou1"
                 target="_blank"
@@ -167,18 +172,18 @@ const Footer = () => {
                   alignItems: 'center',
                   gap: '10px',
                   textDecoration: 'none',
-                  transition: 'opacity 0.25s ease',
+                  transition: `opacity 0.3s ${EASE.focus}`,
                 }}
                 onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
                 onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
               >
-                <Github size={14} color={C.inkDim} />
+                <Github size={15} color={C.inkDim} />
                 <span
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '12px',
+                    fontSize: '13px', // 放大：12px → 13px
                     fontWeight: 300,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.02em',
                     color: C.inkDim,
                   }}
                 >
@@ -192,18 +197,18 @@ const Footer = () => {
                   alignItems: 'center',
                   gap: '10px',
                   textDecoration: 'none',
-                  transition: 'opacity 0.25s ease',
+                  transition: `opacity 0.3s ${EASE.focus}`,
                 }}
                 onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
                 onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
               >
-                <Mail size={14} color={C.inkDim} />
+                <Mail size={15} color={C.inkDim} />
                 <span
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '12px',
+                    fontSize: '13px', // 放大：12px → 13px
                     fontWeight: 300,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.02em',
                     color: C.inkDim,
                   }}
                 >
@@ -231,9 +236,9 @@ const Footer = () => {
             <span
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '8px',
+                fontSize: '11px', // 放大：8px → 11px
                 fontWeight: 300,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 color: C.inkFaint,
                 opacity: 0.6,
               }}
@@ -243,9 +248,9 @@ const Footer = () => {
             <span
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '8px',
+                fontSize: '10px', // 放大：8px → 10px
                 fontWeight: 300,
-                letterSpacing: '0.15em',
+                letterSpacing: '0.12em',
                 color: C.gold,
                 opacity: 0.5,
               }}
@@ -258,9 +263,9 @@ const Footer = () => {
           <span
             style={{
               fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '8px',
+              fontSize: '10px', // 放大：8px → 10px
               fontWeight: 300,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.1em',
               color: C.inkFaint,
               opacity: 0.4,
             }}

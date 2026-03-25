@@ -1,6 +1,6 @@
 'use client'
 
-import { CinematicSection, C, FONTS } from '@/components/CinematicUI'
+import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
 
 export default function LabContent() {
   return (
@@ -62,16 +62,16 @@ export default function LabContent() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
+                gap: '14px',
                 marginBottom: '20px',
               }}
             >
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
-                  fontWeight: 500,
-                  letterSpacing: '0.3em',
+                  fontSize: '13px', // 放大：8px → 13px
+                  fontWeight: 600,
+                  letterSpacing: '0.2em',
                   color: C.gold,
                   textTransform: 'uppercase',
                 }}
@@ -80,19 +80,19 @@ export default function LabContent() {
               </span>
               <div
                 style={{
-                  width: '24px',
+                  width: '28px',
                   height: '0.5px',
                   background: `linear-gradient(to right, ${C.gold}, transparent)`,
-                  opacity: 0.6,
+                  opacity: 0.7,
                 }}
               />
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '13px', // 放大：8px → 13px
                   fontWeight: 400,
-                  letterSpacing: '0.25em',
-                  color: C.inkFaint,
+                  letterSpacing: '0.18em',
+                  color: C.inkDim,
                   textTransform: 'uppercase',
                 }}
               >
@@ -104,7 +104,7 @@ export default function LabContent() {
             <h1
               style={{
                 fontFamily: FONTS.display,
-                fontSize: 'clamp(36px, 5vw, 56px)',
+                fontSize: 'clamp(40px, 6vw, 64px)',
                 fontWeight: 400,
                 lineHeight: 1.05,
                 letterSpacing: '-0.02em',
@@ -119,10 +119,10 @@ export default function LabContent() {
             <p
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(13px, 1.4vw, 16px)',
+                fontSize: 'clamp(15px, 1.6vw, 18px)', // 放大
                 fontWeight: 300,
                 letterSpacing: '0.04em',
-                color: C.inkDim,
+                color: C.inkMid,
                 marginBottom: '20px',
               }}
             >
@@ -141,8 +141,8 @@ export default function LabContent() {
                 style={{
                   height: '0.5px',
                   background: `linear-gradient(to right, ${C.goldChamp}, ${C.goldPale})`,
-                  opacity: 0.5,
-                  width: '40px',
+                  opacity: 0.6,
+                  width: '48px',
                 }}
               />
               <div
@@ -159,7 +159,7 @@ export default function LabContent() {
             <p
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(13px, 1.4vw, 15px)',
+                fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大
                 fontWeight: 300,
                 lineHeight: 1.8,
                 color: C.inkDim,
@@ -191,46 +191,48 @@ export default function LabContent() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px',
             }}
           >
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: '13px', // 放大：8px → 13px
                 fontWeight: 300,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 color: C.inkFaint,
-                opacity: 0.5,
+                opacity: 0.6,
               }}
             >
               03 — 04
             </span>
 
             {/* 导航 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
               <a
                 href="/projects"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '13px', // 放大：8px → 13px
                   fontWeight: 400,
-                  letterSpacing: '0.15em',
-                  color: C.inkFaint,
+                  letterSpacing: '0.12em',
+                  color: C.inkDim,
                   textDecoration: 'none',
                   textTransform: 'uppercase',
-                  opacity: 0.6,
-                  transition: 'all 0.25s ease',
+                  opacity: 0.7,
+                  transition: `all 0.3s ${EASE.focus}`,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.color = C.inkMid
                   e.currentTarget.style.opacity = '1'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.color = C.inkFaint
-                  e.currentTarget.style.opacity = '0.6'
+                  e.currentTarget.style.color = C.inkDim
+                  e.currentTarget.style.opacity = '0.7'
                 }}
               >
                 ← Projects
@@ -239,25 +241,25 @@ export default function LabContent() {
                 href="/games"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '13px', // 放大：8px → 13px
                   fontWeight: 400,
-                  letterSpacing: '0.15em',
-                  color: C.inkFaint,
+                  letterSpacing: '0.12em',
+                  color: C.inkDim,
                   textDecoration: 'none',
                   textTransform: 'uppercase',
-                  opacity: 0.6,
-                  transition: 'all 0.25s ease',
+                  opacity: 0.7,
+                  transition: `all 0.3s ${EASE.focus}`,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.color = C.inkMid
                   e.currentTarget.style.opacity = '1'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.color = C.inkFaint
-                  e.currentTarget.style.opacity = '0.6'
+                  e.currentTarget.style.color = C.inkDim
+                  e.currentTarget.style.opacity = '0.7'
                 }}
               >
                 Games →
@@ -267,11 +269,11 @@ export default function LabContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '8px',
+                fontSize: '12px', // 放大：8px → 12px
                 fontWeight: 300,
-                letterSpacing: '0.15em',
+                letterSpacing: '0.12em',
                 color: C.gold,
-                opacity: 0.4,
+                opacity: 0.5,
               }}
             >
               Lab · Workshop
@@ -357,7 +359,7 @@ function PlaceholderDemo({ title, description, status }: { title: string; descri
       <h3
         style={{
           fontFamily: FONTS.display,
-          fontSize: 'clamp(18px, 2.5vw, 24px)',
+          fontSize: 'clamp(20px, 2.5vw, 26px)', // 放大
           fontWeight: 400,
           color: C.ink,
           marginBottom: '8px',
@@ -371,7 +373,7 @@ function PlaceholderDemo({ title, description, status }: { title: string; descri
       <p
         style={{
           fontFamily: FONTS.body,
-          fontSize: '13px',
+          fontSize: 'clamp(14px, 1.3vw, 15px)', // 放大：13px → 14-15px
           fontWeight: 300,
           color: C.inkDim,
           marginBottom: '16px',
@@ -384,12 +386,12 @@ function PlaceholderDemo({ title, description, status }: { title: string; descri
       <span
         style={{
           fontFamily: FONTS.body,
-          fontSize: '8px',
+          fontSize: '11px', // 放大：8px → 11px
           fontWeight: 500,
-          letterSpacing: '0.3em',
+          letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color: C.gold,
-          padding: '4px 12px',
+          padding: '5px 14px',
           borderRadius: '4px',
           border: `0.5px solid ${C.goldChamp}50`,
           background: `${C.goldChamp}10`,

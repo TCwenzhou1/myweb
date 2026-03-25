@@ -25,6 +25,11 @@ const C = {
   goldPale:     '#E8DCC4',
 }
 
+// 电影级缓动
+const EASE = {
+  focus: 'cubic-bezier(0.33, 1, 0.68, 1)',
+}
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -39,7 +44,6 @@ const Navbar = () => {
 
   useEffect(() => {
     setIsOpen(false)
-    // 延迟显示，形成淡入效果
     const t = setTimeout(() => setIsVisible(true), 300)
     return () => clearTimeout(t)
   }, [pathname])
@@ -133,35 +137,28 @@ const Navbar = () => {
                   borderBottom: isActive
                     ? `0.5px solid ${C.gold}`
                     : '0.5px solid transparent',
-                  transition: 'all 0.3s ease',
+                  transition: `all 0.3s ${EASE.focus}`,
                 }}
                 onMouseEnter={e => {
                   if (!isActive) {
                     e.currentTarget.style.borderBottomColor = 'rgba(168,139,85,0.35)'
-                    e.currentTarget.querySelector('.nav-label')!.setAttribute('style',
-                      `fontFamily: "Jost", "Inter", system-ui, sans-serif; fontSize: 10px; fontWeight: 400; letterSpacing: 0.1em; color: ${C.inkMid}; transition: color 0.3s ease;`
-                    )
                   }
                 }}
                 onMouseLeave={e => {
                   if (!isActive) {
                     e.currentTarget.style.borderBottomColor = 'transparent'
-                    e.currentTarget.querySelector('.nav-label')!.setAttribute('style',
-                      `fontFamily: "Jost", "Inter", system-ui, sans-serif; fontSize: 10px; fontWeight: 400; letterSpacing: 0.1em; color: ${C.inkFaint}; transition: color 0.3s ease;`
-                    )
                   }
                 }}
               >
                 <span
-                  className="nav-label"
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '10px',
+                    fontSize: '11px', // 放大：10px → 11px
                     fontWeight: 400,
                     letterSpacing: '0.1em',
                     color: isActive ? C.inkMid : C.inkFaint,
                     textTransform: 'uppercase',
-                    transition: 'color 0.3s ease',
+                    transition: `color 0.3s ${EASE.focus}`,
                   }}
                 >
                   {item.label}
@@ -254,15 +251,15 @@ const Navbar = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: '12px 0',
+                    padding: '14px 0',
                     borderBottom: '0.5px solid rgba(200,190,168,0.3)',
                   }}
                 >
                   <span style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '9px',
+                    fontSize: '11px', // 放大：9px → 11px
                     fontWeight: 500,
-                    letterSpacing: '0.25em',
+                    letterSpacing: '0.2em',
                     color: C.gold,
                     width: '24px',
                   }}>
@@ -270,7 +267,7 @@ const Navbar = () => {
                   </span>
                   <span style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '13px',
+                    fontSize: '14px', // 放大：13px → 14px
                     fontWeight: isActive ? 500 : 400,
                     letterSpacing: '0.08em',
                     color: isActive ? C.ink : C.inkDim,

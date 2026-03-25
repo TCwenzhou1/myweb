@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Github, Mail } from 'lucide-react'
-import { CinematicSection, C, FONTS } from '@/components/CinematicUI'
+import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
 
 export default function ContactContent() {
   return (
@@ -78,15 +78,15 @@ export default function ContactContent() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
+                gap: '14px',
               }}
             >
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
-                  fontWeight: 500,
-                  letterSpacing: '0.3em',
+                  fontSize: '13px', // 放大：8px → 13px
+                  fontWeight: 600,
+                  letterSpacing: '0.2em',
                   color: C.gold,
                   textTransform: 'uppercase',
                 }}
@@ -95,19 +95,19 @@ export default function ContactContent() {
               </span>
               <div
                 style={{
-                  width: '24px',
+                  width: '28px',
                   height: '0.5px',
                   background: `linear-gradient(to right, ${C.gold}, transparent)`,
-                  opacity: 0.6,
+                  opacity: 0.7,
                 }}
               />
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '13px', // 放大：8px → 13px
                   fontWeight: 400,
-                  letterSpacing: '0.25em',
-                  color: C.inkFaint,
+                  letterSpacing: '0.18em',
+                  color: C.inkDim,
                   textTransform: 'uppercase',
                 }}
               >
@@ -119,7 +119,7 @@ export default function ContactContent() {
             <h1
               style={{
                 fontFamily: FONTS.display,
-                fontSize: 'clamp(36px, 5vw, 52px)',
+                fontSize: 'clamp(40px, 6vw, 60px)',
                 fontWeight: 400,
                 lineHeight: 1.05,
                 letterSpacing: '-0.02em',
@@ -167,7 +167,7 @@ export default function ContactContent() {
             <p
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(13px, 1.4vw, 15px)',
+                fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大：13-15px → 14-16px
                 fontWeight: 300,
                 lineHeight: 1.8,
                 color: C.inkDim,
@@ -231,7 +231,7 @@ export default function ContactContent() {
                   width: '60px',
                   height: '0.5px',
                   background: `linear-gradient(to right, transparent, ${C.goldChamp})`,
-                  opacity: 0.4,
+                  opacity: 0.5,
                 }}
               />
               <div
@@ -240,7 +240,7 @@ export default function ContactContent() {
                   height: '5px',
                   borderRadius: '50%',
                   background: C.gold,
-                  opacity: 0.5,
+                  opacity: 0.6,
                 }}
               />
               <div
@@ -248,7 +248,7 @@ export default function ContactContent() {
                   width: '60px',
                   height: '0.5px',
                   background: `linear-gradient(to left, transparent, ${C.goldChamp})`,
-                  opacity: 0.4,
+                  opacity: 0.5,
                 }}
               />
             </div>
@@ -266,11 +266,11 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '11px', // 放大：8px → 11px
                   fontWeight: 400,
-                  letterSpacing: '0.4em',
+                  letterSpacing: '0.35em',
                   color: C.gold,
-                  opacity: 0.5,
+                  opacity: 0.6,
                   textTransform: 'uppercase',
                 }}
               >
@@ -280,11 +280,11 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '8px',
+                  fontSize: '12px', // 放大：8px → 12px
                   fontWeight: 300,
-                  letterSpacing: '0.2em',
+                  letterSpacing: '0.15em',
                   color: C.inkFaint,
-                  opacity: 0.4,
+                  opacity: 0.5,
                 }}
               >
                 © {new Date().getFullYear()} TCwenzhou
@@ -293,11 +293,11 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '7px',
+                  fontSize: '11px', // 放大：7px → 11px
                   fontWeight: 300,
-                  letterSpacing: '0.15em',
+                  letterSpacing: '0.12em',
                   color: C.inkFaint,
-                  opacity: 0.3,
+                  opacity: 0.4,
                 }}
               >
                 tcwenzhou.site
@@ -316,19 +316,19 @@ export default function ContactContent() {
                 href="/"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '9px',
+                  fontSize: '12px', // 放大：9px → 12px
                   fontWeight: 400,
-                  letterSpacing: '0.2em',
-                  color: C.inkFaint,
+                  letterSpacing: '0.15em',
+                  color: C.inkDim,
                   textDecoration: 'none',
                   textTransform: 'uppercase',
-                  opacity: 0.5,
-                  transition: 'all 0.25s ease',
+                  opacity: 0.7,
+                  transition: `all 0.3s ${EASE.focus}`,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 16px',
-                  border: `0.5px solid ${C.goldPale}40`,
+                  gap: '10px',
+                  padding: '10px 20px',
+                  border: `0.5px solid ${C.goldPale}50`,
                   borderRadius: '6px',
                 }}
                 onMouseEnter={e => {
@@ -337,12 +337,12 @@ export default function ContactContent() {
                   e.currentTarget.style.borderColor = C.goldChamp
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.color = C.inkFaint
-                  e.currentTarget.style.opacity = '0.5'
-                  e.currentTarget.style.borderColor = `${C.goldPale}40`
+                  e.currentTarget.style.color = C.inkDim
+                  e.currentTarget.style.opacity = '0.7'
+                  e.currentTarget.style.borderColor = `${C.goldPale}50`
                 }}
               >
-                <span style={{ fontSize: '12px' }}>←</span>
+                <span style={{ fontSize: '14px' }}>←</span>
                 回到开场
               </a>
             </div>
@@ -386,7 +386,7 @@ function ContactCard({
         boxShadow: hovered
           ? `0 12px 32px rgba(0,0,0,0.08), 0 0 0 0.5px ${C.goldChamp}30`
           : `0 2px 8px rgba(0,0,0,0.04)`,
-        transition: 'all 0.4s cubic-bezier(0.12,1,0.24,1)',
+        transition: `all 0.4s ${EASE.standard}`,
       }}
     >
       {/* 图标 */}
@@ -401,7 +401,7 @@ function ContactCard({
           alignItems: 'center',
           justifyContent: 'center',
           color: hovered ? C.goldChamp : C.inkDim,
-          transition: 'all 0.35s ease',
+          transition: `all 0.35s ${EASE.focus}`,
           flexShrink: 0,
         }}
       >
@@ -413,9 +413,9 @@ function ContactCard({
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: '9px',
+            fontSize: '11px', // 放大：9px → 11px
             fontWeight: 500,
-            letterSpacing: '0.25em',
+            letterSpacing: '0.2em',
             textTransform: 'uppercase',
             color: C.gold,
             marginBottom: '4px',
@@ -426,7 +426,7 @@ function ContactCard({
         <p
           style={{
             fontFamily: FONTS.body,
-            fontSize: 'clamp(14px, 1.5vw, 16px)',
+            fontSize: 'clamp(15px, 1.5vw, 17px)', // 放大：14-16px → 15-17px
             fontWeight: 300,
             color: C.ink,
             letterSpacing: '0.02em',
@@ -445,14 +445,14 @@ function ContactCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: hovered ? 0.7 : 0.3,
-          transition: 'opacity 0.25s ease',
+          opacity: hovered ? 0.8 : 0.35,
+          transition: `opacity 0.25s ${EASE.focus}`,
         }}
       >
         <span
           style={{
             fontFamily: FONTS.body,
-            fontSize: '14px',
+            fontSize: '16px',
             color: C.inkFaint,
           }}
         >
