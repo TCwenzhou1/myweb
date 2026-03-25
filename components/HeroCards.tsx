@@ -4,17 +4,28 @@ import { useEffect, useState, useRef } from 'react'
 
 // ─── 配色 ───────────────────────────────────────────────────────────────────
 const C = {
-  bg:        '#F5F2EC',   // 更厚实的暖象牙
-  bgWarm:    '#F0EDE4',   // 暖灰底层
-  ink:       '#0C0B0E',   // 深邃近黑
-  inkMid:    '#2E2C30',   // 中灰
-  inkDim:    '#6A6760',   // 次级灰
-  inkFaint:  '#A8A49C',   // 极淡灰
-  gold:      '#B8954A',   // 暖金色（更饱满）
-  goldDim:   '#C9AF72',   // 淡金
-  goldPale:  '#E2D5B8',   // 极淡金
-  goldGlow:  '#D4AF37',   // 华丽金色
-  roseGold:  '#E8C4A0',   // 玫瑰金
+  bg:           '#F8F5EE',   // 暖象牙白
+  bgWarm:       '#F2EDE3',   // 暖灰底
+  bgDeep:       '#E8E2D6',   // 深暖层
+  ink:          '#0F0E10',   // 深墨色
+  inkMid:       '#2A282C',   // 中灰墨
+  inkDim:       '#5C585E',   // 次级灰
+  inkFaint:     '#9A9599',   // 极淡灰
+
+  // 高端金色系统 - muted, refined
+  gold:         '#A88B55',   // 古典金
+  goldRich:     '#C4A265',   // 醇厚金
+  goldChamp:    '#D4BC8A',   // 香槟金
+  goldPale:     '#E8DCC4',   // 极淡金
+  goldGlow:     '#D4AF37',   // 亮金色
+
+  // 收藏级材质
+  cardIvory:    '#FAF8F3',   // 牌面象牙白
+  cardShadow:   '#D8D0C0',   // 牌面阴影
+  cardBorder:   '#C8BEA8',   // 牌边框
+
+  // 高光
+  spotlight:    '#FFF9F0',   // 聚光灯色
 }
 
 // ─── 粒子组件 ─────────────────────────────────────────────────────────────────
@@ -24,13 +35,13 @@ function Sparkles() {
   }>>([])
 
   useEffect(() => {
-    const generated = Array.from({ length: 28 }, (_, i) => ({
+    const generated = Array.from({ length: 20 }, (_, i) => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 2.5 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 4,
-      opacity: Math.random() * 0.6 + 0.2,
+      size: Math.random() * 2 + 0.8,
+      duration: Math.random() * 4 + 3,
+      delay: Math.random() * 5,
+      opacity: Math.random() * 0.5 + 0.15,
     }))
     setSparks(generated)
   }, [])
@@ -47,7 +58,7 @@ function Sparkles() {
             width: s.size,
             height: s.size,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${C.goldGlow} 0%, ${C.goldDim} 40%, transparent 70%)`,
+            background: `radial-gradient(circle, ${C.goldRich} 0%, ${C.goldChamp} 40%, transparent 70%)`,
             opacity: s.opacity,
             animation: `sparkPulse ${s.duration}s ease-in-out ${s.delay}s infinite`,
           }}
@@ -55,80 +66,49 @@ function Sparkles() {
       ))}
       <style>{`
         @keyframes sparkPulse {
-          0%, 100% { opacity: 0.1; transform: scale(0.8); }
-          50% { opacity: 0.8; transform: scale(1.4); }
+          0%, 100% { opacity: 0.05; transform: scale(0.6); }
+          50% { opacity: 0.7; transform: scale(1.2); }
         }
       `}</style>
     </div>
   )
 }
 
-// ─── 光晕组件 ─────────────────────────────────────────────────────────────────
-function GoldenOrbs() {
+// ─── 聚光灯效果 ─────────────────────────────────────────────────────────────────
+function Spotlight() {
   return (
     <>
-      {/* 华丽金色主光晕 - 左上 */}
+      {/* 主聚光灯 - 从上方偏左打下来 */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: '-5%',
-        top: '-10%',
-        width: '45vw',
-        height: '45vw',
+        left: '15%',
+        top: '-20%',
+        width: '60vw',
+        height: '80vh',
         borderRadius: '50%',
-        background: `radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(184,149,74,0.06) 35%, transparent 65%)`,
+        background: `radial-gradient(ellipse at center, rgba(255,249,240,0.7) 0%, rgba(255,249,240,0.3) 25%, transparent 60%)`,
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 2,
+        animation: 'spotlightBreath 7s ease-in-out infinite',
+      }} />
+      {/* 副聚光灯 - 牌面下方补光 */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        right: '10%',
+        bottom: '10%',
+        width: '40vw',
+        height: '50vh',
+        borderRadius: '50%',
+        background: `radial-gradient(ellipse at center, rgba(212,188,138,0.12) 0%, transparent 65%)`,
         filter: 'blur(40px)',
         pointerEvents: 'none',
         zIndex: 2,
-        animation: 'orbBreath 6s ease-in-out infinite',
-      }} />
-      {/* 华丽金色次光晕 - 右下 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        right: '-8%',
-        bottom: '-5%',
-        width: '50vw',
-        height: '50vw',
-        borderRadius: '50%',
-        background: `radial-gradient(circle, rgba(232,196,160,0.10) 0%, rgba(201,175,114,0.05) 40%, transparent 65%)`,
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-        zIndex: 2,
-        animation: 'orbBreath 8s ease-in-out 2s infinite',
-      }} />
-      {/* 高光点 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        left: '12%',
-        top: '8%',
-        width: '3px',
-        height: '3px',
-        borderRadius: '50%',
-        background: C.goldGlow,
-        boxShadow: `0 0 12px 4px rgba(212,175,55,0.4), 0 0 24px 8px rgba(212,175,55,0.2)`,
-        pointerEvents: 'none',
-        zIndex: 6,
-        animation: 'starTwinkle 3s ease-in-out infinite',
-      }} />
-      <div aria-hidden style={{
-        position: 'absolute',
-        right: '18%',
-        top: '15%',
-        width: '2px',
-        height: '2px',
-        borderRadius: '50%',
-        background: C.goldPale,
-        boxShadow: `0 0 8px 3px rgba(226,213,184,0.5)`,
-        pointerEvents: 'none',
-        zIndex: 6,
-        animation: 'starTwinkle 2.5s ease-in-out 1s infinite',
+        animation: 'spotlightBreath 9s ease-in-out 2s infinite',
       }} />
       <style>{`
-        @keyframes orbBreath {
-          0%, 100% { opacity: 0.7; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.08); }
-        }
-        @keyframes starTwinkle {
-          0%, 100% { opacity: 0.3; }
+        @keyframes spotlightBreath {
+          0%, 100% { opacity: 0.6; }
           50% { opacity: 1; }
         }
       `}</style>
@@ -136,10 +116,257 @@ function GoldenOrbs() {
   )
 }
 
-// ─── 主组件 ─────────────────────────────────────────────────────────────────
+// ─── 皇家展柜卡牌 ─────────────────────────────────────────────────────────────────
+function RoyalCard({ phase }: { phase: number }) {
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      maxWidth: '340px',
+      aspectRatio: '2.5 / 3.5',
+      opacity: phase >= 3 ? 1 : 0,
+      transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.92)',
+      transition: 'opacity 1.2s cubic-bezier(0.12,1,0.24,1) 0.3s, transform 1.2s cubic-bezier(0.12,1,0.24,1) 0.3s',
+    }}>
+      {/* 外层华丽金色边框 - 第二层 */}
+      <div style={{
+        position: 'absolute',
+        inset: '-4px',
+        borderRadius: '16px',
+        background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 30%, ${C.gold} 50%, ${C.goldRich} 70%, ${C.gold} 100%)`,
+        opacity: 0.6,
+        filter: 'blur(1px)',
+      }} />
 
+      {/* 外层金色边框 - 第一层 */}
+      <div style={{
+        position: 'absolute',
+        inset: '-2px',
+        borderRadius: '14px',
+        background: `linear-gradient(135deg, ${C.goldChamp} 0%, ${C.goldPale} 40%, ${C.goldChamp} 60%, ${C.gold} 100%)`,
+        opacity: 0.8,
+      }} />
+
+      {/* 主牌面 */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        borderRadius: '12px',
+        background: `linear-gradient(165deg, ${C.cardIvory} 0%, #F5F1E8 50%, ${C.bgWarm} 100%)`,
+        boxShadow: `
+          0 2px 4px rgba(0,0,0,0.02),
+          0 8px 24px rgba(0,0,0,0.06),
+          0 24px 60px rgba(0,0,0,0.08),
+          inset 0 1px 0 rgba(255,255,255,0.9)
+        `,
+        overflow: 'hidden',
+      }}>
+        {/* 牌面纸纹质感 */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`,
+          opacity: 0.8,
+        }} />
+
+        {/* 内层双线边框 */}
+        <div style={{
+          position: 'absolute',
+          inset: '16px',
+          border: `1px solid ${C.goldPale}`,
+          borderRadius: '4px',
+          opacity: 0.6,
+        }} />
+        <div style={{
+          position: 'absolute',
+          inset: '20px',
+          border: `0.5px solid ${C.goldChamp}`,
+          borderRadius: '3px',
+          opacity: 0.4,
+        }} />
+
+        {/* 顶部装饰角标 */}
+        <div style={{
+          position: 'absolute',
+          top: '28px',
+          left: '28px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '2px',
+        }}>
+          <span style={{
+            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
+            fontSize: '18px',
+            fontWeight: 500,
+            color: C.ink,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+          }}>A</span>
+          <span style={{
+            fontSize: '11px',
+            color: C.inkDim,
+            lineHeight: 1,
+          }}>♠</span>
+        </div>
+
+        {/* 中央大花色 - 精致压纹 */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: 'clamp(100px, 18vw, 140px)',
+          color: 'transparent',
+          fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
+          lineHeight: 1,
+          letterSpacing: '-0.04em',
+          // 压纹效果
+          WebkitTextStroke: `0.5px ${C.inkMid}`,
+          textShadow: `
+            0 0 0 ${C.cardIvory},
+            0 2px 4px rgba(0,0,0,0.06),
+            0 8px 16px rgba(0,0,0,0.04)
+          `,
+          opacity: 0.7,
+        }}>♠</div>
+
+        {/* 底部ROYAL EDITION */}
+        <div style={{
+          position: 'absolute',
+          bottom: '32px',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+        }}>
+          <div style={{
+            width: '40px',
+            height: '0.5px',
+            background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
+            opacity: 0.6,
+          }} />
+          <span style={{
+            fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+            fontSize: '7px',
+            fontWeight: 500,
+            letterSpacing: '0.35em',
+            color: C.gold,
+            textTransform: 'uppercase',
+          }}>Royal Edition</span>
+          <div style={{
+            width: '40px',
+            height: '0.5px',
+            background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
+            opacity: 0.6,
+          }} />
+        </div>
+
+        {/* 底部角标 */}
+        <div style={{
+          position: 'absolute',
+          bottom: '28px',
+          right: '28px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '2px',
+          transform: 'rotate(180deg)',
+        }}>
+          <span style={{
+            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
+            fontSize: '18px',
+            fontWeight: 500,
+            color: C.ink,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+          }}>A</span>
+          <span style={{
+            fontSize: '11px',
+            color: C.inkDim,
+            lineHeight: 1,
+          }}>♠</span>
+        </div>
+
+        {/* 金属烫边效果 - 顶部 */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '10%',
+          right: '10%',
+          height: '1px',
+          background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
+          opacity: 0.5,
+        }} />
+        {/* 金属烫边效果 - 底部 */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: '10%',
+          right: '10%',
+          height: '1px',
+          background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
+          opacity: 0.4,
+        }} />
+      </div>
+
+      {/* 展示台阴影 */}
+      <div style={{
+        position: 'absolute',
+        bottom: '-30px',
+        left: '10%',
+        right: '10%',
+        height: '40px',
+        background: `radial-gradient(ellipse at center top, rgba(0,0,0,0.15) 0%, transparent 70%)`,
+        filter: 'blur(12px)',
+      }} />
+    </div>
+  )
+}
+
+// ─── 副牌（极淡背景装饰）────────────────────────────────────────────────────────────────
+function FaintCards({ phase }: { phase: number }) {
+  return (
+    <>
+      {/* 左侧极淡副牌 */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        left: '-15%',
+        top: '15%',
+        width: '45%',
+        aspectRatio: '2.5 / 3.5',
+        borderRadius: '8px',
+        background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgWarm} 100%)`,
+        opacity: phase >= 4 ? 0.15 : 0,
+        transform: `rotate(-12deg) translateY(${phase >= 4 ? 0 : 20}px)`,
+        transition: 'opacity 1.0s ease 0.5s, transform 1.0s ease 0.5s',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+        zIndex: 1,
+      }} />
+      {/* 右侧极淡副牌 */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        right: '-12%',
+        bottom: '10%',
+        width: '40%',
+        aspectRatio: '2.5 / 3.5',
+        borderRadius: '8px',
+        background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgDeep} 100%)`,
+        opacity: phase >= 4 ? 0.12 : 0,
+        transform: `rotate(8deg) translateY(${phase >= 4 ? 0 : 20}px)`,
+        transition: 'opacity 1.0s ease 0.7s, transform 1.0s ease 0.7s',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
+        zIndex: 1,
+      }} />
+    </>
+  )
+}
+
+// ─── 主组件 ─────────────────────────────────────────────────────────────────
 export default function HeroSection() {
-  const [phase, setPhase] = useState(0)  // 0=静默 1=mark出现 2=内容 3=完成
+  const [phase, setPhase] = useState(0)
   const [mouseX, setMouseX] = useState(0.5)
   const [mouseY, setMouseY] = useState(0.5)
   const sectionRef = useRef<HTMLElement>(null)
@@ -147,9 +374,10 @@ export default function HeroSection() {
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
     t.push(setTimeout(() => setPhase(1), 100))
-    t.push(setTimeout(() => setPhase(2), 800))
-    t.push(setTimeout(() => setPhase(3), 1500))
-    t.push(setTimeout(() => setPhase(4), 2000))
+    t.push(setTimeout(() => setPhase(2), 600))
+    t.push(setTimeout(() => setPhase(3), 1100))
+    t.push(setTimeout(() => setPhase(4), 1700))
+    t.push(setTimeout(() => setPhase(5), 2100))
     return () => t.forEach(clearTimeout)
   }, [])
 
@@ -160,9 +388,8 @@ export default function HeroSection() {
     setMouseY((e.clientY - rect.top) / rect.height)
   }
 
-  // ♠ 随鼠标轻微视差
-  const markX = 48 + (mouseX - 0.5) * 1.8
-  const markY = 40 + (mouseY - 0.5) * 1.5
+  const markX = 55 + (mouseX - 0.5) * 1.2
+  const markY = 45 + (mouseY - 0.5) * 1.0
 
   return (
     <section
@@ -178,224 +405,147 @@ export default function HeroSection() {
       }}
     >
       {/* ═══════════════════════════════════════════════════
-          背景层：多层次空间感
+          背景层
       ═══════════════════════════════════════════════════ */}
 
-      {/* 华丽金色光晕层 */}
-      <GoldenOrbs />
+      {/* 聚光灯效果 */}
+      <Spotlight />
 
       {/* 粒子层 */}
       <Sparkles />
 
-      {/* 层1：顶部光源渐变（华丽感核心） */}
+      {/* 背景渐变层 */}
       <div aria-hidden style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
+        position: 'absolute',
+        inset: 0,
         background: `
-          radial-gradient(ellipse 90% 70% at 10% 0%, rgba(255,248,235,0.80) 0%, transparent 55%),
-          radial-gradient(ellipse 70% 60% at 90% 100%, rgba(215,200,170,0.25) 0%, transparent 55%),
-          radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,252,244,0.15) 0%, transparent 70%),
-          linear-gradient(175deg, rgba(255,252,244,0.5) 0%, transparent 35%, rgba(10,8,5,0.04) 100%)
+          radial-gradient(ellipse 80% 60% at 15% 5%, rgba(255,252,244,0.9) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 50% at 85% 95%, rgba(212,188,138,0.08) 0%, transparent 45%),
+          linear-gradient(175deg, rgba(255,252,244,0.3) 0%, transparent 30%, rgba(15,14,16,0.02) 100%)
         `,
         zIndex: 0,
       }} />
 
-      {/* 层2：纸纹 */}
+      {/* 纸纹层 */}
       <div aria-hidden style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E")`,
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E")`,
         zIndex: 1,
       }} />
 
-      {/* 层3：地面阴影（展台感） */}
+      {/* 地面阴影 */}
       <div aria-hidden style={{
         position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        height: '35%',
-        background: 'linear-gradient(to top, rgba(30,25,15,0.05) 0%, transparent 100%)',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '30%',
+        background: 'linear-gradient(to top, rgba(30,25,15,0.04) 0%, transparent 100%)',
         pointerEvents: 'none',
         zIndex: 1,
       }} />
 
-      {/* 层4：左垂直金色光线（华丽感装饰） */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        left: 'clamp(40px, 8vw, 120px)',
-        top: '8%',
-        bottom: '12%',
-        width: '1px',
-        background: `linear-gradient(to bottom, transparent, ${C.gold} 15%, ${C.goldGlow} 50%, ${C.gold} 85%, transparent)`,
-        opacity: phase >= 2 ? 0.8 : 0,
-        transition: 'opacity 1.4s ease',
-        zIndex: 2,
-        boxShadow: `0 0 8px 1px rgba(212,175,55,0.3), 0 0 20px 3px rgba(212,175,55,0.15)`,
-      }} />
-      {/* 右垂直金色光线 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        right: 'clamp(60px, 10vw, 140px)',
-        top: '15%',
-        bottom: '20%',
-        width: '1px',
-        background: `linear-gradient(to bottom, transparent, ${C.goldDim} 30%, ${C.goldPale} 70%, transparent)`,
-        opacity: phase >= 2 ? 0.5 : 0,
-        transition: 'opacity 1.6s ease 0.3s',
-        zIndex: 2,
-        boxShadow: `0 0 6px 1px rgba(201,175,114,0.2)`,
-      }} />
-      {/* 顶部金色短光线装饰 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        left: 'clamp(40px, 8vw, 120px)',
-        top: '8%',
-        width: '20px',
-        height: '1px',
-        background: `linear-gradient(to right, ${C.gold}, transparent)`,
-        opacity: phase >= 2 ? 0.7 : 0,
-        transition: 'opacity 1.4s ease',
-        zIndex: 2,
-      }} />
-      {/* 底部金色短光线装饰 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        left: 'clamp(40px, 8vw, 120px)',
-        bottom: '12%',
-        width: '30px',
-        height: '1px',
-        background: `linear-gradient(to left, ${C.gold}, transparent)`,
-        opacity: phase >= 2 ? 0.5 : 0,
-        transition: 'opacity 1.4s ease 0.2s',
-        zIndex: 2,
-      }} />
-
-      {/* ═══════════════════════════════════════════════════
-          ♠ 标记：水印 + 质感
-      ═══════════════════════════════════════════════════ */}
+      {/* ♠ 背景大水印 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
-        top:  `${markY}vh`,
+        top: `${markY}vh`,
         transform: 'translate(50%, -50%)',
-        fontSize: 'clamp(360px, 65vw, 900px)',
+        fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: '#0A090E',
-        opacity: phase >= 1 ? 0.055 : 0,
+        opacity: phase >= 1 ? 0.045 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
-        transition: `opacity 2.0s cubic-bezier(0.12,1,0.24,1)`,
+        transition: 'opacity 2.0s cubic-bezier(0.12,1,0.24,1)',
         zIndex: 1,
         letterSpacing: '-0.02em',
-        // 极淡纹理叠加
-        WebkitTextStroke: '0.3px rgba(180,160,110,0.08)',
+        WebkitTextStroke: '0.3px rgba(180,160,110,0.06)',
       }}>♠</div>
 
-      {/* ♠ 内发光叠加层 - 增强华丽感 */}
+      {/* ♠ 内发光 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
-        top:  `${markY}vh`,
+        top: `${markY}vh`,
         transform: 'translate(50%, -50%)',
-        fontSize: 'clamp(360px, 65vw, 900px)',
+        fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: 'transparent',
-        opacity: phase >= 1 ? 0.06 : 0,
+        opacity: phase >= 1 ? 0.05 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
-        transition: `opacity 2.0s cubic-bezier(0.12,1,0.24,1)`,
+        transition: 'opacity 2.0s cubic-bezier(0.12,1,0.24,1)',
         zIndex: 2,
         letterSpacing: '-0.02em',
         textShadow: `
-          0 0 80px rgba(212,175,55,0.25),
-          0 0 160px rgba(184,149,74,0.15),
-          0 0 280px rgba(184,149,74,0.08)
+          0 0 60px rgba(212,175,55,0.2),
+          0 0 120px rgba(184,149,74,0.12)
         `,
       }}>♠</div>
-      {/* ♠ 外发光光晕 */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        right: `${markX - 5}vw`,
-        top:  `${markY - 3}vh`,
-        transform: 'translate(50%, -50%)',
-        width: 'clamp(300px, 50vw, 700px)',
-        height: 'clamp(300px, 50vw, 700px)',
-        borderRadius: '50%',
-        background: `radial-gradient(circle, rgba(212,175,55,0.08) 0%, rgba(184,149,74,0.04) 40%, transparent 70%)`,
-        pointerEvents: 'none',
-        userSelect: 'none',
-        opacity: phase >= 1 ? 0.8 : 0,
-        transition: `opacity 2.5s cubic-bezier(0.12,1,0.24,1)`,
-        zIndex: 1,
-        filter: 'blur(30px)',
-      }} />
 
       {/* ═══════════════════════════════════════════════════
-          顶部华丽金色边框线
+          顶部金色边框线
       ═══════════════════════════════════════════════════ */}
       <div style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: '2px',
-        background: `linear-gradient(to right, transparent 3%, ${C.goldGlow} 25%, ${C.gold} 50%, ${C.goldGlow} 75%, transparent 97%)`,
-        opacity: phase >= 2 ? 0.5 : 0,
-        transition: 'opacity 1.2s ease 0.3s',
-        zIndex: 10,
-        boxShadow: `0 0 10px 2px rgba(212,175,55,0.25), 0 0 20px 4px rgba(212,175,55,0.1)`,
-      }} />
-      {/* 底部呼应边框线 */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0, left: 0, right: 0,
+        top: 0,
+        left: 0,
+        right: 0,
         height: '1px',
-        background: `linear-gradient(to right, transparent 5%, ${C.goldDim} 30%, ${C.goldDim} 70%, transparent 95%)`,
-        opacity: phase >= 3 ? 0.3 : 0,
-        transition: 'opacity 1.2s ease 0.5s',
+        background: `linear-gradient(to right, transparent 5%, ${C.goldChamp} 30%, ${C.goldRich} 50%, ${C.goldChamp} 70%, transparent 95%)`,
+        opacity: phase >= 2 ? 0.4 : 0,
+        transition: 'opacity 1.0s ease 0.2s',
         zIndex: 10,
+        boxShadow: `0 0 8px 1px rgba(196,162,101,0.2)`,
       }} />
 
       {/* ═══════════════════════════════════════════════════
-          版心容器
+          版心容器 - 两栏布局
       ═══════════════════════════════════════════════════ */}
       <div style={{
         position: 'relative',
         width: '100%',
         maxWidth: '1360px',
         margin: '0 auto',
-        padding: 'clamp(80px, 11vh, 130px) clamp(48px, 9vw, 140px)',
+        padding: 'clamp(70px, 10vh, 120px) clamp(48px, 8vw, 120px)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
         zIndex: 3,
       }}>
 
-        {/* ── 顶部：极简导航 ── */}
+        {/* ── 顶部：导航 ── */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           opacity: phase >= 2 ? 1 : 0,
-          transform: phase >= 2 ? 'translateY(0)' : 'translateY(-10px)',
+          transform: phase >= 2 ? 'translateY(0)' : 'translateY(-12px)',
           transition: 'opacity 1.0s ease, transform 1.0s ease',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{
-              width: '6px', height: '6px',
+              width: '5px',
+              height: '5px',
               borderRadius: '50%',
-              background: C.gold,
-              opacity: 0.8,
+              background: `linear-gradient(135deg, ${C.goldChamp}, ${C.gold})`,
+              boxShadow: `0 0 6px 1px rgba(196,162,101,0.4)`,
             }} />
             <span style={{
               fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '11px',
+              fontSize: '10px',
               fontWeight: 500,
-              letterSpacing: '0.22em',
+              letterSpacing: '0.28em',
               color: C.inkMid,
               textTransform: 'uppercase',
             }}>TCwenzhou</span>
           </div>
 
-          <nav style={{ display: 'flex', gap: '40px' }}>
+          <nav style={{ display: 'flex', gap: '36px' }}>
             {[
               { label: 'Projects', href: '/projects' },
               { label: 'Games',    href: '/games'    },
@@ -409,15 +559,15 @@ export default function HeroSection() {
                   fontFamily: '"Jost", "Inter", system-ui, sans-serif',
                   fontSize: '10px',
                   fontWeight: 400,
-                  letterSpacing: '0.14em',
-                  color: C.inkDim,
+                  letterSpacing: '0.12em',
+                  color: C.inkFaint,
                   textDecoration: 'none',
                   position: 'relative',
                   paddingBottom: '2px',
-                  transition: 'color 0.25s ease',
+                  transition: 'color 0.3s ease',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.color = C.ink)}
-                onMouseLeave={e => (e.currentTarget.style.color = C.inkDim)}
+                onMouseEnter={e => (e.currentTarget.style.color = C.inkMid)}
+                onMouseLeave={e => (e.currentTarget.style.color = C.inkFaint)}
               >
                 {item.label}
               </a>
@@ -426,161 +576,202 @@ export default function HeroSection() {
         </div>
 
         {/* ══════════════════════════════════════════════════
-            中部：主内容区
+            中部：两栏主内容区
         ══════════════════════════════════════════════════ */}
         <div style={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          paddingTop: 'clamp(48px, 10vh, 120px)',
-          paddingBottom: 'clamp(48px, 10vh, 120px)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 'clamp(40px, 6vw, 80px)',
+          alignItems: 'center',
+          paddingTop: 'clamp(48px, 8vh, 100px)',
+          paddingBottom: 'clamp(48px, 8vh, 100px)',
         }}>
 
-          {/* 主标题区块 */}
+          {/* ── 左栏：标题与信息 ── */}
           <div style={{
-            opacity: phase >= 2 ? 1 : 0,
-            transform: phase >= 2 ? 'translateY(0)' : 'translateY(24px)',
-            transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1), transform 1.4s cubic-bezier(0.12,1,0.24,1)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
           }}>
             {/* 标签行 */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '20px',
-              marginBottom: '36px',
+              gap: '16px',
+              marginBottom: '32px',
+              opacity: phase >= 2 ? 1 : 0,
+              transform: phase >= 2 ? 'translateX(0)' : 'translateX(-20px)',
+              transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
             }}>
               <div style={{
-                width: '32px', height: '1px',
-                background: C.gold,
-                opacity: 0.7,
+                width: '28px',
+                height: '0.5px',
+                background: `linear-gradient(to right, ${C.gold}, ${C.goldChamp})`,
+                opacity: 0.8,
               }} />
               <p style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '9px',
+                fontSize: '8px',
                 fontWeight: 500,
-                letterSpacing: '0.48em',
+                letterSpacing: '0.52em',
                 textTransform: 'uppercase',
                 color: C.gold,
               }}>Portfolio · 2024</p>
             </div>
 
-            {/* 人名主标题 */}
-            <h1 style={{
-              fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-              fontSize: 'clamp(80px, 12vw, 168px)',
-              fontWeight: 400,
-              lineHeight: 0.86,
-              letterSpacing: '-0.025em',
-              color: C.ink,
-              marginBottom: '0',
-              position: 'relative',
-            }}>
-              TCwenzhou
-            </h1>
-
-            {/* 标题下方装饰线组 */}
+            {/* 主标题 */}
             <div style={{
-              marginTop: '28px',
+              opacity: phase >= 2 ? 1 : 0,
+              transform: phase >= 2 ? 'translateY(0)' : 'translateY(28px)',
+              transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s, transform 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s',
+            }}>
+              <h1 style={{
+                fontFamily: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
+                fontSize: 'clamp(72px, 10vw, 152px)',
+                fontWeight: 400,
+                lineHeight: 0.88,
+                letterSpacing: '-0.03em',
+                color: C.ink,
+                marginBottom: '0',
+                position: 'relative',
+              }}>
+                TCwenzhou
+              </h1>
+
+              {/* 标题下方装饰组 */}
+              <div style={{
+                marginTop: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '5px',
+              }}>
+                <div style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.goldChamp}, ${C.goldPale})`,
+                  opacity: 0.6,
+                  width: '50px',
+                }} />
+                <div style={{
+                  height: '0.5px',
+                  background: `linear-gradient(to right, ${C.ink}, transparent)`,
+                  opacity: 0.06,
+                  width: '100%',
+                }} />
+              </div>
+            </div>
+
+            {/* 副标题 + 链接组 */}
+            <div style={{
+              marginTop: '48px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
+              gap: '32px',
+              opacity: phase >= 4 ? 1 : 0,
+              transform: phase >= 4 ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
             }}>
+              {/* 短描述 */}
+              <p style={{
+                fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+                fontSize: 'clamp(13px, 1.4vw, 16px)',
+                fontWeight: 300,
+                lineHeight: 1.8,
+                letterSpacing: '0.02em',
+                color: C.inkDim,
+                maxWidth: '360px',
+              }}>
+                计算机工程 · 系统实践<br />
+                与 AI / 游戏探索
+              </p>
+
+              {/* 链接组 - 奢华按钮风格 */}
               <div style={{
-                height: '1px',
-                background: `linear-gradient(to right, ${C.gold}, ${C.goldDim})`,
-                opacity: 0.5,
-                width: '60px',
-              }} />
-              <div style={{
-                height: '1px',
-                background: `linear-gradient(to right, ${C.ink}, transparent)`,
-                opacity: 0.08,
-                width: '100%',
-              }} />
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+              }}>
+                {[
+                  { label: '查看项目', href: '/projects', primary: true },
+                  { label: '进入实验室', href: '/lab', primary: false },
+                ].map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+                      fontSize: '10px',
+                      fontWeight: 400,
+                      letterSpacing: '0.16em',
+                      color: item.primary ? C.ink : C.inkFaint,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      transition: 'all 0.3s ease',
+                      paddingBottom: '6px',
+                      borderBottom: item.primary
+                        ? `0.5px solid ${C.gold}`
+                        : `0.5px solid rgba(90,85,90,0.25)`,
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.color = item.primary ? C.goldRich : C.inkMid
+                      e.currentTarget.style.borderBottomColor = item.primary ? C.goldRich : C.inkDim
+                      const line = e.currentTarget.querySelector('.line') as HTMLElement
+                      if (line) {
+                        line.style.width = item.primary ? '32px' : '24px'
+                        line.style.background = item.primary ? C.goldRich : C.inkDim
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = item.primary ? C.ink : C.inkFaint
+                      e.currentTarget.style.borderBottomColor = item.primary ? C.gold : 'rgba(90,85,90,0.25)'
+                      const line = e.currentTarget.querySelector('.line') as HTMLElement
+                      if (line) {
+                        line.style.width = '22px'
+                        line.style.background = item.primary ? C.gold : C.inkFaint
+                      }
+                    }}
+                  >
+                    <span
+                      className="line"
+                      style={{
+                        width: '22px',
+                        height: '0.5px',
+                        background: item.primary ? C.gold : C.inkFaint,
+                        flexShrink: 0,
+                        transition: 'width 0.3s ease, background 0.3s ease',
+                      }}
+                    />
+                    {item.label}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* 副标题 + 链接组 */}
+          {/* ── 右栏：皇家展柜卡牌 ── */}
           <div style={{
-            marginTop: '52px',
             display: 'flex',
-            gap: '80px',
-            alignItems: 'flex-start',
-            opacity: phase >= 3 ? 1 : 0,
-            transform: phase >= 3 ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 1.2s ease 0.1s, transform 1.2s ease 0.1s',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
           }}>
-            {/* 短描述 */}
-            <p style={{
-              fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: 'clamp(14px, 1.5vw, 18px)',
-              fontWeight: 300,
-              lineHeight: 1.75,
-              letterSpacing: '0.01em',
-              color: C.inkDim,
-              maxWidth: '400px',
-            }}>
-              计算机工程 · 系统实践<br />
-              与 AI / 游戏探索
-            </p>
-
-            {/* 链接组 */}
+            {/* 展柜装饰框架 */}
             <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              paddingTop: '4px',
-            }}>
-              {[
-                { label: '查看项目', href: '/projects', primary: true },
-                { label: '进入实验室', href: '/lab', primary: false },
-              ].map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  style={{
-                    fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '11px',
-                    fontWeight: 400,
-                    letterSpacing: '0.12em',
-                    color: item.primary ? C.ink : C.inkDim,
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    transition: 'all 0.25s ease',
-                    paddingBottom: '4px',
-                    borderBottom: item.primary
-                      ? `1px solid ${C.gold}`
-                      : `1px solid rgba(106,103,96,0.3)`,
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = item.primary ? C.gold : C.inkMid
-                    const line = e.currentTarget.querySelector('.line') as HTMLElement
-                    if (line) line.style.width = item.primary ? '28px' : '22px'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = item.primary ? C.ink : C.inkDim
-                    const line = e.currentTarget.querySelector('.line') as HTMLElement
-                    if (line) line.style.width = '20px'
-                  }}
-                >
-                  <span
-                    className="line"
-                    style={{
-                      width: '20px',
-                      height: '1px',
-                      background: item.primary ? C.gold : C.inkFaint,
-                      opacity: item.primary ? 0.9 : 0.5,
-                      flexShrink: 0,
-                      transition: 'width 0.25s ease, background 0.25s ease',
-                    }}
-                  />
-                  {item.label}
-                </a>
-              ))}
-            </div>
+              position: 'absolute',
+              inset: '-20px',
+              border: `0.5px solid ${C.goldPale}`,
+              borderRadius: '20px',
+              opacity: phase >= 3 ? 0.3 : 0,
+              transition: 'opacity 1.0s ease 0.2s',
+            }} />
+
+            {/* 副牌装饰 */}
+            <FaintCards phase={phase} />
+
+            {/* 主牌 */}
+            <RoyalCard phase={phase} />
           </div>
         </div>
 
@@ -589,27 +780,29 @@ export default function HeroSection() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingTop: '20px',
-          borderTop: `1px solid rgba(12,11,14,0.06)`,
-          opacity: phase >= 4 ? 1 : 0,
-          transform: phase >= 4 ? 'translateY(0)' : 'translateY(8px)',
+          paddingTop: '16px',
+          borderTop: `0.5px solid rgba(15,14,16,0.06)`,
+          opacity: phase >= 5 ? 1 : 0,
+          transform: phase >= 5 ? 'translateY(0)' : 'translateY(8px)',
           transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
         }}>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '10px',
+            fontSize: '9px',
             fontWeight: 400,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.1em',
             color: C.inkFaint,
+            opacity: 0.7,
           }}>
             github.com/TCwenzhou1
           </p>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '10px',
+            fontSize: '9px',
             fontWeight: 400,
-            letterSpacing: '0.06em',
+            letterSpacing: '0.08em',
             color: C.inkFaint,
+            opacity: 0.7,
           }}>
             hello@tcwenzhou.site
           </p>
@@ -619,116 +812,125 @@ export default function HeroSection() {
       {/* ── 右下角页码感装饰 ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        right: 'clamp(40px, 6vw, 80px)',
-        bottom: '40px',
+        right: 'clamp(36px, 5vw, 70px)',
+        bottom: '36px',
         fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-        fontSize: '9px',
+        fontSize: '8px',
         fontWeight: 300,
-        letterSpacing: '0.18em',
+        letterSpacing: '0.2em',
         color: C.inkFaint,
-        opacity: phase >= 4 ? 0.5 : 0,
+        opacity: phase >= 5 ? 0.4 : 0,
         transition: 'opacity 1.0s ease 0.4s',
         zIndex: 4,
       }}>01 — 04</div>
 
-      {/* ── 左下角华丽装饰 ── */}
+      {/* ── 左下角 Royal Edition ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: 'clamp(40px, 6vw, 80px)',
-        bottom: '40px',
+        left: 'clamp(36px, 5vw, 70px)',
+        bottom: '36px',
         fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-        fontSize: '9px',
-        fontWeight: 300,
-        letterSpacing: '0.14em',
+        fontSize: '8px',
+        fontWeight: 400,
+        letterSpacing: '0.18em',
         color: C.gold,
-        opacity: phase >= 4 ? 0.7 : 0,
+        opacity: phase >= 5 ? 0.6 : 0,
         transition: 'opacity 1.0s ease 0.5s',
         zIndex: 4,
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
       }}>
-        <div style={{ width: '20px', height: '1px', background: `linear-gradient(to right, ${C.gold}, ${C.goldDim})`, opacity: 0.8 }} />
+        <div style={{
+          width: '18px',
+          height: '0.5px',
+          background: `linear-gradient(to right, ${C.goldChamp}, ${C.gold})`,
+          opacity: 0.7
+        }} />
         Royal Edition
       </div>
 
-      {/* ── 华丽角落装饰：左上角 ── */}
+      {/* ── 角落装饰：左上 ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: 'clamp(48px, 8vw, 100px)',
-        top: 'clamp(48px, 8vh, 100px)',
-        width: '40px',
-        height: '40px',
-        opacity: phase >= 2 ? 0.4 : 0,
+        left: 'clamp(44px, 7vw, 90px)',
+        top: 'clamp(44px, 7vh, 90px)',
+        width: '36px',
+        height: '36px',
+        opacity: phase >= 2 ? 0.35 : 0,
         transition: 'opacity 1.2s ease 0.4s',
         zIndex: 4,
         pointerEvents: 'none',
       }}>
-        {/* 左上角 L 形金色装饰 */}
         <div style={{
           position: 'absolute',
-          top: 0, left: 0,
-          width: '1px',
+          top: 0,
+          left: 0,
+          width: '0.5px',
           height: '100%',
-          background: `linear-gradient(to bottom, ${C.gold}, transparent)`,
+          background: `linear-gradient(to bottom, ${C.goldChamp}, transparent)`,
         }} />
         <div style={{
           position: 'absolute',
-          top: 0, left: 0,
+          top: 0,
+          left: 0,
           width: '100%',
-          height: '1px',
-          background: `linear-gradient(to right, ${C.gold}, transparent)`,
+          height: '0.5px',
+          background: `linear-gradient(to right, ${C.goldChamp}, transparent)`,
         }} />
       </div>
 
-      {/* ── 华丽角落装饰：右上角 ── */}
+      {/* ── 角落装饰：右上 ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        right: 'clamp(48px, 8vw, 100px)',
-        top: 'clamp(48px, 8vh, 100px)',
-        width: '40px',
-        height: '40px',
-        opacity: phase >= 2 ? 0.35 : 0,
+        right: 'clamp(44px, 7vw, 90px)',
+        top: 'clamp(44px, 7vh, 90px)',
+        width: '36px',
+        height: '36px',
+        opacity: phase >= 2 ? 0.3 : 0,
         transition: 'opacity 1.2s ease 0.5s',
         zIndex: 4,
         pointerEvents: 'none',
       }}>
-        {/* 右上角 L 形金色装饰（镜像） */}
         <div style={{
           position: 'absolute',
-          top: 0, right: 0,
-          width: '1px',
+          top: 0,
+          right: 0,
+          width: '0.5px',
           height: '100%',
-          background: `linear-gradient(to bottom, ${C.goldDim}, transparent)`,
+          background: `linear-gradient(to bottom, ${C.goldPale}, transparent)`,
         }} />
         <div style={{
           position: 'absolute',
-          top: 0, right: 0,
+          top: 0,
+          right: 0,
           width: '100%',
-          height: '1px',
-          background: `linear-gradient(to left, ${C.goldDim}, transparent)`,
+          height: '0.5px',
+          background: `linear-gradient(to left, ${C.goldPale}, transparent)`,
         }} />
       </div>
 
-      {/* ── 华丽金色对角线装饰 ── */}
+      {/* ── 对角装饰光效 ── */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: 0, top: 0,
-        width: '30vw',
-        height: '30vh',
-        background: `linear-gradient(135deg, rgba(212,175,55,0.06) 0%, transparent 50%)`,
-        opacity: phase >= 2 ? 0.8 : 0,
+        left: 0,
+        top: 0,
+        width: '25vw',
+        height: '25vh',
+        background: `linear-gradient(135deg, rgba(212,188,138,0.05) 0%, transparent 50%)`,
+        opacity: phase >= 2 ? 0.7 : 0,
         transition: 'opacity 1.5s ease 0.3s',
         zIndex: 1,
         pointerEvents: 'none',
       }} />
       <div aria-hidden style={{
         position: 'absolute',
-        right: 0, bottom: 0,
-        width: '25vw',
-        height: '25vh',
-        background: `linear-gradient(315deg, rgba(232,196,160,0.05) 0%, transparent 50%)`,
-        opacity: phase >= 2 ? 0.6 : 0,
+        right: 0,
+        bottom: 0,
+        width: '20vw',
+        height: '20vh',
+        background: `linear-gradient(315deg, rgba(232,196,160,0.04) 0%, transparent 50%)`,
+        opacity: phase >= 2 ? 0.5 : 0,
         transition: 'opacity 1.5s ease 0.4s',
         zIndex: 1,
         pointerEvents: 'none',
@@ -736,8 +938,17 @@ export default function HeroSection() {
 
       {/* ── 响应式 ── */}
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+          .main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 60px !important;
+          }
           nav { display: none !important; }
+          .card-column {
+            order: -1;
+            max-width: 260px;
+            margin: 0 auto;
+          }
         }
       `}</style>
     </section>
