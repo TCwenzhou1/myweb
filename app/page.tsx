@@ -1,9 +1,5 @@
-import HeroCards from '@/components/HeroCards'
+import HeroSection from '@/components/HeroCards'
 
 export default function Home() {
-  return (
-    <div>
-      <HeroCards />
-    </div>
-  )
+  return <HeroSection />
 }

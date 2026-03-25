@@ -1,14 +1,19 @@
 import type { Metadata } from 'next'
-import { Inter, Cormorant_Garamond } from 'next/font/google'
+import { Inter } from 'next/font/google'
+import { Bodoni_Moda, Jost } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import ClientLayout from '@/components/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const cormorant = Cormorant_Garamond({
+const bodoni = Bodoni_Moda({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-cormorant',
+  variable: '--font-bodoni',
+})
+const jost = Jost({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-jost',
 })
 
 export const metadata: Metadata = {
@@ -44,12 +49,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${inter.variable} ${cormorant.variable} ${inter.className} page-bg min-h-screen`}>
-        <Navbar />
-        <main className="pt-16">
-          {children}
-        </main>
-        <Footer />
+      <body className={`${inter.variable} ${bodoni.variable} ${jost.variable} ${inter.className} min-h-screen`}>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   )

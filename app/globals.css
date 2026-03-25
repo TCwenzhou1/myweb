@@ -4,26 +4,24 @@
 
 @layer base {
   :root {
-    /* 暖白基底 #F6F3EE */
-    --background: 36 16% 95.0%;
-    --foreground: 240 6% 10%;
-    /* 主色改为深灰/黑，不再是蓝色 */
-    --primary: 240 5% 13%;
-    --primary-foreground: 36 20% 97%;
-    --secondary: 36 12% 92%;
-    --secondary-foreground: 240 6% 22%;
-    /* 点缀：暖金 #B79A63 */
-    --accent: 38 38% 55%;
-    --accent-foreground: 240 6% 10%;
-    --muted: 36 12% 92%;
-    --muted-foreground: 36 8% 44%;
-    --border: 36 10% 86%;
-    --card: 36 22% 98%;
-    --card-foreground: 240 6% 10%;
-    --ring: 240 5% 20%;
-    /* card shadow token */
-    --card-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.05);
-    --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06);
+    /* 编辑美学暖白 #F8F6F1 */
+    --background: 38 14% 95.5%;
+    --foreground: 250 8% 8%;
+    /* 深灰主色，无蓝色 */
+    --primary: 250 5% 10%;
+    --primary-foreground: 38 14% 95.5%;
+    --secondary: 38 12% 90%;
+    --secondary-foreground: 250 6% 20%;
+    --accent: 38 35% 55%;
+    --accent-foreground: 250 5% 8%;
+    --muted: 38 12% 90%;
+    --muted-foreground: 38 8% 45%;
+    --border: 38 10% 84%;
+    --card: 38 22% 97%;
+    --card-foreground: 250 6% 10%;
+    --ring: 250 5% 20%;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.05);
   }
 
   * {
