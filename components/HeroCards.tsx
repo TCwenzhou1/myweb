@@ -120,7 +120,9 @@ function Spotlight({ phase }: { phase: number }) {
 }
 
 // ─── 皇家展柜卡牌 ─────────────────────────────────────────────────────────────────
-// 五层结构：角标层 / 中央徽记 / 铭文层 / 边框压纹 / 底部编号
+// 工艺型馆藏卡：纯版式、纯材质、纯收藏感
+// 不要像：游戏道具卡 / 塔罗牌 / 插画卡
+// 要像：博物馆馆藏卡 / 皇家牌册样张 / 奢华 edition card
 function RoyalCard({ phase }: { phase: number }) {
   return (
     <div style={{
@@ -132,16 +134,16 @@ function RoyalCard({ phase }: { phase: number }) {
       transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.90)',
       transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.2s, transform 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s',
     }}>
-      {/* 外层金色边框 — 简洁旧金感 */}
+      {/* 外层金色边框 */}
       <div style={{
         position: 'absolute',
         inset: '-3px',
         borderRadius: '14px',
         background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 30%, ${C.goldPale} 50%, ${C.goldChamp} 70%, ${C.gold} 100%)`,
-        opacity: 0.65,
+        opacity: 0.5,
       }} />
 
-      {/* 主牌面 — 减少装饰，用光影说话 */}
+      {/* 主牌面 */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -165,111 +167,104 @@ function RoyalCard({ phase }: { phase: number }) {
         }} />
 
         {/* ═══════════════════════════════════════════════════
-            简洁边框 — 一层足够
+            极淡黑桃压纹 — 背景水印层次，非画面中心
+            只在牌面中心偏下位置，像母版钢印
+        ═══════════════════════════════════════════════════ */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          top: '52%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: 'clamp(120px, 22vw, 160px)',
+          color: 'transparent',
+          fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
+          lineHeight: 1,
+          letterSpacing: '-0.04em',
+          // 压纹效果：描边+淡淡阴影，模拟凹凸印痕
+          WebkitTextStroke: `0.4px ${C.inkFaint}`,
+          textShadow: `
+            0 0 0 ${C.cardIvory},
+            0 1px 2px rgba(0,0,0,0.04)
+          `,
+          opacity: 0.12,
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}>♠</div>
+
+        {/* ═══════════════════════════════════════════════════
+            内层细边框 — 一层足够，克制
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
           inset: '10px',
           border: `0.4px solid ${C.goldPale}`,
           borderRadius: '6px',
-          opacity: 0.45,
+          opacity: 0.4,
         }} />
 
-        {/* 四角切角装饰 — 精确但克制 */}
+        {/* ═══════════════════════════════════════════════════
+            四角极淡切角 — 精致但安静
+        ═══════════════════════════════════════════════════ */}
         {/* 左上 */}
         <div style={{
           position: 'absolute',
-          top: '20px',
-          left: '20px',
-          width: '12px',
-          height: '12px',
-          borderTop: `0.6px solid ${C.goldChamp}`,
-          borderLeft: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.55,
+          top: '18px',
+          left: '18px',
+          width: '10px',
+          height: '10px',
+          borderTop: `0.5px solid ${C.goldChamp}`,
+          borderLeft: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
         }} />
         {/* 右上 */}
         <div style={{
           position: 'absolute',
-          top: '20px',
-          right: '20px',
-          width: '12px',
-          height: '12px',
-          borderTop: `0.6px solid ${C.goldChamp}`,
-          borderRight: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.55,
+          top: '18px',
+          right: '18px',
+          width: '10px',
+          height: '10px',
+          borderTop: `0.5px solid ${C.goldChamp}`,
+          borderRight: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
         }} />
         {/* 左下 */}
         <div style={{
           position: 'absolute',
-          bottom: '20px',
-          left: '20px',
-          width: '12px',
-          height: '12px',
-          borderBottom: `0.6px solid ${C.goldChamp}`,
-          borderLeft: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.55,
+          bottom: '18px',
+          left: '18px',
+          width: '10px',
+          height: '10px',
+          borderBottom: `0.5px solid ${C.goldChamp}`,
+          borderLeft: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
         }} />
         {/* 右下 */}
         <div style={{
           position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          width: '12px',
-          height: '12px',
-          borderBottom: `0.6px solid ${C.goldChamp}`,
-          borderRight: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.55,
+          bottom: '18px',
+          right: '18px',
+          width: '10px',
+          height: '10px',
+          borderBottom: `0.5px solid ${C.goldChamp}`,
+          borderRight: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
         }} />
 
         {/* ═══════════════════════════════════════════════════
-            第二层：中央大花色压纹 ♠（像王室纹章中心）
-        ═══════════════════════════════════════════════════ */}
-        {/* 纹章底晕 — 让黑桃更像中心焦点 */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: `radial-gradient(circle, rgba(212,188,138,0.06) 0%, transparent 70%)`,
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontSize: 'clamp(90px, 16vw, 130px)',
-          color: 'transparent',
-          fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-          lineHeight: 1,
-          letterSpacing: '-0.04em',
-          WebkitTextStroke: `0.5px ${C.inkMid}`,
-          textShadow: `
-            0 0 0 ${C.cardIvory},
-            0 2px 4px rgba(0,0,0,0.04),
-            0 6px 12px rgba(0,0,0,0.03)
-          `,
-          opacity: 0.55,
-        }}>♠</div>
-
-        {/* ═══════════════════════════════════════════════════
-            第三层：顶部角标 A♠（优雅衬线体）
+            顶部角标 A♠ — 极小，安静
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          top: '30px',
+          top: '28px',
           left: '30px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1px',
+          gap: '0px',
         }}>
           <span style={{
             fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '16px',
+            fontSize: '13px',
             fontWeight: 500,
             color: C.inkMid,
             lineHeight: 1,
@@ -277,28 +272,28 @@ function RoyalCard({ phase }: { phase: number }) {
           }}>A</span>
           <span style={{
             fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-            fontSize: '10px',
+            fontSize: '8px',
             color: C.inkDim,
             lineHeight: 1,
           }}>♠</span>
         </div>
 
         {/* ═══════════════════════════════════════════════════
-            第四层：底部角标 A♠（倒置）
+            底部角标 A♠ — 倒置，对称平衡
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          bottom: '30px',
+          bottom: '28px',
           right: '30px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1px',
+          gap: '0px',
           transform: 'rotate(180deg)',
         }}>
           <span style={{
             fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '16px',
+            fontSize: '13px',
             fontWeight: 500,
             color: C.inkMid,
             lineHeight: 1,
@@ -306,122 +301,123 @@ function RoyalCard({ phase }: { phase: number }) {
           }}>A</span>
           <span style={{
             fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
-            fontSize: '10px',
+            fontSize: '8px',
             color: C.inkDim,
             lineHeight: 1,
           }}>♠</span>
         </div>
 
         {/* ═══════════════════════════════════════════════════
-            第五层：中央铭文信息层 — 三层节奏
-            上：TCWENZHOU（主身份）
-            中：ROYAL EDITION（系列）
+            中央主铭文区 — 馆藏标签风格
+            上：TCWENZHOU（主身份，衬线体）
+            中：ROYAL EDITION（系列，金色）
             下：SYSTEMS · AI · GAMES（分类）
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          top: '50%',
+          top: '46%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '9px',
-          paddingTop: '4px',
+          gap: '10px',
         }}>
-          {/* TCWENZHOU — 主铭文，远看身份感更强 */}
+          {/* TCWENZHOU — 主铭文，衬线体，版式核心 */}
           <span style={{
             fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '14px',     // 13px → 14px
-            fontWeight: 600,       // 500 → 600（更明确）
-            letterSpacing: '0.32em',
-            color: C.ink,         // inkMid → ink（最清晰）
+            fontSize: '15px',
+            fontWeight: 600,
+            letterSpacing: '0.38em',
+            color: C.ink,
             textTransform: 'uppercase',
           }}>TCwenzhou</span>
 
-          {/* 分隔线 */}
+          {/* 分隔线 — 极细 */}
           <div style={{
-            width: '36px',
-            height: '0.4px',
+            width: '32px',
+            height: '0.35px',
             background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
-            opacity: 0.7,
+            opacity: 0.6,
           }} />
 
-          {/* ROYAL EDITION — 系列，金色清晰 */}
+          {/* ROYAL EDITION — 系列铭文，金色 */}
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '7px',
+            fontSize: '6.5px',
             fontWeight: 500,
-            letterSpacing: '0.38em',  // 0.34 → 0.38（更舒展）
+            letterSpacing: '0.42em',
             color: C.gold,
             textTransform: 'uppercase',
           }}>Royal Edition</span>
 
           {/* 分隔线 */}
           <div style={{
-            width: '28px',
-            height: '0.3px',
+            width: '24px',
+            height: '0.25px',
             background: `linear-gradient(to right, transparent, ${C.goldPale}, transparent)`,
-            opacity: 0.5,
+            opacity: 0.45,
           }} />
 
-          {/* SYSTEMS · AI · GAMES — 分类，稳定可读 */}
+          {/* SYSTEMS · AI · GAMES — 分类铭文 */}
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '6px',        // 5.5px → 6px
+            fontSize: '5.5px',
             fontWeight: 400,
-            letterSpacing: '0.22em',
+            letterSpacing: '0.24em',
             color: C.inkDim,
             textTransform: 'uppercase',
           }}>Systems · AI · Games</span>
         </div>
 
         {/* ═══════════════════════════════════════════════════
-            第六层：底部档案编号 — 馆藏样张感
+            底部档案编号区 — 馆藏样张感
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          bottom: '24px',
+          bottom: '26px',
           left: 0,
           right: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '5px',
+          gap: '4px',
         }}>
           <div style={{
-            width: '44px',
-            height: '0.4px',
+            width: '40px',
+            height: '0.35px',
             background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
-            opacity: 0.6,
+            opacity: 0.5,
           }} />
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '6.5px',     // 6px → 6.5px
-            fontWeight: 500,        // 400 → 500
-            letterSpacing: '0.24em',
+            fontSize: '6px',
+            fontWeight: 500,
+            letterSpacing: '0.26em',
             color: C.inkDim,
             textTransform: 'uppercase',
           }}>Scene 01 / Archive No. A-01</span>
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '5px',       // 4.5px → 5px
+            fontSize: '4.5px',
             fontWeight: 300,
             letterSpacing: '0.18em',
             color: C.inkDim,
-            opacity: 0.75,
+            opacity: 0.65,
           }}>TCwenzhou Private Collection</span>
         </div>
 
-        {/* 顶部金属烫边 — 简洁 */}
+        {/* ═══════════════════════════════════════════════════
+            顶部金属烫边 — 极淡
+        ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: '8%',
           right: '8%',
-          height: '0.4px',
+          height: '0.35px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.5,
+          opacity: 0.4,
         }} />
         {/* 底部金属烫边 */}
         <div style={{
@@ -429,9 +425,9 @@ function RoyalCard({ phase }: { phase: number }) {
           bottom: 0,
           left: '8%',
           right: '8%',
-          height: '0.4px',
+          height: '0.35px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.4,
+          opacity: 0.35,
         }} />
 
         {/* ═══════════════════════════════════════════════════
@@ -453,7 +449,7 @@ function RoyalCard({ phase }: { phase: number }) {
         }} />
       </div>
 
-      {/* 展示台阴影 — 更像接地 */}
+      {/* 展示台阴影 */}
       <div style={{
         position: 'absolute',
         bottom: '-28px',
