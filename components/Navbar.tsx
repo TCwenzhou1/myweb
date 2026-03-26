@@ -73,7 +73,7 @@ const Navbar = () => {
         style={{
           maxWidth: '1360px',
           margin: '0 auto',
-          padding: '0 clamp(32px, 6vw, 80px)',
+          padding: '0 clamp(24px, 5vw, 80px)',
           height: '64px',
           display: 'flex',
           alignItems: 'center',
@@ -116,11 +116,11 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div
+          className="navbar-desktop-nav"
           style={{
             display: 'flex',
             gap: '32px',
           }}
-          className="hidden md:flex"
         >
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -153,7 +153,7 @@ const Navbar = () => {
                 <span
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '11px', // 放大：10px → 11px
+                    fontSize: '11px',
                     fontWeight: 400,
                     letterSpacing: '0.1em',
                     color: isActive ? C.inkMid : C.inkFaint,
@@ -180,7 +180,7 @@ const Navbar = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          className="md:hidden"
+          className="navbar-mobile-menu-btn"
           aria-label="Toggle menu"
         >
           <div style={{
@@ -222,6 +222,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div
+          className="navbar-mobile-menu"
           style={{
             position: 'absolute',
             top: '100%',
@@ -231,9 +232,8 @@ const Navbar = () => {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(200,190,168,0.5)',
-            padding: '24px clamp(32px, 6vw, 80px)',
+            padding: '24px clamp(24px, 5vw, 80px)',
           }}
-          className="md:hidden"
         >
           <div style={{
             display: 'flex',
@@ -257,7 +257,7 @@ const Navbar = () => {
                 >
                   <span style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '11px', // 放大：9px → 11px
+                    fontSize: '11px',
                     fontWeight: 500,
                     letterSpacing: '0.2em',
                     color: C.gold,
@@ -267,7 +267,7 @@ const Navbar = () => {
                   </span>
                   <span style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '14px', // 放大：13px → 14px
+                    fontSize: '14px',
                     fontWeight: isActive ? 500 : 400,
                     letterSpacing: '0.08em',
                     color: isActive ? C.ink : C.inkDim,
@@ -281,6 +281,37 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* Responsive Styles */}
+      <style>{`
+        /* Desktop nav visible by default */
+        .navbar-desktop-nav {
+          display: flex;
+        }
+        .navbar-mobile-menu-btn {
+          display: none;
+        }
+        .navbar-mobile-menu {
+          display: none;
+        }
+
+        /* Tablet/Mobile: Show hamburger, hide desktop nav */
+        @media (max-width: 1023px) {
+          .navbar-desktop-nav {
+            display: none !important;
+          }
+          .navbar-mobile-menu-btn {
+            display: flex !important;
+          }
+        }
+
+        /* Mobile menu is shown via React state, no media query needed */
+        @media (max-width: 1023px) {
+          .navbar-mobile-menu {
+            display: block !important;
+          }
+        }
+      `}</style>
     </nav>
   )
 }

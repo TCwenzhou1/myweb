@@ -106,7 +106,7 @@ export default function ProjectsContent() {
           zIndex: 1,
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
+          padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) clamp(60px, 8vh, 100px)',
         }}
       >
         {/* 页头 */}
@@ -117,8 +117,8 @@ export default function ProjectsContent() {
           scene={{ chapter: '02', title: 'Projects', subtitle: 'Collected Works' }}
         />
 
-        {/* 档案馆布局 - 3个项目，1大2小 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* 档案馆布局 - 三端响应式 */}
+        <div className="projects-grid" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* 第一个项目 - 特色档案卡（更大） */}
           <CinematicSection delay={100}>
             <ProjectCard
@@ -128,8 +128,9 @@ export default function ProjectsContent() {
             />
           </CinematicSection>
 
-          {/* 第二、三个项目 - 横向排列 */}
+          {/* 第二、三个项目 - 响应式网格 */}
           <div
+            className="projects-secondary-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
@@ -151,6 +152,7 @@ export default function ProjectsContent() {
         {/* 底部场景编号与导航 */}
         <CinematicSection delay={500}>
           <div
+            className="projects-footer"
             style={{
               marginTop: 'clamp(60px, 8vh, 80px)',
               paddingTop: '24px',
@@ -165,7 +167,7 @@ export default function ProjectsContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '13px', // 放大：8px → 13px
+                fontSize: '13px',
                 fontWeight: 300,
                 letterSpacing: '0.15em',
                 color: C.inkFaint,
@@ -176,7 +178,7 @@ export default function ProjectsContent() {
             </span>
 
             {/* 场景导航 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+            <div className="projects-nav" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
               <NavLink href="/lab" label="Lab" />
               <NavLink href="/games" label="Games" />
               <NavLink href="/about" label="About" />
@@ -185,7 +187,7 @@ export default function ProjectsContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '12px', // 放大：8px → 12px
+                fontSize: '12px',
                 fontWeight: 300,
                 letterSpacing: '0.12em',
                 color: C.gold,
@@ -197,6 +199,46 @@ export default function ProjectsContent() {
           </div>
         </CinematicSection>
       </div>
+
+      {/* 响应式样式 */}
+      <style>{`
+        /* ── Tablet (768px - 1199px) ── */
+        @media (max-width: 1199px) and (min-width: 768px) {
+          .projects-secondary-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px !important;
+          }
+          .projects-footer {
+            justify-content: center !important;
+            text-align: center;
+          }
+          .projects-nav {
+            gap: 20px !important;
+          }
+        }
+
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .projects-secondary-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .projects-footer {
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-align: center;
+            gap: 20px !important;
+          }
+          .projects-nav {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 16px !important;
+          }
+          .projects-nav a {
+            font-size: 14px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -207,7 +249,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
       href={href}
       style={{
         fontFamily: FONTS.body,
-        fontSize: '13px', // 放大：8px → 13px
+        fontSize: '13px',
         fontWeight: 400,
         letterSpacing: '0.12em',
         color: C.inkDim,
@@ -266,7 +308,7 @@ function ProjectCard({
         background: C.cardIvory,
         border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
         borderRadius: isFeatured ? '16px' : '12px',
-        padding: isFeatured ? 'clamp(32px, 4vw, 48px)' : 'clamp(24px, 3vw, 32px)',
+        padding: isFeatured ? 'clamp(28px, 4vw, 48px)' : 'clamp(20px, 3vw, 32px)',
         opacity: hovered ? 1 : 0.98,
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         boxShadow: hovered
@@ -314,7 +356,7 @@ function ProjectCard({
           position: 'absolute',
           inset: 0,
           borderRadius: isFeatured ? '16px' : '12px',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
           opacity: 0.6,
           pointerEvents: 'none',
         }}
@@ -324,6 +366,7 @@ function ProjectCard({
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* 顶部行 */}
         <div
+          className="project-card-header"
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -335,9 +378,10 @@ function ProjectCard({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <h2
+              className="project-title"
               style={{
                 fontFamily: FONTS.display,
-                fontSize: isFeatured ? 'clamp(24px, 2.8vw, 32px)' : 'clamp(18px, 2vw, 24px)', // 放大
+                fontSize: isFeatured ? 'clamp(22px, 3vw, 32px)' : 'clamp(18px, 2.2vw, 24px)',
                 fontWeight: 400,
                 letterSpacing: '-0.01em',
                 color: C.ink,
@@ -346,9 +390,10 @@ function ProjectCard({
               {project.title}
             </h2>
             <span
+              className="project-status"
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '11px', // 放大：7px → 11px
+                fontSize: '11px',
                 fontWeight: 500,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
@@ -364,7 +409,7 @@ function ProjectCard({
           </div>
 
           {/* 操作按钮 */}
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="project-actions" style={{ display: 'flex', gap: '10px' }}>
             {project.github && (
               <a
                 href={project.github}
@@ -374,8 +419,8 @@ function ProjectCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: isFeatured ? '38px' : '32px',
-                  height: isFeatured ? '38px' : '32px',
+                  width: isFeatured ? '38px' : '34px',
+                  height: isFeatured ? '38px' : '34px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
                   color: C.inkDim,
@@ -404,8 +449,8 @@ function ProjectCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: isFeatured ? '38px' : '32px',
-                  height: isFeatured ? '38px' : '32px',
+                  width: isFeatured ? '38px' : '34px',
+                  height: isFeatured ? '38px' : '34px',
                   borderRadius: '8px',
                   border: `0.5px solid ${C.goldPale}`,
                   color: C.inkDim,
@@ -430,9 +475,10 @@ function ProjectCard({
 
         {/* 描述 - 放大可读性 */}
         <p
+          className="project-desc"
           style={{
             fontFamily: FONTS.body,
-            fontSize: isFeatured ? 'clamp(15px, 1.5vw, 17px)' : 'clamp(14px, 1.3vw, 15px)', // 放大
+            fontSize: isFeatured ? 'clamp(15px, 1.6vw, 17px)' : 'clamp(14px, 1.4vw, 16px)',
             fontWeight: 300,
             lineHeight: 1.8,
             color: C.inkDim,
@@ -444,13 +490,13 @@ function ProjectCard({
         </p>
 
         {/* 标签 - 放大可读性 */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+        <div className="project-tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {project.tags.map((tag) => (
             <span
               key={tag}
               style={{
                 fontFamily: FONTS.body,
-                fontSize: isFeatured ? '12px' : '11px', // 放大：8-9px → 11-12px
+                fontSize: isFeatured ? '12px' : '11px',
                 fontWeight: 400,
                 letterSpacing: '0.08em',
                 color: C.inkDim,
@@ -465,6 +511,30 @@ function ProjectCard({
           ))}
         </div>
       </div>
+
+      {/* Mobile 响应式样式 */}
+      <style>{`
+        @media (max-width: 767px) {
+          .project-card-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .project-title {
+            font-size: clamp(20px, 5vw, 26px) !important;
+          }
+          .project-status {
+            font-size: 10px !important;
+          }
+          .project-desc {
+            font-size: 15px !important;
+            line-height: 1.7 !important;
+          }
+          .project-tags span {
+            font-size: 12px !important;
+            padding: 6px 12px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

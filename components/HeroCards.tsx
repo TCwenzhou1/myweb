@@ -78,7 +78,6 @@ function Sparkles() {
 function Spotlight() {
   return (
     <>
-      {/* 主聚光灯 - 从上方偏左打下来 */}
       <div aria-hidden style={{
         position: 'absolute',
         left: '15%',
@@ -92,7 +91,6 @@ function Spotlight() {
         zIndex: 2,
         animation: 'spotlightBreath 7s ease-in-out infinite',
       }} />
-      {/* 副聚光灯 - 牌面下方补光 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: '10%',
@@ -165,7 +163,7 @@ function RoyalCard({ phase }: { phase: number }) {
         <div aria-hidden style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`,
           opacity: 0.8,
         }} />
 
@@ -221,7 +219,6 @@ function RoyalCard({ phase }: { phase: number }) {
           fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
           lineHeight: 1,
           letterSpacing: '-0.04em',
-          // 压纹效果
           WebkitTextStroke: `0.5px ${C.inkMid}`,
           textShadow: `
             0 0 0 ${C.cardIvory},
@@ -430,7 +427,7 @@ export default function HeroSection() {
       <div aria-hidden style={{
         position: 'absolute',
         inset: 0,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E")`,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E")`,
         zIndex: 1,
       }} />
 
@@ -504,22 +501,22 @@ export default function HeroSection() {
       }} />
 
       {/* ═══════════════════════════════════════════════════
-          版心容器 - 两栏布局
+          版心容器 - Desktop: 两栏 / Tablet: 上下 / Mobile: 单列
       ═══════════════════════════════════════════════════ */}
       <div style={{
         position: 'relative',
         width: '100%',
         maxWidth: '1360px',
         margin: '0 auto',
-        padding: 'clamp(70px, 10vh, 120px) clamp(48px, 8vw, 120px)',
+        padding: 'clamp(70px, 10vh, 120px) clamp(24px, 5vw, 80px)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 3,
       }}>
 
-        {/* ── 顶部：导航 ── */}
-        <div style={{
+        {/* ── 顶部：导航（Desktop 显示，Mobile 隐藏）─ */}
+        <div className="hero-nav" style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -537,7 +534,7 @@ export default function HeroSection() {
             }} />
             <span style={{
               fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 500,
               letterSpacing: '0.28em',
               color: C.inkMid,
@@ -545,7 +542,7 @@ export default function HeroSection() {
             }}>TCwenzhou</span>
           </div>
 
-          <nav style={{ display: 'flex', gap: '36px' }}>
+          <nav className="desktop-nav" style={{ display: 'flex', gap: '36px' }}>
             {[
               { label: 'Projects', href: '/projects' },
               { label: 'Games',    href: '/games'    },
@@ -557,7 +554,7 @@ export default function HeroSection() {
                 href={item.href}
                 style={{
                   fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 400,
                   letterSpacing: '0.12em',
                   color: C.inkFaint,
@@ -576,12 +573,15 @@ export default function HeroSection() {
         </div>
 
         {/* ══════════════════════════════════════════════════
-            中部：两栏主内容区
+            中部：主内容区 - 三端响应式布局
+            Desktop (>= 1200px): 两栏网格
+            Tablet (768px-1199px): 上下双段
+            Mobile (< 768px): 单列竖排
         ══════════════════════════════════════════════════ */}
-        <div style={{
+        <div className="hero-main-grid" style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 'clamp(40px, 6vw, 80px)',
           alignItems: 'center',
           paddingTop: 'clamp(48px, 8vh, 100px)',
@@ -589,13 +589,14 @@ export default function HeroSection() {
         }}>
 
           {/* ── 左栏：标题与信息 ── */}
-          <div style={{
+          <div className="hero-content" style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            order: 2, // Mobile: 卡片在上，内容在下
           }}>
             {/* 标签行 */}
-            <div style={{
+            <div className="hero-tag" style={{
               display: 'flex',
               alignItems: 'center',
               gap: '16px',
@@ -612,7 +613,7 @@ export default function HeroSection() {
               }} />
               <p style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '8px',
+                fontSize: '11px',
                 fontWeight: 500,
                 letterSpacing: '0.52em',
                 textTransform: 'uppercase',
@@ -621,14 +622,14 @@ export default function HeroSection() {
             </div>
 
             {/* 主标题 */}
-            <div style={{
+            <div className="hero-title" style={{
               opacity: phase >= 2 ? 1 : 0,
               transform: phase >= 2 ? 'translateY(0)' : 'translateY(28px)',
               transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s, transform 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s',
             }}>
               <h1 style={{
                 fontFamily: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
-                fontSize: 'clamp(72px, 10vw, 152px)',
+                fontSize: 'clamp(48px, 8vw, 152px)',
                 fontWeight: 400,
                 lineHeight: 0.88,
                 letterSpacing: '-0.03em',
@@ -662,7 +663,7 @@ export default function HeroSection() {
             </div>
 
             {/* 副标题 + 链接组 */}
-            <div style={{
+            <div className="hero-links" style={{
               marginTop: '48px',
               display: 'flex',
               flexDirection: 'column',
@@ -674,7 +675,7 @@ export default function HeroSection() {
               {/* 短描述 */}
               <p style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: 'clamp(13px, 1.4vw, 16px)',
+                fontSize: 'clamp(15px, 1.6vw, 18px)',
                 fontWeight: 300,
                 lineHeight: 1.8,
                 letterSpacing: '0.02em',
@@ -686,7 +687,7 @@ export default function HeroSection() {
               </p>
 
               {/* 链接组 - 奢华按钮风格 */}
-              <div style={{
+              <div className="hero-buttons" style={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '14px',
@@ -700,7 +701,7 @@ export default function HeroSection() {
                     href={item.href}
                     style={{
                       fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                      fontSize: '10px',
+                      fontSize: '13px',
                       fontWeight: 400,
                       letterSpacing: '0.16em',
                       color: item.primary ? C.ink : C.inkFaint,
@@ -751,11 +752,12 @@ export default function HeroSection() {
           </div>
 
           {/* ── 右栏：皇家展柜卡牌 ── */}
-          <div style={{
+          <div className="hero-card" style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             position: 'relative',
+            order: 1, // Mobile: 卡片在上
           }}>
             {/* 展柜装饰框架 */}
             <div style={{
@@ -776,7 +778,7 @@ export default function HeroSection() {
         </div>
 
         {/* ── 底部：信息行 ── */}
-        <div style={{
+        <div className="hero-footer" style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -785,10 +787,12 @@ export default function HeroSection() {
           opacity: phase >= 5 ? 1 : 0,
           transform: phase >= 5 ? 'translateY(0)' : 'translateY(8px)',
           transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
+          flexWrap: 'wrap',
+          gap: '12px',
         }}>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '9px',
+            fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.1em',
             color: C.inkFaint,
@@ -798,7 +802,7 @@ export default function HeroSection() {
           </p>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '9px',
+            fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.08em',
             color: C.inkFaint,
@@ -810,12 +814,12 @@ export default function HeroSection() {
       </div>
 
       {/* ── 右下角页码感装饰 ── */}
-      <div aria-hidden style={{
+      <div aria-hidden className="hero-page-num" style={{
         position: 'absolute',
-        right: 'clamp(36px, 5vw, 70px)',
+        right: 'clamp(24px, 5vw, 70px)',
         bottom: '36px',
         fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-        fontSize: '8px',
+        fontSize: '11px',
         fontWeight: 300,
         letterSpacing: '0.2em',
         color: C.inkFaint,
@@ -825,12 +829,12 @@ export default function HeroSection() {
       }}>01 — 04</div>
 
       {/* ── 左下角 Royal Edition ── */}
-      <div aria-hidden style={{
+      <div aria-hidden className="hero-royal" style={{
         position: 'absolute',
-        left: 'clamp(36px, 5vw, 70px)',
+        left: 'clamp(24px, 5vw, 70px)',
         bottom: '36px',
         fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-        fontSize: '8px',
+        fontSize: '11px',
         fontWeight: 400,
         letterSpacing: '0.18em',
         color: C.gold,
@@ -851,10 +855,10 @@ export default function HeroSection() {
       </div>
 
       {/* ── 角落装饰：左上 ── */}
-      <div aria-hidden style={{
+      <div aria-hidden className="hero-corner-tl" style={{
         position: 'absolute',
-        left: 'clamp(44px, 7vw, 90px)',
-        top: 'clamp(44px, 7vh, 90px)',
+        left: 'clamp(24px, 7vw, 90px)',
+        top: 'clamp(24px, 7vh, 90px)',
         width: '36px',
         height: '36px',
         opacity: phase >= 2 ? 0.35 : 0,
@@ -881,10 +885,10 @@ export default function HeroSection() {
       </div>
 
       {/* ── 角落装饰：右上 ── */}
-      <div aria-hidden style={{
+      <div aria-hidden className="hero-corner-tr" style={{
         position: 'absolute',
-        right: 'clamp(44px, 7vw, 90px)',
-        top: 'clamp(44px, 7vh, 90px)',
+        right: 'clamp(24px, 7vw, 90px)',
+        top: 'clamp(24px, 7vh, 90px)',
         width: '36px',
         height: '36px',
         opacity: phase >= 2 ? 0.3 : 0,
@@ -936,18 +940,131 @@ export default function HeroSection() {
         pointerEvents: 'none',
       }} />
 
-      {/* ── 响应式 ── */}
+      {/* ═══════════════════════════════════════════════════════════════
+          三端响应式样式
+          Mobile: < 768px - 单列竖排，卡片优先
+          Tablet: 768px-1199px - 上下双段
+          Desktop: >= 1200px - 两栏网格
+      ═══════════════════════════════════════════════════════════════ */}
       <style>{`
-        @media (max-width: 900px) {
-          .main-grid {
+        /* ── Tablet (768px - 1199px) ── */
+        @media (max-width: 1199px) and (min-width: 768px) {
+          .hero-main-grid {
             grid-template-columns: 1fr !important;
-            gap: 60px !important;
+            gap: 48px !important;
           }
-          nav { display: none !important; }
-          .card-column {
-            order: -1;
-            max-width: 260px;
+          .hero-card {
+            order: 1 !important;
+          }
+          .hero-content {
+            order: 2 !important;
+            align-items: center;
+            text-align: center;
+          }
+          .hero-tag {
+            justify-content: center;
+          }
+          .hero-title h1 {
+            text-align: center;
+          }
+          .hero-title > div {
+            align-items: center;
+          }
+          .hero-title > div > div:first-child {
+            margin: 24px auto 0;
+          }
+          .hero-links {
+            align-items: center;
+          }
+          .hero-links p {
+            text-align: center;
+          }
+          .hero-buttons {
+            align-items: center;
+          }
+          .hero-footer {
+            justify-content: center;
+            text-align: center;
+          }
+          .hero-page-num, .hero-royal {
+            display: none;
+          }
+          .desktop-nav {
+            gap: 24px !important;
+          }
+        }
+
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .hero-main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+            padding-top: 40px !important;
+            padding-bottom: 40px !important;
+          }
+          .hero-nav {
+            justify-content: center !important;
+          }
+          .hero-card {
+            order: 1 !important;
+            max-width: 240px;
             margin: 0 auto;
+          }
+          .hero-card > div:first-child {
+            inset: -12px !important;
+          }
+          .hero-content {
+            order: 2 !important;
+            align-items: center;
+            text-align: center;
+          }
+          .hero-tag {
+            justify-content: center;
+          }
+          .hero-title h1 {
+            text-align: center;
+            font-size: clamp(42px, 12vw, 72px) !important;
+          }
+          .hero-title > div {
+            align-items: center;
+          }
+          .hero-title > div > div:first-child {
+            margin: 24px auto 0;
+          }
+          .hero-links {
+            align-items: center;
+            margin-top: 32px !important;
+            gap: 24px !important;
+          }
+          .hero-links p {
+            text-align: center;
+            font-size: 15px !important;
+          }
+          .hero-buttons {
+            align-items: center;
+            width: 100%;
+            max-width: 240px;
+          }
+          .hero-buttons a {
+            font-size: 14px !important;
+            justify-content: center;
+            padding: 12px 0 !important;
+            border-bottom-width: 1px !important;
+          }
+          .hero-footer {
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            gap: 8px;
+          }
+          .hero-footer p {
+            font-size: 11px !important;
+          }
+          .hero-page-num, .hero-royal, .hero-corner-tl, .hero-corner-tr {
+            display: none !important;
+          }
+          .desktop-nav {
+            display: none !important;
           }
         }
       `}</style>

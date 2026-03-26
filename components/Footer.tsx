@@ -32,6 +32,7 @@ const EASE = {
 const Footer = () => {
   return (
     <footer
+      className="footer"
       style={{
         borderTop: '0.5px solid rgba(200,190,168,0.5)',
         background: C.bg,
@@ -45,8 +46,8 @@ const Footer = () => {
         style={{
           position: 'absolute',
           top: 0,
-          left: 'clamp(32px, 6vw, 80px)',
-          right: 'clamp(32px, 6vw, 80px)',
+          left: 'clamp(24px, 5vw, 80px)',
+          right: 'clamp(24px, 5vw, 80px)',
           height: '0.5px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp}40, ${C.goldChamp}60, ${C.goldChamp}40, transparent)`,
         }}
@@ -56,20 +57,21 @@ const Footer = () => {
         style={{
           maxWidth: '1360px',
           margin: '0 auto',
-          padding: 'clamp(48px, 6vh, 72px) clamp(32px, 6vw, 80px) clamp(32px, 4vh, 48px)',
+          padding: 'clamp(48px, 6vh, 72px) clamp(24px, 5vw, 80px) clamp(32px, 4vh, 48px)',
         }}
       >
         {/* 主内容区 */}
         <div
+          className="footer-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 'clamp(32px, 4vw, 48px)',
             marginBottom: 'clamp(40px, 5vh, 56px)',
           }}
         >
           {/* 品牌区 */}
-          <div>
+          <div className="footer-brand">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div
                 style={{
@@ -96,7 +98,7 @@ const Footer = () => {
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '13px', // 放大：12px → 13px
+                fontSize: '13px',
                 fontWeight: 300,
                 lineHeight: 1.7,
                 color: C.inkDim,
@@ -110,11 +112,11 @@ const Footer = () => {
           </div>
 
           {/* 导航链接 */}
-          <div>
+          <div className="footer-nav">
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '11px', // 放大：8px → 11px
+                fontSize: '11px',
                 fontWeight: 500,
                 letterSpacing: '0.3em',
                 color: C.gold,
@@ -131,7 +133,7 @@ const Footer = () => {
                   href={link.href}
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '13px', // 放大：12px → 13px
+                    fontSize: '13px',
                     fontWeight: 300,
                     letterSpacing: '0.06em',
                     color: C.inkFaint,
@@ -148,11 +150,11 @@ const Footer = () => {
           </div>
 
           {/* 联系 */}
-          <div>
+          <div className="footer-contact">
             <p
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '11px', // 放大：8px → 11px
+                fontSize: '11px',
                 fontWeight: 500,
                 letterSpacing: '0.3em',
                 color: C.gold,
@@ -181,7 +183,7 @@ const Footer = () => {
                 <span
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '13px', // 放大：12px → 13px
+                    fontSize: '13px',
                     fontWeight: 300,
                     letterSpacing: '0.02em',
                     color: C.inkDim,
@@ -206,7 +208,7 @@ const Footer = () => {
                 <span
                   style={{
                     fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                    fontSize: '13px', // 放大：12px → 13px
+                    fontSize: '13px',
                     fontWeight: 300,
                     letterSpacing: '0.02em',
                     color: C.inkDim,
@@ -221,6 +223,7 @@ const Footer = () => {
 
         {/* 底部字幕区 */}
         <div
+          className="footer-bottom"
           style={{
             borderTop: '0.5px solid rgba(200,190,168,0.4)',
             paddingTop: 'clamp(24px, 3vh, 32px)',
@@ -236,7 +239,7 @@ const Footer = () => {
             <span
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '11px', // 放大：8px → 11px
+                fontSize: '11px',
                 fontWeight: 300,
                 letterSpacing: '0.15em',
                 color: C.inkFaint,
@@ -248,7 +251,7 @@ const Footer = () => {
             <span
               style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                fontSize: '10px', // 放大：8px → 10px
+                fontSize: '10px',
                 fontWeight: 300,
                 letterSpacing: '0.12em',
                 color: C.gold,
@@ -261,9 +264,10 @@ const Footer = () => {
 
           {/* 右：技术标注 */}
           <span
+            className="footer-tech"
             style={{
               fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '10px', // 放大：8px → 10px
+              fontSize: '10px',
               fontWeight: 300,
               letterSpacing: '0.1em',
               color: C.inkFaint,
@@ -274,6 +278,62 @@ const Footer = () => {
           </span>
         </div>
       </div>
+
+      {/* Responsive Styles */}
+      <style>{`
+        /* ── Tablet (768px - 1023px) ── */
+        @media (max-width: 1023px) and (min-width: 768px) {
+          .footer-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .footer-brand {
+            grid-column: span 2 !important;
+          }
+          .footer-bottom {
+            justify-content: center !important;
+            text-align: center;
+          }
+        }
+
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          .footer-brand {
+            text-align: center;
+          }
+          .footer-brand > div {
+            justify-content: center;
+          }
+          .footer-brand p {
+            max-width: 100% !important;
+            text-align: center;
+          }
+          .footer-nav {
+            text-align: center;
+          }
+          .footer-nav > div {
+            align-items: center;
+          }
+          .footer-contact {
+            text-align: center;
+          }
+          .footer-contact > div {
+            align-items: center;
+          }
+          .footer-bottom {
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-align: center;
+            gap: 12px !important;
+          }
+          .footer-tech {
+            font-size: 9px !important;
+          }
+        }
+      `}</style>
     </footer>
   )
 }

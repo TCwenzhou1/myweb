@@ -54,12 +54,12 @@ export default function GamesContent() {
           zIndex: 1,
           maxWidth: '1100px',
           margin: '0 auto',
-          padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
+          padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) clamp(60px, 8vh, 100px)',
         }}
       >
         {/* 页头 */}
         <CinematicSection delay={0}>
-          <div style={{ marginBottom: 'clamp(40px, 6vh, 64px)' }}>
+          <div className="games-header" style={{ marginBottom: 'clamp(40px, 6vh, 64px)' }}>
             {/* 场景标签 */}
             <div
               style={{
@@ -72,7 +72,7 @@ export default function GamesContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 600,
                   letterSpacing: '0.2em',
                   color: C.gold,
@@ -92,7 +92,7 @@ export default function GamesContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.18em',
                   color: C.inkDim,
@@ -122,7 +122,7 @@ export default function GamesContent() {
             <p
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(15px, 1.6vw, 18px)', // 放大
+                fontSize: 'clamp(15px, 1.6vw, 18px)',
                 fontWeight: 300,
                 letterSpacing: '0.04em',
                 color: C.inkMid,
@@ -160,9 +160,10 @@ export default function GamesContent() {
 
             {/* 描述 */}
             <p
+              className="games-desc"
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大
+                fontSize: 'clamp(14px, 1.4vw, 16px)',
                 fontWeight: 300,
                 lineHeight: 1.8,
                 color: C.inkDim,
@@ -195,6 +196,7 @@ export default function GamesContent() {
         {/* 底部场景编号与导航 */}
         <CinematicSection delay={300}>
           <div
+            className="games-footer"
             style={{
               marginTop: 'clamp(60px, 8vh, 80px)',
               paddingTop: '24px',
@@ -209,7 +211,7 @@ export default function GamesContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '13px', // 放大：8px → 13px
+                fontSize: '13px',
                 fontWeight: 300,
                 letterSpacing: '0.15em',
                 color: C.inkFaint,
@@ -220,12 +222,12 @@ export default function GamesContent() {
             </span>
 
             {/* 导航 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+            <div className="games-nav" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
               <a
                 href="/lab"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.12em',
                   color: C.inkDim,
@@ -252,7 +254,7 @@ export default function GamesContent() {
                 href="/about"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.12em',
                   color: C.inkDim,
@@ -280,7 +282,7 @@ export default function GamesContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '12px', // 放大：8px → 12px
+                fontSize: '12px',
                 fontWeight: 300,
                 letterSpacing: '0.12em',
                 color: C.gold,
@@ -292,6 +294,39 @@ export default function GamesContent() {
           </div>
         </CinematicSection>
       </div>
+
+      {/* 响应式样式 */}
+      <style>{`
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .games-desc {
+            font-size: 15px !important;
+            line-height: 1.7 !important;
+          }
+          .games-footer {
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-align: center;
+            gap: 20px !important;
+          }
+          .games-nav {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 16px !important;
+          }
+          .games-nav a {
+            font-size: 14px !important;
+          }
+        }
+
+        /* ── Tablet (768px - 1199px) ── */
+        @media (max-width: 1199px) and (min-width: 768px) {
+          .games-footer {
+            justify-content: center !important;
+            text-align: center;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -299,12 +334,13 @@ export default function GamesContent() {
 function PlaceholderGame({ title, description, status }: { title: string; description: string; status: string }) {
   return (
     <div
+      className="games-placeholder"
       style={{
         position: 'relative',
         background: C.cardIvory,
         border: `0.5px solid rgba(200,190,168,0.5)`,
         borderRadius: '12px',
-        padding: 'clamp(48px, 6vw, 72px)',
+        padding: 'clamp(40px, 6vw, 72px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -334,7 +370,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           position: 'absolute',
           inset: 0,
           borderRadius: '12px',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
           opacity: 0.5,
           pointerEvents: 'none',
         }}
@@ -368,9 +404,10 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
 
       {/* 标题 */}
       <h3
+        className="games-placeholder-title"
         style={{
           fontFamily: FONTS.display,
-          fontSize: 'clamp(20px, 2.5vw, 26px)', // 放大
+          fontSize: 'clamp(20px, 2.5vw, 26px)',
           fontWeight: 400,
           color: C.ink,
           marginBottom: '8px',
@@ -382,9 +419,10 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
 
       {/* 描述 */}
       <p
+        className="games-placeholder-desc"
         style={{
           fontFamily: FONTS.body,
-          fontSize: 'clamp(14px, 1.3vw, 15px)', // 放大：13px → 14-15px
+          fontSize: 'clamp(14px, 1.3vw, 15px)',
           fontWeight: 300,
           color: C.inkDim,
           marginBottom: '16px',
@@ -395,9 +433,10 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
 
       {/* 状态标签 */}
       <span
+        className="games-placeholder-status"
         style={{
           fontFamily: FONTS.body,
-          fontSize: '11px', // 放大：8px → 11px
+          fontSize: '11px',
           fontWeight: 500,
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
@@ -410,6 +449,22 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
       >
         {status}
       </span>
+
+      {/* Mobile 响应式 */}
+      <style>{`
+        @media (max-width: 767px) {
+          .games-placeholder {
+            padding: 40px 24px !important;
+            min-height: 260px !important;
+          }
+          .games-placeholder-title {
+            font-size: 22px !important;
+          }
+          .games-placeholder-desc {
+            font-size: 15px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

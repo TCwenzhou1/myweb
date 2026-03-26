@@ -30,12 +30,13 @@ export default function AboutContent() {
 
       {/* 主内容 - 居中更近的构图 */}
       <div
+        className="about-container"
         style={{
           position: 'relative',
           zIndex: 1,
           maxWidth: '680px',
           margin: '0 auto',
-          padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
+          padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) clamp(60px, 8vh, 100px)',
         }}
       >
         {/* 页头 - 更克制的设计 */}
@@ -43,6 +44,7 @@ export default function AboutContent() {
           <CinematicSection delay={0}>
             {/* 场景标签 */}
             <div
+              className="about-scene-label"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -53,7 +55,7 @@ export default function AboutContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 600,
                   letterSpacing: '0.2em',
                   color: C.gold,
@@ -73,7 +75,7 @@ export default function AboutContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.18em',
                   color: C.inkDim,
@@ -129,6 +131,7 @@ export default function AboutContent() {
 
         {/* 内容区块 - 更近的镜头感 */}
         <div
+          className="about-sections"
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -146,7 +149,7 @@ export default function AboutContent() {
 
           <CinematicSection delay={180}>
             <AboutSection title="几个方向">
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <ul className="about-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {[
                   { label: 'AI 项目', desc: '做了一些强化学习和 LLM 应用的实验，偏工程实践，不止停在论文阶段' },
                   { label: '游戏开发', desc: '长期关注游戏引擎和交互设计，慢慢在积累' },
@@ -154,6 +157,7 @@ export default function AboutContent() {
                 ].map((item, i) => (
                   <li
                     key={i}
+                    className="about-list-item"
                     style={{
                       position: 'relative',
                       paddingLeft: '20px',
@@ -173,9 +177,10 @@ export default function AboutContent() {
                       }}
                     />
                     <span
+                      className="about-list-label"
                       style={{
                         fontFamily: FONTS.body,
-                        fontSize: '13px', // 放大：11px → 13px
+                        fontSize: '13px',
                         fontWeight: 500,
                         letterSpacing: '0.08em',
                         color: C.gold,
@@ -187,9 +192,10 @@ export default function AboutContent() {
                       {item.label}
                     </span>
                     <span
+                      className="about-list-desc"
                       style={{
                         fontFamily: FONTS.body,
-                        fontSize: 'clamp(14px, 1.4vw, 15px)', // 放大：13-15px → 14-15px
+                        fontSize: 'clamp(14px, 1.4vw, 15px)',
                         fontWeight: 300,
                         lineHeight: 1.8,
                         color: C.inkDim,
@@ -225,6 +231,7 @@ export default function AboutContent() {
         {/* 底部场景编号与导航 */}
         <CinematicSection delay={420}>
           <div
+            className="about-footer"
             style={{
               marginTop: 'clamp(60px, 8vh, 80px)',
               paddingTop: '24px',
@@ -239,7 +246,7 @@ export default function AboutContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '13px', // 放大：8px → 13px
+                fontSize: '13px',
                 fontWeight: 300,
                 letterSpacing: '0.15em',
                 color: C.inkFaint,
@@ -250,12 +257,12 @@ export default function AboutContent() {
             </span>
 
             {/* 导航 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div className="about-nav" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
               <a
                 href="/contact"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.12em',
                   color: C.inkDim,
@@ -284,7 +291,7 @@ export default function AboutContent() {
             <span
               style={{
                 fontFamily: FONTS.body,
-                fontSize: '12px', // 放大：8px → 12px
+                fontSize: '12px',
                 fontWeight: 300,
                 letterSpacing: '0.12em',
                 color: C.gold,
@@ -296,6 +303,44 @@ export default function AboutContent() {
           </div>
         </CinematicSection>
       </div>
+
+      {/* 响应式样式 */}
+      <style>{`
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .about-container {
+            max-width: 100% !important;
+          }
+          .about-footer {
+            flex-direction: column !important;
+            justify-content: center !important;
+            text-align: center;
+            gap: 20px !important;
+          }
+          .about-nav a {
+            font-size: 14px !important;
+          }
+          .about-list-item {
+            padding-left: 16px !important;
+            margin-bottom: 16px !important;
+          }
+          .about-list-label {
+            font-size: 12px !important;
+          }
+          .about-list-desc {
+            font-size: 15px !important;
+            line-height: 1.7 !important;
+          }
+        }
+
+        /* ── Tablet (768px - 1199px) ── */
+        @media (max-width: 1199px) and (min-width: 768px) {
+          .about-footer {
+            justify-content: center !important;
+            text-align: center;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -307,7 +352,7 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
       <h2
         style={{
           fontFamily: FONTS.display,
-          fontSize: 'clamp(16px, 1.6vw, 20px)', // 放大
+          fontSize: 'clamp(18px, 2vw, 22px)',
           fontWeight: 400,
           letterSpacing: '0.01em',
           color: C.ink,
@@ -320,7 +365,7 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
         <span
           style={{
             fontFamily: FONTS.body,
-            fontSize: '13px', // 放大：8px → 13px
+            fontSize: '13px',
             fontWeight: 500,
             letterSpacing: '0.15em',
             color: C.gold,
@@ -334,9 +379,10 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
 
       {/* 内容 */}
       <div
+        className="about-section-content"
         style={{
           fontFamily: FONTS.body,
-          fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大：13-15px → 14-16px
+          fontSize: 'clamp(15px, 1.5vw, 17px)',
           fontWeight: 300,
           lineHeight: 1.9,
           color: C.inkDim,
@@ -346,6 +392,16 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
       >
         {children}
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          .about-section-content {
+            font-size: 16px !important;
+            line-height: 1.8 !important;
+            padding-left: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

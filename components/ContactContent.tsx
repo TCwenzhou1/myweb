@@ -51,12 +51,13 @@ export default function ContactContent() {
 
       {/* 主内容 */}
       <div
+        className="contact-container"
         style={{
           position: 'relative',
           zIndex: 1,
           maxWidth: '560px',
           margin: '0 auto',
-          padding: 'clamp(100px, 12vh, 140px) clamp(32px, 6vw, 80px) clamp(60px, 8vh, 100px)',
+          padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) clamp(60px, 8vh, 100px)',
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
@@ -65,6 +66,7 @@ export default function ContactContent() {
         {/* 顶部装饰 */}
         <CinematicSection delay={0}>
           <div
+            className="contact-header"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -84,7 +86,7 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 600,
                   letterSpacing: '0.2em',
                   color: C.gold,
@@ -104,7 +106,7 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '13px', // 放大：8px → 13px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.18em',
                   color: C.inkDim,
@@ -165,9 +167,10 @@ export default function ContactContent() {
 
             {/* 描述 */}
             <p
+              className="contact-desc"
               style={{
                 fontFamily: FONTS.body,
-                fontSize: 'clamp(14px, 1.4vw, 16px)', // 放大：13-15px → 14-16px
+                fontSize: 'clamp(15px, 1.5vw, 17px)',
                 fontWeight: 300,
                 lineHeight: 1.8,
                 color: C.inkDim,
@@ -182,6 +185,7 @@ export default function ContactContent() {
 
         {/* 联系卡片 */}
         <div
+          className="contact-cards"
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -211,6 +215,7 @@ export default function ContactContent() {
         {/* 片尾字幕区 */}
         <CinematicSection delay={300}>
           <div
+            className="contact-footer"
             style={{
               marginTop: 'auto',
               paddingTop: 'clamp(60px, 8vh, 80px)',
@@ -255,6 +260,7 @@ export default function ContactContent() {
 
             {/* Archive 标注 */}
             <div
+              className="contact-credits"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -266,7 +272,7 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '11px', // 放大：8px → 11px
+                  fontSize: '11px',
                   fontWeight: 400,
                   letterSpacing: '0.35em',
                   color: C.gold,
@@ -280,7 +286,7 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '12px', // 放大：8px → 12px
+                  fontSize: '12px',
                   fontWeight: 300,
                   letterSpacing: '0.15em',
                   color: C.inkFaint,
@@ -293,7 +299,7 @@ export default function ContactContent() {
               <span
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '11px', // 放大：7px → 11px
+                  fontSize: '11px',
                   fontWeight: 300,
                   letterSpacing: '0.12em',
                   color: C.inkFaint,
@@ -306,6 +312,7 @@ export default function ContactContent() {
 
             {/* 导航回首页 */}
             <div
+              className="contact-back"
               style={{
                 marginTop: '40px',
                 display: 'flex',
@@ -316,7 +323,7 @@ export default function ContactContent() {
                 href="/"
                 style={{
                   fontFamily: FONTS.body,
-                  fontSize: '12px', // 放大：9px → 12px
+                  fontSize: '13px',
                   fontWeight: 400,
                   letterSpacing: '0.15em',
                   color: C.inkDim,
@@ -327,7 +334,7 @@ export default function ContactContent() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  padding: '10px 20px',
+                  padding: '12px 24px',
                   border: `0.5px solid ${C.goldPale}50`,
                   borderRadius: '6px',
                 }}
@@ -342,13 +349,52 @@ export default function ContactContent() {
                   e.currentTarget.style.borderColor = `${C.goldPale}50`
                 }}
               >
-                <span style={{ fontSize: '14px' }}>←</span>
+                <span style={{ fontSize: '16px' }}>←</span>
                 回到开场
               </a>
             </div>
           </div>
         </CinematicSection>
       </div>
+
+      {/* 响应式样式 */}
+      <style>{`
+        /* ── Mobile (< 768px) ── */
+        @media (max-width: 767px) {
+          .contact-container {
+            max-width: 100% !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+          .contact-desc {
+            font-size: 16px !important;
+            line-height: 1.7 !important;
+          }
+          .contact-cards {
+            gap: 12px !important;
+          }
+          .contact-footer {
+            padding-top: 48px !important;
+          }
+          .contact-credits {
+            gap: 10px !important;
+          }
+          .contact-credits span {
+            font-size: 10px !important;
+          }
+          .contact-back a {
+            font-size: 13px !important;
+            padding: 14px 28px !important;
+          }
+        }
+
+        /* ── Tablet (768px - 1199px) ── */
+        @media (max-width: 1199px) and (min-width: 768px) {
+          .contact-container {
+            max-width: 600px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -368,6 +414,7 @@ function ContactCard({
 
   return (
     <a
+      className="contact-card"
       href={href}
       target={href.startsWith('http') ? '_blank' : undefined}
       rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
@@ -377,7 +424,7 @@ function ContactCard({
         display: 'flex',
         alignItems: 'center',
         gap: '20px',
-        padding: 'clamp(20px, 2.5vw, 28px)',
+        padding: 'clamp(18px, 2.5vw, 28px)',
         background: C.cardIvory,
         border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
         borderRadius: '12px',
@@ -411,9 +458,10 @@ function ContactCard({
       {/* 文字 */}
       <div>
         <p
+          className="contact-card-label"
           style={{
             fontFamily: FONTS.body,
-            fontSize: '11px', // 放大：9px → 11px
+            fontSize: '11px',
             fontWeight: 500,
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
@@ -424,9 +472,10 @@ function ContactCard({
           {label}
         </p>
         <p
+          className="contact-card-value"
           style={{
             fontFamily: FONTS.body,
-            fontSize: 'clamp(15px, 1.5vw, 17px)', // 放大：14-16px → 15-17px
+            fontSize: 'clamp(14px, 1.5vw, 17px)',
             fontWeight: 300,
             color: C.ink,
             letterSpacing: '0.02em',
@@ -459,6 +508,22 @@ function ContactCard({
           →
         </span>
       </div>
+
+      {/* Mobile 响应式 */}
+      <style>{`
+        @media (max-width: 767px) {
+          .contact-card {
+            padding: 16px !important;
+            gap: 16px !important;
+          }
+          .contact-card-label {
+            font-size: 10px !important;
+          }
+          .contact-card-value {
+            font-size: 15px !important;
+          }
+        }
+      `}</style>
     </a>
   )
 }

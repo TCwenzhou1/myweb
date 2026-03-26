@@ -44,7 +44,7 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     /* 奢华纸本质感 */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.012'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.012'/%3E%3C/svg%3E");
     /* 优化滚动性能 */
     overflow-x: hidden;
   }
@@ -139,6 +139,21 @@
   }
 }
 
+/* ============================================
+   三端响应式断点系统
+   Mobile: < 768px
+   Tablet: 768px - 1199px
+   Desktop: >= 1200px
+   ============================================ */
+
+:root {
+  /* 断点参考（用于 CSS clamp 计算）*/
+  --mobile-max: 767px;
+  --tablet-min: 768px;
+  --tablet-max: 1199px;
+  --desktop-min: 1200px;
+}
+
 /* 电影级转场动画 */
 .page-transition-enter {
   opacity: 0;
@@ -176,4 +191,49 @@
 
 .smooth-button:hover {
   transform: translateY(-1px);
+}
+
+/* ============================================
+   移动端全局优化
+   ============================================ */
+
+@media (max-width: 767px) {
+  /* 移动端禁用 hover 效果（防止残留）*/
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 确保触摸目标足够大 */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 移除移动端的平滑滚动（可能导致卡顿）*/
+  html {
+    scroll-behavior: auto;
+    -webkit-overflow-scrolling: auto;
+  }
+}
+
+/* ============================================
+   平板端全局优化
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  /* 平板端居中布局 */
+  main {
+    max-width: 100%;
+  }
+}
+
+/* ============================================
+   桌面端全局优化
+   ============================================ */
+
+@media (min-width: 1200px) {
+  /* 桌面端启用完整动画 */
+  * {
+    will-change: auto;
+  }
 }
