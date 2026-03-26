@@ -526,19 +526,15 @@ export default function HeroSection() {
 
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
-    // 电影化入场顺序：
-    // 1. 背景暖雾先醒（100ms）
-    // 2. 金框线条与角落装饰（500ms）
-    // 3. 展柜框架显现（900ms）
-    // 4. 主牌轻滑落位（1400ms）
-    // 5. 副牌装饰（1800ms）
-    // 6. 标题后显（2000ms）
-    // 7. 副标题与按钮最后出现（2400ms）
-    t.push(setTimeout(() => setPhase(1), 100))
-    t.push(setTimeout(() => setPhase(2), 500))
-    t.push(setTimeout(() => setPhase(3), 900))
-    t.push(setTimeout(() => setPhase(4), 1400))
-    t.push(setTimeout(() => setPhase(5), 2000))
+    // 电影化入场顺序（4阶段）：
+    // 1. 背景暖雾醒（200ms）
+    // 2. 黑桃水印隐约 + 金框线条（800ms）
+    // 3. 主牌滑入落位（1500ms），副牌跟随
+    // 4. 标题 + 副标题 + 按钮 + 底部信息最后出现（2100ms）
+    t.push(setTimeout(() => setPhase(1), 200))
+    t.push(setTimeout(() => setPhase(2), 800))
+    t.push(setTimeout(() => setPhase(3), 1500))
+    t.push(setTimeout(() => setPhase(4), 2100))
     return () => t.forEach(clearTimeout)
   }, [])
 
@@ -607,7 +603,7 @@ export default function HeroSection() {
         zIndex: 1,
       }} />
 
-      {/* ♠ 背景大水印 — 更淡（降低 25~30%） */}
+      {/* ♠ 背景大水印 — phase 2 才显现，更慢更电影 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -616,18 +612,18 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: '#0A090E',
-        opacity: phase >= 1 ? 0.032 : 0,   // 0.045 → 0.032 (-28%)
+        opacity: phase >= 2 ? 0.032 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
-        transition: 'opacity 2.0s cubic-bezier(0.12,1,0.24,1)',
+        transition: 'opacity 2.5s cubic-bezier(0.12,1,0.24,1)',
         zIndex: 1,
         letterSpacing: '-0.02em',
         WebkitTextStroke: '0.3px rgba(180,160,110,0.06)',
-        filter: 'blur(0.5px)',             // 边缘再雾一点
+        filter: 'blur(0.5px)',
       }}>♠</div>
 
-      {/* ♠ 内发光 — 更淡 */}
+      {/* ♠ 内发光 — phase 2 更慢显现 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -636,18 +632,18 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: 'transparent',
-        opacity: phase >= 1 ? 0.035 : 0,  // 0.05 → 0.035 (-30%)
+        opacity: phase >= 2 ? 0.035 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
-        transition: 'opacity 2.0s cubic-bezier(0.12,1,0.24,1)',
+        transition: 'opacity 2.5s cubic-bezier(0.12,1,0.24,1)',
         zIndex: 2,
         letterSpacing: '-0.02em',
         textShadow: `
           0 0 60px rgba(212,175,55,0.12),
           0 0 120px rgba(184,149,74,0.08)
         `,
-        filter: 'blur(1px)',              // 边缘更雾
+        filter: 'blur(1px)',
       }}>♠</div>
 
       {/* ═══════════════════════════════════════════════════
@@ -838,14 +834,14 @@ export default function HeroSection() {
               transform: phase >= 4 ? 'translateY(0)' : 'translateY(20px)',
               transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
             }}>
-              {/* 短描述 — 可读性提升 */}
+              {/* 短描述 — 一眼可读 */}
               <p style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
                 fontSize: 'clamp(15px, 1.6vw, 18px)',
-                fontWeight: 400,           // 300 → 400
-                lineHeight: 1.85,          // 1.8 → 1.85
-                letterSpacing: '0.03em',   // 0.02 → 0.03
-                color: C.inkMid,            // inkDim → inkMid
+                fontWeight: 400,
+                lineHeight: 1.9,           // 1.85 → 1.9
+                letterSpacing: '0.03em',
+                color: C.ink,              // inkMid → ink（清晰可读）
                 maxWidth: '360px',
               }}>
                 计算机工程 · 系统实践<br />
@@ -953,29 +949,29 @@ export default function HeroSection() {
           alignItems: 'center',
           paddingTop: '16px',
           borderTop: `0.5px solid rgba(15,14,16,0.06)`,
-          opacity: phase >= 5 ? 1 : 0,
-          transform: phase >= 5 ? 'translateY(0)' : 'translateY(8px)',
+          opacity: phase >= 4 ? 1 : 0,
+          transform: phase >= 4 ? 'translateY(0)' : 'translateY(8px)',
           transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
           flexWrap: 'wrap',
           gap: '12px',
         }}>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '12px',             // 11px → 12px
+            fontSize: '13px',             // 12px → 13px
             fontWeight: 400,
-            letterSpacing: '0.1em',
-            color: C.inkDim,              // inkFaint → inkDim
-            opacity: 0.85,                // 0.7 → 0.85
+            letterSpacing: '0.08em',
+            color: C.inkMid,              // inkDim → inkMid
+            opacity: 0.9,                 // 0.85 → 0.9
           }}>
             github.com/TCwenzhou1
           </p>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '12px',             // 11px → 12px
+            fontSize: '13px',             // 12px → 13px
             fontWeight: 400,
-            letterSpacing: '0.08em',
-            color: C.inkDim,              // inkFaint → inkDim
-            opacity: 0.85,                // 0.7 → 0.85
+            letterSpacing: '0.06em',
+            color: C.inkMid,               // inkDim → inkMid
+            opacity: 0.9,                  // 0.85 → 0.9
           }}>
             hello@tcwenzhou.site
           </p>
@@ -992,7 +988,7 @@ export default function HeroSection() {
         fontWeight: 300,
         letterSpacing: '0.2em',
         color: C.inkFaint,
-        opacity: phase >= 5 ? 0.4 : 0,
+        opacity: phase >= 4 ? 0.4 : 0,
         transition: 'opacity 1.0s ease 0.4s',
         zIndex: 4,
       }}>01 — 04</div>
@@ -1007,7 +1003,7 @@ export default function HeroSection() {
         fontWeight: 400,
         letterSpacing: '0.18em',
         color: C.gold,
-        opacity: phase >= 5 ? 0.6 : 0,
+        opacity: phase >= 4 ? 0.6 : 0,
         transition: 'opacity 1.0s ease 0.5s',
         zIndex: 4,
         display: 'flex',
