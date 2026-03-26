@@ -467,8 +467,8 @@ function RoyalCard({ phase }: { phase: number }) {
   )
 }
 
-// ─── 副牌（幽灵装饰 — 让主牌更孤立）────────────────────────────────────────────
-function FaintCards({ phase }: { phase: number }) {
+// ─── 副牌（幽灵装饰 — 让主牌更孤立，反向微旋转增强层次）────────────────────
+function FaintCards({ phase, tilt }: { phase: number; tilt: { x: number; y: number } }) {
   return (
     <>
       {/* 左侧幽灵副牌 */}
@@ -481,7 +481,12 @@ function FaintCards({ phase }: { phase: number }) {
         borderRadius: '8px',
         background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgWarm} 100%)`,
         opacity: phase >= 3 ? 0.08 : 0,
-        transform: `rotate(-12deg) translateY(${phase >= 3 ? 0 : 25}px)`,
+        transform: `
+          rotate(-12deg)
+          translateY(${phase >= 3 ? 0 : 25}px)
+          rotateX(${tilt.x * -0.4}deg)
+          rotateY(${tilt.y * -0.4}deg)
+        `,
         transition: 'opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s',
         zIndex: 0,
       }} />
@@ -495,7 +500,12 @@ function FaintCards({ phase }: { phase: number }) {
         borderRadius: '8px',
         background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgDeep} 100%)`,
         opacity: phase >= 3 ? 0.06 : 0,
-        transform: `rotate(8deg) translateY(${phase >= 3 ? 0 : 25}px)`,
+        transform: `
+          rotate(8deg)
+          translateY(${phase >= 3 ? 0 : 25}px)
+          rotateX(${tilt.x * -0.3}deg)
+          rotateY(${tilt.y * -0.3}deg)
+        `,
         transition: 'opacity 1.2s ease 0.6s, transform 1.2s ease 0.6s',
         zIndex: 0,
       }} />
@@ -508,7 +518,10 @@ export default function HeroSection() {
   const [phase, setPhase] = useState(0)
   const [mouseX, setMouseX] = useState(0.5)
   const [mouseY, setMouseY] = useState(0.5)
+  // 3D 视差倾斜状态 — 极细腻的旋转角度
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const sectionRef = useRef<HTMLElement>(null)
+  const tiltRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
@@ -527,8 +540,31 @@ export default function HeroSection() {
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!sectionRef.current) return
     const rect = sectionRef.current.getBoundingClientRect()
-    setMouseX((e.clientX - rect.left) / rect.width)
-    setMouseY((e.clientY - rect.top) / rect.height)
+    const rawX = (e.clientX - rect.left) / rect.width
+    const rawY = (e.clientY - rect.top) / rect.height
+    setMouseX(rawX)
+    setMouseY(rawY)
+
+    // 仅在主牌出现后启用视差 — 避免开场抖动
+    if (phase < 3) return
+
+    // 极细腻的倾斜：最大 ±4deg，像悬浮的真品
+    const targetX = (rawY - 0.5) * -8  // 上下 → X轴旋转
+    const targetY = (rawX - 0.5) * 8    // 左右 → Y轴旋转
+
+    // 防抖：避免每次鼠标移动都重绘
+    if (tiltRef.current) clearTimeout(tiltRef.current)
+    tiltRef.current = setTimeout(() => {
+      setTilt({ x: targetX, y: targetY })
+    }, 8)
+  }
+
+  const handleMouseLeave = () => {
+    // 离开时缓慢回正 — 像漂浮物归位
+    if (tiltRef.current) clearTimeout(tiltRef.current)
+    tiltRef.current = setTimeout(() => {
+      setTilt({ x: 0, y: 0 })
+    }, 120)
   }
 
   const markX = 55 + (mouseX - 0.5) * 1.2
@@ -538,6 +574,7 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
         position: 'relative',
         width: '100%',
@@ -923,21 +960,34 @@ export default function HeroSection() {
             position: 'relative',
             order: 1, // Mobile: 卡片在上
           }}>
-            {/* 展柜装饰框架 */}
+            {/* 展柜装饰框架 — 随主牌同倾斜 */}
             <div style={{
               position: 'absolute',
               inset: '-20px',
               border: `0.5px solid ${C.goldPale}`,
               borderRadius: '20px',
               opacity: phase >= 3 ? 0.3 : 0,
-              transition: 'opacity 1.0s ease 0.2s',
+              transform: phase >= 3
+                ? `perspective(800px) rotateX(${tilt.x * 0.3}deg) rotateY(${tilt.y * 0.3}deg)`
+                : 'none',
+              transition: `opacity 1.0s ease 0.2s, transform 0.15s cubic-bezier(0.12,1,0.24,1)`,
             }} />
 
-            {/* 副牌装饰 */}
-            <FaintCards phase={phase} />
+            {/* 3D 视差悬浮容器 — 承载主牌和副牌 */}
+            <div style={{
+              position: 'relative',
+              transform: phase >= 3
+                ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
+                : 'none',
+              transition: 'transform 0.15s cubic-bezier(0.12,1,0.24,1)',
+              willChange: 'transform',
+            }}>
+              {/* 副牌装饰 — 反向微旋转，增强层次感 */}
+              <FaintCards phase={phase} tilt={tilt} />
 
-            {/* 主牌 */}
-            <RoyalCard phase={phase} />
+              {/* 主牌 */}
+              <RoyalCard phase={phase} />
+            </div>
           </div>
         </div>
 
