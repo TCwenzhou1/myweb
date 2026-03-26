@@ -115,6 +115,7 @@ function Spotlight() {
 }
 
 // ─── 皇家展柜卡牌 ─────────────────────────────────────────────────────────────────
+// 五层结构：角标层 / 中央徽记 / 铭文层 / 边框压纹 / 底部编号
 function RoyalCard({ phase }: { phase: number }) {
   return (
     <div style={{
@@ -132,8 +133,8 @@ function RoyalCard({ phase }: { phase: number }) {
         inset: '-4px',
         borderRadius: '16px',
         background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 30%, ${C.gold} 50%, ${C.goldRich} 70%, ${C.gold} 100%)`,
-        opacity: 0.6,
-        filter: 'blur(1px)',
+        opacity: 0.5,
+        filter: 'blur(0.5px)',
       }} />
 
       {/* 外层金色边框 - 第一层 */}
@@ -142,7 +143,7 @@ function RoyalCard({ phase }: { phase: number }) {
         inset: '-2px',
         borderRadius: '14px',
         background: `linear-gradient(135deg, ${C.goldChamp} 0%, ${C.goldPale} 40%, ${C.goldChamp} 60%, ${C.gold} 100%)`,
-        opacity: 0.8,
+        opacity: 0.75,
       }} />
 
       {/* 主牌面 */}
@@ -150,7 +151,7 @@ function RoyalCard({ phase }: { phase: number }) {
         position: 'absolute',
         inset: 0,
         borderRadius: '12px',
-        background: `linear-gradient(165deg, ${C.cardIvory} 0%, #F5F1E8 50%, ${C.bgWarm} 100%)`,
+        background: `linear-gradient(168deg, ${C.cardIvory} 0%, #F5F1E8 40%, ${C.bgWarm} 100%)`,
         boxShadow: `
           0 2px 4px rgba(0,0,0,0.02),
           0 8px 24px rgba(0,0,0,0.06),
@@ -167,124 +168,246 @@ function RoyalCard({ phase }: { phase: number }) {
           opacity: 0.8,
         }} />
 
-        {/* 内层双线边框 */}
+        {/* ═══════════════════════════════════════════════════
+            第一层：外层双线边框 + 四角切角装饰
+        ═══════════════════════════════════════════════════ */}
+        {/* 外层装饰线 */}
         <div style={{
           position: 'absolute',
-          inset: '16px',
-          border: `1px solid ${C.goldPale}`,
-          borderRadius: '4px',
-          opacity: 0.6,
+          inset: '12px',
+          border: `0.5px solid ${C.goldPale}`,
+          borderRadius: '6px',
+          opacity: 0.5,
         }} />
+        {/* 内层装饰线 */}
         <div style={{
           position: 'absolute',
-          inset: '20px',
-          border: `0.5px solid ${C.goldChamp}`,
-          borderRadius: '3px',
+          inset: '17px',
+          border: `0.3px solid ${C.goldChamp}`,
+          borderRadius: '4px',
+          opacity: 0.35,
+        }} />
+
+        {/* 四角极淡切角装饰 - 左上 */}
+        <div style={{
+          position: 'absolute',
+          top: '22px',
+          left: '22px',
+          width: '8px',
+          height: '8px',
+          borderTop: `0.5px solid ${C.goldChamp}`,
+          borderLeft: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
+        }} />
+        {/* 四角极淡切角装饰 - 右上 */}
+        <div style={{
+          position: 'absolute',
+          top: '22px',
+          right: '22px',
+          width: '8px',
+          height: '8px',
+          borderTop: `0.5px solid ${C.goldChamp}`,
+          borderRight: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
+        }} />
+        {/* 四角极淡切角装饰 - 左下 */}
+        <div style={{
+          position: 'absolute',
+          bottom: '22px',
+          left: '22px',
+          width: '8px',
+          height: '8px',
+          borderBottom: `0.5px solid ${C.goldChamp}`,
+          borderLeft: `0.5px solid ${C.goldChamp}`,
+          opacity: 0.4,
+        }} />
+        {/* 四角极淡切角装饰 - 右下 */}
+        <div style={{
+          position: 'absolute',
+          bottom: '22px',
+          right: '22px',
+          width: '8px',
+          height: '8px',
+          borderBottom: `0.5px solid ${C.goldChamp}`,
+          borderRight: `0.5px solid ${C.goldChamp}`,
           opacity: 0.4,
         }} />
 
-        {/* 顶部装饰角标 */}
-        <div style={{
-          position: 'absolute',
-          top: '28px',
-          left: '28px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '2px',
-        }}>
-          <span style={{
-            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '18px',
-            fontWeight: 500,
-            color: C.ink,
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-          }}>A</span>
-          <span style={{
-            fontSize: '11px',
-            color: C.inkDim,
-            lineHeight: 1,
-          }}>♠</span>
-        </div>
-
-        {/* 中央大花色 - 精致压纹 */}
+        {/* ═══════════════════════════════════════════════════
+            第二层：中央大花色压纹 ♠（极淡，像王室纹章）
+        ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          fontSize: 'clamp(100px, 18vw, 140px)',
+          fontSize: 'clamp(90px, 16vw, 130px)',
           color: 'transparent',
           fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
           lineHeight: 1,
           letterSpacing: '-0.04em',
-          WebkitTextStroke: `0.5px ${C.inkMid}`,
+          WebkitTextStroke: `0.4px ${C.inkMid}`,
           textShadow: `
             0 0 0 ${C.cardIvory},
-            0 2px 4px rgba(0,0,0,0.06),
-            0 8px 16px rgba(0,0,0,0.04)
+            0 2px 4px rgba(0,0,0,0.04),
+            0 6px 12px rgba(0,0,0,0.03)
           `,
-          opacity: 0.7,
+          opacity: 0.5,
         }}>♠</div>
 
-        {/* 底部ROYAL EDITION */}
+        {/* ═══════════════════════════════════════════════════
+            第三层：顶部角标 A♠（优雅衬线体）
+        ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          bottom: '32px',
+          top: '30px',
+          left: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1px',
+        }}>
+          <span style={{
+            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: C.inkMid,
+            lineHeight: 1,
+            letterSpacing: '-0.01em',
+          }}>A</span>
+          <span style={{
+            fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
+            fontSize: '10px',
+            color: C.inkDim,
+            lineHeight: 1,
+          }}>♠</span>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════
+            第四层：底部角标 A♠（倒置）
+        ═══════════════════════════════════════════════════ */}
+        <div style={{
+          position: 'absolute',
+          bottom: '30px',
+          right: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1px',
+          transform: 'rotate(180deg)',
+        }}>
+          <span style={{
+            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: C.inkMid,
+            lineHeight: 1,
+            letterSpacing: '-0.01em',
+          }}>A</span>
+          <span style={{
+            fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
+            fontSize: '10px',
+            color: C.inkDim,
+            lineHeight: 1,
+          }}>♠</span>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════
+            第五层：中央铭文信息层
+        ═══════════════════════════════════════════════════ */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '6px',
+          paddingTop: '8px',
+        }}>
+          {/* TCWENZHOU */}
+          <span style={{
+            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
+            fontSize: '11px',
+            fontWeight: 500,
+            letterSpacing: '0.28em',
+            color: C.inkMid,
+            textTransform: 'uppercase',
+          }}>TCwenzhou</span>
+
+          {/* 分隔线 */}
+          <div style={{
+            width: '30px',
+            height: '0.3px',
+            background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
+            opacity: 0.6,
+          }} />
+
+          {/* ROYAL EDITION */}
+          <span style={{
+            fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+            fontSize: '6px',
+            fontWeight: 500,
+            letterSpacing: '0.32em',
+            color: C.gold,
+            textTransform: 'uppercase',
+          }}>Royal Edition</span>
+
+          {/* 分隔线 */}
+          <div style={{
+            width: '24px',
+            height: '0.3px',
+            background: `linear-gradient(to right, transparent, ${C.goldPale}, transparent)`,
+            opacity: 0.4,
+          }} />
+
+          {/* SYSTEMS · AI · GAMES */}
+          <span style={{
+            fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+            fontSize: '5px',
+            fontWeight: 400,
+            letterSpacing: '0.18em',
+            color: C.inkFaint,
+            textTransform: 'uppercase',
+          }}>Systems · AI · Games</span>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════
+            第六层：底部档案编号
+        ═══════════════════════════════════════════════════ */}
+        <div style={{
+          position: 'absolute',
+          bottom: '28px',
           left: 0,
           right: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '4px',
+          gap: '3px',
         }}>
           <div style={{
-            width: '40px',
-            height: '0.5px',
+            width: '36px',
+            height: '0.3px',
             background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
-            opacity: 0.6,
+            opacity: 0.5,
           }} />
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '7px',
-            fontWeight: 500,
-            letterSpacing: '0.35em',
-            color: C.gold,
+            fontSize: '5px',
+            fontWeight: 400,
+            letterSpacing: '0.2em',
+            color: C.inkFaint,
             textTransform: 'uppercase',
-          }}>Royal Edition</span>
-          <div style={{
-            width: '40px',
-            height: '0.5px',
-            background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
+          }}>Scene 01 · Archive A-01</span>
+          <span style={{
+            fontFamily: '"Jost", "Inter", system-ui, sans-serif',
+            fontSize: '4px',
+            fontWeight: 300,
+            letterSpacing: '0.15em',
+            color: C.inkFaint,
             opacity: 0.6,
-          }} />
-        </div>
-
-        {/* 底部角标 */}
-        <div style={{
-          position: 'absolute',
-          bottom: '28px',
-          right: '28px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '2px',
-          transform: 'rotate(180deg)',
-        }}>
-          <span style={{
-            fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '18px',
-            fontWeight: 500,
-            color: C.ink,
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-          }}>A</span>
-          <span style={{
-            fontSize: '11px',
-            color: C.inkDim,
-            lineHeight: 1,
-          }}>♠</span>
+          }}>TCwenzhou Private Collection</span>
         </div>
 
         {/* 金属烫边效果 - 顶部 */}
@@ -293,9 +416,9 @@ function RoyalCard({ phase }: { phase: number }) {
           top: 0,
           left: '10%',
           right: '10%',
-          height: '1px',
+          height: '0.5px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.5,
+          opacity: 0.45,
         }} />
         {/* 金属烫边效果 - 底部 */}
         <div style={{
@@ -303,9 +426,9 @@ function RoyalCard({ phase }: { phase: number }) {
           bottom: 0,
           left: '10%',
           right: '10%',
-          height: '1px',
+          height: '0.5px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.4,
+          opacity: 0.35,
         }} />
       </div>
 
@@ -316,7 +439,7 @@ function RoyalCard({ phase }: { phase: number }) {
         left: '10%',
         right: '10%',
         height: '40px',
-        background: `radial-gradient(ellipse at center top, rgba(0,0,0,0.15) 0%, transparent 70%)`,
+        background: `radial-gradient(ellipse at center top, rgba(0,0,0,0.12) 0%, transparent 70%)`,
         filter: 'blur(12px)',
       }} />
     </div>
@@ -618,7 +741,7 @@ export default function HeroSection() {
                 letterSpacing: '0.52em',
                 textTransform: 'uppercase',
                 color: C.gold,
-              }}>Portfolio · 2024</p>
+              }}>TCwenzhou · Royal Edition</p>
             </div>
 
             {/* 主标题 */}
