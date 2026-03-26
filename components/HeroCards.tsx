@@ -74,39 +74,44 @@ function Sparkles() {
   )
 }
 
-// ─── 聚光灯效果 ─────────────────────────────────────────────────────────────────
-function Spotlight() {
+// ─── 聚光灯效果 — 戏剧化片头版 ─────────────────────────────────────────────────
+function Spotlight({ phase }: { phase: number }) {
   return (
     <>
+      {/* 主聚光灯 — 先于一切出现，像舞台灯 */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: '15%',
-        top: '-20%',
-        width: '60vw',
-        height: '80vh',
+        left: '50%',
+        top: '-30%',
+        width: '50vw',
+        height: '100vh',
+        transform: 'translateX(-50%)',
         borderRadius: '50%',
-        background: `radial-gradient(ellipse at center, rgba(255,249,240,0.7) 0%, rgba(255,249,240,0.3) 25%, transparent 60%)`,
-        filter: 'blur(60px)',
+        background: `radial-gradient(ellipse at center bottom, rgba(255,249,240,0.85) 0%, rgba(255,249,240,0.4) 20%, transparent 60%)`,
+        filter: 'blur(80px)',
         pointerEvents: 'none',
         zIndex: 2,
-        animation: 'spotlightBreath 7s ease-in-out infinite',
+        opacity: phase >= 1 ? (phase >= 3 ? 0.7 : 0.3) : 0,
+        transition: 'opacity 1.5s ease',
       }} />
+      {/* 暖色补光 */}
       <div aria-hidden style={{
         position: 'absolute',
-        right: '10%',
-        bottom: '10%',
-        width: '40vw',
-        height: '50vh',
+        right: '5%',
+        bottom: '0%',
+        width: '35vw',
+        height: '60vh',
         borderRadius: '50%',
-        background: `radial-gradient(ellipse at center, rgba(212,188,138,0.12) 0%, transparent 65%)`,
-        filter: 'blur(40px)',
+        background: `radial-gradient(ellipse at center, rgba(212,188,138,0.15) 0%, transparent 65%)`,
+        filter: 'blur(50px)',
         pointerEvents: 'none',
         zIndex: 2,
-        animation: 'spotlightBreath 9s ease-in-out 2s infinite',
+        opacity: phase >= 3 ? 0.8 : 0,
+        transition: 'opacity 1.2s ease 0.3s',
       }} />
       <style>{`
         @keyframes spotlightBreath {
-          0%, 100% { opacity: 0.6; }
+          0%, 100% { opacity: 0.85; }
           50% { opacity: 1; }
         }
       `}</style>
@@ -127,110 +132,93 @@ function RoyalCard({ phase }: { phase: number }) {
       transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.90)',
       transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.2s, transform 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s',
     }}>
-      {/* 外层华丽金色边框 - 第二层（旧金/香槟金） */}
+      {/* 外层金色边框 — 简洁旧金感 */}
       <div style={{
         position: 'absolute',
-        inset: '-4px',
-        borderRadius: '16px',
-        background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 25%, ${C.goldPale} 50%, ${C.goldChamp} 75%, ${C.gold} 100%)`,
-        opacity: 0.6,
-        filter: 'blur(0.3px)',
-      }} />
-
-      {/* 外层金色边框 - 第一层（更香槟金） */}
-      <div style={{
-        position: 'absolute',
-        inset: '-2px',
+        inset: '-3px',
         borderRadius: '14px',
-        background: `linear-gradient(135deg, ${C.goldChamp} 0%, ${C.goldPale} 35%, ${C.goldChamp} 65%, ${C.goldRich} 100%)`,
-        opacity: 0.8,
+        background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 30%, ${C.goldPale} 50%, ${C.goldChamp} 70%, ${C.gold} 100%)`,
+        opacity: 0.65,
       }} />
 
-      {/* 主牌面 */}
+      {/* 主牌面 — 减少装饰，用光影说话 */}
       <div style={{
         position: 'absolute',
         inset: 0,
         borderRadius: '12px',
-        background: `linear-gradient(168deg, ${C.cardIvory} 0%, #F5F1E8 40%, ${C.bgWarm} 100%)`,
+        background: `linear-gradient(168deg, ${C.cardIvory} 0%, #F5F1E8 30%, ${C.bgWarm} 100%)`,
         boxShadow: `
-          0 2px 4px rgba(0,0,0,0.02),
-          0 8px 24px rgba(0,0,0,0.06),
-          0 24px 60px rgba(0,0,0,0.08),
-          inset 0 1px 0 rgba(255,255,255,0.9)
+          0 4px 8px rgba(0,0,0,0.03),
+          0 16px 40px rgba(0,0,0,0.06),
+          0 32px 80px rgba(0,0,0,0.05),
+          inset 0 1px 0 rgba(255,255,255,0.95),
+          inset 0 -2px 8px rgba(180,160,120,0.03)
         `,
         overflow: 'hidden',
       }}>
-        {/* 牌面纸纹质感 */}
+        {/* 牌面纸纹质感 — 极淡 */}
         <div aria-hidden style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`,
-          opacity: 0.8,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3Cfilter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E")`,
+          opacity: 0.6,
         }} />
 
         {/* ═══════════════════════════════════════════════════
-            第一层：外层双线边框 + 四角切角装饰
+            简洁边框 — 一层足够
         ═══════════════════════════════════════════════════ */}
-        {/* 外层装饰线（更淡更细） */}
         <div style={{
           position: 'absolute',
-          inset: '12px',
+          inset: '10px',
           border: `0.4px solid ${C.goldPale}`,
           borderRadius: '6px',
-          opacity: 0.4,
-        }} />
-        {/* 内层装饰线（更淡更细） */}
-        <div style={{
-          position: 'absolute',
-          inset: '17px',
-          border: `0.25px solid ${C.goldChamp}`,
-          borderRadius: '4px',
-          opacity: 0.28,
+          opacity: 0.45,
         }} />
 
-        {/* 四角切角装饰 - 左上（更明确） */}
+        {/* 四角切角装饰 — 精确但克制 */}
+        {/* 左上 */}
         <div style={{
           position: 'absolute',
-          top: '22px',
-          left: '22px',
-          width: '10px',
-          height: '10px',
+          top: '20px',
+          left: '20px',
+          width: '12px',
+          height: '12px',
           borderTop: `0.6px solid ${C.goldChamp}`,
           borderLeft: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.5,
+          opacity: 0.55,
         }} />
-        {/* 四角切角装饰 - 右上 */}
+        {/* 右上 */}
         <div style={{
           position: 'absolute',
-          top: '22px',
-          right: '22px',
-          width: '10px',
-          height: '10px',
+          top: '20px',
+          right: '20px',
+          width: '12px',
+          height: '12px',
           borderTop: `0.6px solid ${C.goldChamp}`,
           borderRight: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.5,
+          opacity: 0.55,
         }} />
-        {/* 四角切角装饰 - 左下 */}
+        {/* 左下 */}
         <div style={{
           position: 'absolute',
-          bottom: '22px',
-          left: '22px',
-          width: '10px',
-          height: '10px',
+          bottom: '20px',
+          left: '20px',
+          width: '12px',
+          height: '12px',
           borderBottom: `0.6px solid ${C.goldChamp}`,
           borderLeft: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.5,
+          opacity: 0.55,
         }} />
-        {/* 四角切角装饰 - 右下 */}
+        {/* 右下 */}
         <div style={{
           position: 'absolute',
-          bottom: '22px',
-          right: '22px',
-          width: '10px',
-          height: '10px',
+          bottom: '20px',
+          right: '20px',
+          width: '12px',
+          height: '12px',
           borderBottom: `0.6px solid ${C.goldChamp}`,
           borderRight: `0.6px solid ${C.goldChamp}`,
-          opacity: 0.5,
+          opacity: 0.55,
         }} />
 
         {/* ═══════════════════════════════════════════════════
@@ -425,93 +413,91 @@ function RoyalCard({ phase }: { phase: number }) {
           }}>TCwenzhou Private Collection</span>
         </div>
 
-        {/* 金属烫边效果 - 顶部 */}
+        {/* 顶部金属烫边 — 简洁 */}
         <div style={{
           position: 'absolute',
           top: 0,
-          left: '10%',
-          right: '10%',
-          height: '0.5px',
+          left: '8%',
+          right: '8%',
+          height: '0.4px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.45,
+          opacity: 0.5,
         }} />
-        {/* 金属烫边效果 - 底部 */}
+        {/* 底部金属烫边 */}
         <div style={{
           position: 'absolute',
           bottom: 0,
-          left: '10%',
-          right: '10%',
-          height: '0.5px',
+          left: '8%',
+          right: '8%',
+          height: '0.4px',
           background: `linear-gradient(to right, transparent, ${C.goldChamp} 20%, ${C.goldRich} 50%, ${C.goldChamp} 80%, transparent)`,
-          opacity: 0.35,
+          opacity: 0.4,
+        }} />
+
+        {/* ═══════════════════════════════════════════════════
+            展厅光效果 — 极轻左上光
+        ═══════════════════════════════════════════════════ */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '12px',
+          background: `linear-gradient(
+            130deg,
+            rgba(255,249,240,0.2) 0%,
+            transparent 35%,
+            transparent 65%,
+            rgba(30,25,15,0.03) 100%
+          )`,
+          pointerEvents: 'none',
+          zIndex: 10,
         }} />
       </div>
 
       {/* 展示台阴影 — 更像接地 */}
       <div style={{
         position: 'absolute',
-        bottom: '-30px',
+        bottom: '-28px',
         left: '8%',
         right: '8%',
-        height: '45px',
-        background: `radial-gradient(ellipse at center top, rgba(30,25,15,0.15) 0%, transparent 70%)`,
-        filter: 'blur(14px)',
-      }} />
-
-      {/* ═══════════════════════════════════════════════════
-          展厅光效果 — 左上到右下极轻柔光过渡
-      ═══════════════════════════════════════════════════ */}
-      <div aria-hidden style={{
-        position: 'absolute',
-        inset: 0,
-        borderRadius: '12px',
-        background: `linear-gradient(
-          135deg,
-          rgba(255,249,240,0.15) 0%,
-          transparent 40%,
-          transparent 60%,
-          rgba(30,25,15,0.04) 100%
-        )`,
-        pointerEvents: 'none',
-        zIndex: 10,
+        height: '50px',
+        background: `radial-gradient(ellipse at center top, rgba(30,25,15,0.18) 0%, transparent 70%)`,
+        filter: 'blur(16px)',
       }} />
     </div>
   )
 }
 
-// ─── 副牌（极淡背景装饰）────────────────────────────────────────────────────────────────
+// ─── 副牌（幽灵装饰 — 让主牌更孤立）────────────────────────────────────────────
 function FaintCards({ phase }: { phase: number }) {
   return (
     <>
-      {/* 左侧极淡副牌 */}
+      {/* 左侧幽灵副牌 */}
       <div aria-hidden style={{
         position: 'absolute',
-        left: '-15%',
-        top: '15%',
-        width: '45%',
+        left: '-18%',
+        top: '18%',
+        width: '42%',
         aspectRatio: '2.5 / 3.5',
         borderRadius: '8px',
         background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgWarm} 100%)`,
-        opacity: phase >= 4 ? 0.15 : 0,
-        transform: `rotate(-12deg) translateY(${phase >= 4 ? 0 : 20}px)`,
-        transition: 'opacity 1.0s ease 0.5s, transform 1.0s ease 0.5s',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-        zIndex: 1,
+        opacity: phase >= 3 ? 0.08 : 0,
+        transform: `rotate(-12deg) translateY(${phase >= 3 ? 0 : 25}px)`,
+        transition: 'opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s',
+        zIndex: 0,
       }} />
-      {/* 右侧极淡副牌 */}
+      {/* 右侧幽灵副牌 */}
       <div aria-hidden style={{
         position: 'absolute',
-        right: '-12%',
-        bottom: '10%',
-        width: '40%',
+        right: '-15%',
+        bottom: '8%',
+        width: '38%',
         aspectRatio: '2.5 / 3.5',
         borderRadius: '8px',
         background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgDeep} 100%)`,
-        opacity: phase >= 4 ? 0.12 : 0,
-        transform: `rotate(8deg) translateY(${phase >= 4 ? 0 : 20}px)`,
-        transition: 'opacity 1.0s ease 0.7s, transform 1.0s ease 0.7s',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
-        zIndex: 1,
+        opacity: phase >= 3 ? 0.06 : 0,
+        transform: `rotate(8deg) translateY(${phase >= 3 ? 0 : 25}px)`,
+        transition: 'opacity 1.2s ease 0.6s, transform 1.2s ease 0.6s',
+        zIndex: 0,
       }} />
     </>
   )
@@ -526,15 +512,15 @@ export default function HeroSection() {
 
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
-    // 电影化入场顺序（4阶段）：
-    // 1. 背景暖雾醒（200ms）
-    // 2. 黑桃水印隐约 + 金框线条（800ms）
-    // 3. 主牌滑入落位（1500ms），副牌跟随
-    // 4. 标题 + 副标题 + 按钮 + 底部信息最后出现（2100ms）
-    t.push(setTimeout(() => setPhase(1), 200))
-    t.push(setTimeout(() => setPhase(2), 800))
-    t.push(setTimeout(() => setPhase(3), 1500))
-    t.push(setTimeout(() => setPhase(4), 2100))
+    // 电影化入场序列（4阶段戏剧化）：
+    // 1. 聚光灯先于一切（150ms）— 舞台感
+    // 2. 黑桃呼吸 + 金框线（600ms）
+    // 3. 主牌落位 + 副牌现（1200ms）
+    // 4. 标题 + 信息全出（1800ms）
+    t.push(setTimeout(() => setPhase(1), 150))
+    t.push(setTimeout(() => setPhase(2), 600))
+    t.push(setTimeout(() => setPhase(3), 1200))
+    t.push(setTimeout(() => setPhase(4), 1800))
     return () => t.forEach(clearTimeout)
   }, [])
 
@@ -566,7 +552,7 @@ export default function HeroSection() {
       ═══════════════════════════════════════════════════ */}
 
       {/* 聚光灯效果 */}
-      <Spotlight />
+      <Spotlight phase={phase} />
 
       {/* 粒子层 */}
       <Sparkles />
@@ -603,7 +589,7 @@ export default function HeroSection() {
         zIndex: 1,
       }} />
 
-      {/* ♠ 背景大水印 — phase 2 才显现，更慢更电影 */}
+      {/* ♠ 背景大水印 — 呼吸感，像活的母题 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -612,7 +598,7 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: '#0A090E',
-        opacity: phase >= 2 ? 0.032 : 0,
+        opacity: phase >= 2 ? 0.038 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
@@ -621,9 +607,10 @@ export default function HeroSection() {
         letterSpacing: '-0.02em',
         WebkitTextStroke: '0.3px rgba(180,160,110,0.06)',
         filter: 'blur(0.5px)',
+        animation: 'spadeBreath 6s ease-in-out infinite',
       }}>♠</div>
 
-      {/* ♠ 内发光 — phase 2 更慢显现 */}
+      {/* ♠ 内发光 — 呼吸节奏 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -632,7 +619,7 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: 'transparent',
-        opacity: phase >= 2 ? 0.035 : 0,
+        opacity: phase >= 2 ? 0.04 : 0,
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
@@ -640,11 +627,23 @@ export default function HeroSection() {
         zIndex: 2,
         letterSpacing: '-0.02em',
         textShadow: `
-          0 0 60px rgba(212,175,55,0.12),
-          0 0 120px rgba(184,149,74,0.08)
+          0 0 80px rgba(212,175,55,0.15),
+          0 0 150px rgba(184,149,74,0.1)
         `,
         filter: 'blur(1px)',
+        animation: 'spadeGlow 6s ease-in-out 1s infinite',
       }}>♠</div>
+
+      <style>{`
+        @keyframes spadeBreath {
+          0%, 100% { opacity: 0.038; transform: translate(50%, -50%) scale(1); }
+          50% { opacity: 0.048; transform: translate(50%, -50%) scale(1.008); }
+        }
+        @keyframes spadeGlow {
+          0%, 100% { opacity: 0.04; }
+          50% { opacity: 0.055; }
+        }
+      `}</style>
 
       {/* ═══════════════════════════════════════════════════
           顶部金色边框线
@@ -783,11 +782,11 @@ export default function HeroSection() {
               }}>TCwenzhou · Royal Edition</p>
             </div>
 
-            {/* 主标题 */}
+            {/* 主标题 — 聚光灯后显 */}
             <div className="hero-title" style={{
-              opacity: phase >= 2 ? 1 : 0,
-              transform: phase >= 2 ? 'translateY(0)' : 'translateY(28px)',
-              transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s, transform 1.4s cubic-bezier(0.12,1,0.24,1) 0.1s',
+              opacity: phase >= 4 ? 1 : 0,
+              transform: phase >= 4 ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.97)',
+              transition: 'opacity 1.2s cubic-bezier(0.12,1,0.24,1) 0.1s, transform 1.2s cubic-bezier(0.16,1,0.3,1) 0.1s',
             }}>
               <h1 style={{
                 fontFamily: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
