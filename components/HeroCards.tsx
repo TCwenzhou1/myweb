@@ -124,26 +124,26 @@ function RoyalCard({ phase }: { phase: number }) {
       maxWidth: '340px',
       aspectRatio: '2.5 / 3.5',
       opacity: phase >= 3 ? 1 : 0,
-      transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.92)',
-      transition: 'opacity 1.2s cubic-bezier(0.12,1,0.24,1) 0.3s, transform 1.2s cubic-bezier(0.12,1,0.24,1) 0.3s',
+      transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.90)',
+      transition: 'opacity 1.4s cubic-bezier(0.12,1,0.24,1) 0.2s, transform 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s',
     }}>
-      {/* 外层华丽金色边框 - 第二层 */}
+      {/* 外层华丽金色边框 - 第二层（旧金/香槟金） */}
       <div style={{
         position: 'absolute',
         inset: '-4px',
         borderRadius: '16px',
-        background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 30%, ${C.gold} 50%, ${C.goldRich} 70%, ${C.gold} 100%)`,
-        opacity: 0.5,
-        filter: 'blur(0.5px)',
+        background: `linear-gradient(135deg, ${C.gold} 0%, ${C.goldChamp} 25%, ${C.goldPale} 50%, ${C.goldChamp} 75%, ${C.gold} 100%)`,
+        opacity: 0.6,
+        filter: 'blur(0.3px)',
       }} />
 
-      {/* 外层金色边框 - 第一层 */}
+      {/* 外层金色边框 - 第一层（更香槟金） */}
       <div style={{
         position: 'absolute',
         inset: '-2px',
         borderRadius: '14px',
-        background: `linear-gradient(135deg, ${C.goldChamp} 0%, ${C.goldPale} 40%, ${C.goldChamp} 60%, ${C.gold} 100%)`,
-        opacity: 0.75,
+        background: `linear-gradient(135deg, ${C.goldChamp} 0%, ${C.goldPale} 35%, ${C.goldChamp} 65%, ${C.goldRich} 100%)`,
+        opacity: 0.8,
       }} />
 
       {/* 主牌面 */}
@@ -171,71 +171,83 @@ function RoyalCard({ phase }: { phase: number }) {
         {/* ═══════════════════════════════════════════════════
             第一层：外层双线边框 + 四角切角装饰
         ═══════════════════════════════════════════════════ */}
-        {/* 外层装饰线 */}
+        {/* 外层装饰线（更淡更细） */}
         <div style={{
           position: 'absolute',
           inset: '12px',
-          border: `0.5px solid ${C.goldPale}`,
+          border: `0.4px solid ${C.goldPale}`,
           borderRadius: '6px',
-          opacity: 0.5,
+          opacity: 0.4,
         }} />
-        {/* 内层装饰线 */}
+        {/* 内层装饰线（更淡更细） */}
         <div style={{
           position: 'absolute',
           inset: '17px',
-          border: `0.3px solid ${C.goldChamp}`,
+          border: `0.25px solid ${C.goldChamp}`,
           borderRadius: '4px',
-          opacity: 0.35,
+          opacity: 0.28,
         }} />
 
-        {/* 四角极淡切角装饰 - 左上 */}
+        {/* 四角切角装饰 - 左上（更明确） */}
         <div style={{
           position: 'absolute',
           top: '22px',
           left: '22px',
-          width: '8px',
-          height: '8px',
-          borderTop: `0.5px solid ${C.goldChamp}`,
-          borderLeft: `0.5px solid ${C.goldChamp}`,
-          opacity: 0.4,
+          width: '10px',
+          height: '10px',
+          borderTop: `0.6px solid ${C.goldChamp}`,
+          borderLeft: `0.6px solid ${C.goldChamp}`,
+          opacity: 0.5,
         }} />
-        {/* 四角极淡切角装饰 - 右上 */}
+        {/* 四角切角装饰 - 右上 */}
         <div style={{
           position: 'absolute',
           top: '22px',
           right: '22px',
-          width: '8px',
-          height: '8px',
-          borderTop: `0.5px solid ${C.goldChamp}`,
-          borderRight: `0.5px solid ${C.goldChamp}`,
-          opacity: 0.4,
+          width: '10px',
+          height: '10px',
+          borderTop: `0.6px solid ${C.goldChamp}`,
+          borderRight: `0.6px solid ${C.goldChamp}`,
+          opacity: 0.5,
         }} />
-        {/* 四角极淡切角装饰 - 左下 */}
+        {/* 四角切角装饰 - 左下 */}
         <div style={{
           position: 'absolute',
           bottom: '22px',
           left: '22px',
-          width: '8px',
-          height: '8px',
-          borderBottom: `0.5px solid ${C.goldChamp}`,
-          borderLeft: `0.5px solid ${C.goldChamp}`,
-          opacity: 0.4,
+          width: '10px',
+          height: '10px',
+          borderBottom: `0.6px solid ${C.goldChamp}`,
+          borderLeft: `0.6px solid ${C.goldChamp}`,
+          opacity: 0.5,
         }} />
-        {/* 四角极淡切角装饰 - 右下 */}
+        {/* 四角切角装饰 - 右下 */}
         <div style={{
           position: 'absolute',
           bottom: '22px',
           right: '22px',
-          width: '8px',
-          height: '8px',
-          borderBottom: `0.5px solid ${C.goldChamp}`,
-          borderRight: `0.5px solid ${C.goldChamp}`,
-          opacity: 0.4,
+          width: '10px',
+          height: '10px',
+          borderBottom: `0.6px solid ${C.goldChamp}`,
+          borderRight: `0.6px solid ${C.goldChamp}`,
+          opacity: 0.5,
         }} />
 
         {/* ═══════════════════════════════════════════════════
-            第二层：中央大花色压纹 ♠（极淡，像王室纹章）
+            第二层：中央大花色压纹 ♠（像王室纹章中心）
         ═══════════════════════════════════════════════════ */}
+        {/* 纹章底晕 — 让黑桃更像中心焦点 */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, rgba(212,188,138,0.06) 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }} />
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -246,13 +258,13 @@ function RoyalCard({ phase }: { phase: number }) {
           fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
           lineHeight: 1,
           letterSpacing: '-0.04em',
-          WebkitTextStroke: `0.4px ${C.inkMid}`,
+          WebkitTextStroke: `0.5px ${C.inkMid}`,
           textShadow: `
             0 0 0 ${C.cardIvory},
             0 2px 4px rgba(0,0,0,0.04),
             0 6px 12px rgba(0,0,0,0.03)
           `,
-          opacity: 0.5,
+          opacity: 0.55,
         }}>♠</div>
 
         {/* ═══════════════════════════════════════════════════
@@ -313,7 +325,10 @@ function RoyalCard({ phase }: { phase: number }) {
         </div>
 
         {/* ═══════════════════════════════════════════════════
-            第五层：中央铭文信息层
+            第五层：中央铭文信息层 — 三层节奏
+            上：TCWENZHOU（主身份）
+            中：ROYAL EDITION（系列）
+            下：SYSTEMS · AI · GAMES（分类）
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
@@ -323,90 +338,90 @@ function RoyalCard({ phase }: { phase: number }) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '6px',
-          paddingTop: '8px',
+          gap: '9px',
+          paddingTop: '4px',
         }}>
-          {/* TCWENZHOU */}
+          {/* TCWENZHOU — 主铭文，远看身份感更强 */}
           <span style={{
             fontFamily: '"Cormorant Garamond", "Times New Roman", Georgia, serif',
-            fontSize: '11px',
-            fontWeight: 500,
-            letterSpacing: '0.28em',
-            color: C.inkMid,
+            fontSize: '14px',     // 13px → 14px
+            fontWeight: 600,       // 500 → 600（更明确）
+            letterSpacing: '0.32em',
+            color: C.ink,         // inkMid → ink（最清晰）
             textTransform: 'uppercase',
           }}>TCwenzhou</span>
 
           {/* 分隔线 */}
           <div style={{
-            width: '30px',
-            height: '0.3px',
+            width: '36px',
+            height: '0.4px',
             background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
-            opacity: 0.6,
+            opacity: 0.7,
           }} />
 
-          {/* ROYAL EDITION */}
+          {/* ROYAL EDITION — 系列，金色清晰 */}
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '6px',
+            fontSize: '7px',
             fontWeight: 500,
-            letterSpacing: '0.32em',
+            letterSpacing: '0.38em',  // 0.34 → 0.38（更舒展）
             color: C.gold,
             textTransform: 'uppercase',
           }}>Royal Edition</span>
 
           {/* 分隔线 */}
           <div style={{
-            width: '24px',
+            width: '28px',
             height: '0.3px',
             background: `linear-gradient(to right, transparent, ${C.goldPale}, transparent)`,
-            opacity: 0.4,
+            opacity: 0.5,
           }} />
 
-          {/* SYSTEMS · AI · GAMES */}
+          {/* SYSTEMS · AI · GAMES — 分类，稳定可读 */}
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '5px',
+            fontSize: '6px',        // 5.5px → 6px
             fontWeight: 400,
-            letterSpacing: '0.18em',
-            color: C.inkFaint,
+            letterSpacing: '0.22em',
+            color: C.inkDim,
             textTransform: 'uppercase',
           }}>Systems · AI · Games</span>
         </div>
 
         {/* ═══════════════════════════════════════════════════
-            第六层：底部档案编号
+            第六层：底部档案编号 — 馆藏样张感
         ═══════════════════════════════════════════════════ */}
         <div style={{
           position: 'absolute',
-          bottom: '28px',
+          bottom: '24px',
           left: 0,
           right: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '5px',
         }}>
           <div style={{
-            width: '36px',
-            height: '0.3px',
+            width: '44px',
+            height: '0.4px',
             background: `linear-gradient(to right, transparent, ${C.gold}, transparent)`,
-            opacity: 0.5,
+            opacity: 0.6,
           }} />
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '5px',
-            fontWeight: 400,
-            letterSpacing: '0.2em',
-            color: C.inkFaint,
+            fontSize: '6.5px',     // 6px → 6.5px
+            fontWeight: 500,        // 400 → 500
+            letterSpacing: '0.24em',
+            color: C.inkDim,
             textTransform: 'uppercase',
-          }}>Scene 01 · Archive A-01</span>
+          }}>Scene 01 / Archive No. A-01</span>
           <span style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '4px',
+            fontSize: '5px',       // 4.5px → 5px
             fontWeight: 300,
-            letterSpacing: '0.15em',
-            color: C.inkFaint,
-            opacity: 0.6,
+            letterSpacing: '0.18em',
+            color: C.inkDim,
+            opacity: 0.75,
           }}>TCwenzhou Private Collection</span>
         </div>
 
@@ -432,15 +447,33 @@ function RoyalCard({ phase }: { phase: number }) {
         }} />
       </div>
 
-      {/* 展示台阴影 */}
+      {/* 展示台阴影 — 更像接地 */}
       <div style={{
         position: 'absolute',
         bottom: '-30px',
-        left: '10%',
-        right: '10%',
-        height: '40px',
-        background: `radial-gradient(ellipse at center top, rgba(0,0,0,0.12) 0%, transparent 70%)`,
-        filter: 'blur(12px)',
+        left: '8%',
+        right: '8%',
+        height: '45px',
+        background: `radial-gradient(ellipse at center top, rgba(30,25,15,0.15) 0%, transparent 70%)`,
+        filter: 'blur(14px)',
+      }} />
+
+      {/* ═══════════════════════════════════════════════════
+          展厅光效果 — 左上到右下极轻柔光过渡
+      ═══════════════════════════════════════════════════ */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        inset: 0,
+        borderRadius: '12px',
+        background: `linear-gradient(
+          135deg,
+          rgba(255,249,240,0.15) 0%,
+          transparent 40%,
+          transparent 60%,
+          rgba(30,25,15,0.04) 100%
+        )`,
+        pointerEvents: 'none',
+        zIndex: 10,
       }} />
     </div>
   )
@@ -493,11 +526,19 @@ export default function HeroSection() {
 
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
+    // 电影化入场顺序：
+    // 1. 背景暖雾先醒（100ms）
+    // 2. 金框线条与角落装饰（500ms）
+    // 3. 展柜框架显现（900ms）
+    // 4. 主牌轻滑落位（1400ms）
+    // 5. 副牌装饰（1800ms）
+    // 6. 标题后显（2000ms）
+    // 7. 副标题与按钮最后出现（2400ms）
     t.push(setTimeout(() => setPhase(1), 100))
-    t.push(setTimeout(() => setPhase(2), 600))
-    t.push(setTimeout(() => setPhase(3), 1100))
-    t.push(setTimeout(() => setPhase(4), 1700))
-    t.push(setTimeout(() => setPhase(5), 2100))
+    t.push(setTimeout(() => setPhase(2), 500))
+    t.push(setTimeout(() => setPhase(3), 900))
+    t.push(setTimeout(() => setPhase(4), 1400))
+    t.push(setTimeout(() => setPhase(5), 2000))
     return () => t.forEach(clearTimeout)
   }, [])
 
@@ -566,7 +607,7 @@ export default function HeroSection() {
         zIndex: 1,
       }} />
 
-      {/* ♠ 背景大水印 */}
+      {/* ♠ 背景大水印 — 更淡（降低 25~30%） */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -575,7 +616,7 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: '#0A090E',
-        opacity: phase >= 1 ? 0.045 : 0,
+        opacity: phase >= 1 ? 0.032 : 0,   // 0.045 → 0.032 (-28%)
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
@@ -583,9 +624,10 @@ export default function HeroSection() {
         zIndex: 1,
         letterSpacing: '-0.02em',
         WebkitTextStroke: '0.3px rgba(180,160,110,0.06)',
+        filter: 'blur(0.5px)',             // 边缘再雾一点
       }}>♠</div>
 
-      {/* ♠ 内发光 */}
+      {/* ♠ 内发光 — 更淡 */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -594,7 +636,7 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: 'transparent',
-        opacity: phase >= 1 ? 0.05 : 0,
+        opacity: phase >= 1 ? 0.035 : 0,  // 0.05 → 0.035 (-30%)
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
@@ -602,9 +644,10 @@ export default function HeroSection() {
         zIndex: 2,
         letterSpacing: '-0.02em',
         textShadow: `
-          0 0 60px rgba(212,175,55,0.2),
-          0 0 120px rgba(184,149,74,0.12)
+          0 0 60px rgba(212,175,55,0.12),
+          0 0 120px rgba(184,149,74,0.08)
         `,
+        filter: 'blur(1px)',              // 边缘更雾
       }}>♠</div>
 
       {/* ═══════════════════════════════════════════════════
@@ -718,19 +761,19 @@ export default function HeroSection() {
             justifyContent: 'center',
             order: 2, // Mobile: 卡片在上，内容在下
           }}>
-            {/* 标签行 */}
+            {/* 标签行 — Edition Mark 风格 */}
             <div className="hero-tag" style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '16px',
+              gap: '18px',
               marginBottom: '32px',
               opacity: phase >= 2 ? 1 : 0,
               transform: phase >= 2 ? 'translateX(0)' : 'translateX(-20px)',
               transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
             }}>
               <div style={{
-                width: '28px',
-                height: '0.5px',
+                width: '32px',
+                height: '0.4px',
                 background: `linear-gradient(to right, ${C.gold}, ${C.goldChamp})`,
                 opacity: 0.8,
               }} />
@@ -738,7 +781,7 @@ export default function HeroSection() {
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 500,
-                letterSpacing: '0.52em',
+                letterSpacing: '0.58em',    // 0.52em → 0.58em（更像 edition mark）
                 textTransform: 'uppercase',
                 color: C.gold,
               }}>TCwenzhou · Royal Edition</p>
@@ -795,25 +838,25 @@ export default function HeroSection() {
               transform: phase >= 4 ? 'translateY(0)' : 'translateY(20px)',
               transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
             }}>
-              {/* 短描述 */}
+              {/* 短描述 — 可读性提升 */}
               <p style={{
                 fontFamily: '"Jost", "Inter", system-ui, sans-serif',
                 fontSize: 'clamp(15px, 1.6vw, 18px)',
-                fontWeight: 300,
-                lineHeight: 1.8,
-                letterSpacing: '0.02em',
-                color: C.inkDim,
+                fontWeight: 400,           // 300 → 400
+                lineHeight: 1.85,          // 1.8 → 1.85
+                letterSpacing: '0.03em',   // 0.02 → 0.03
+                color: C.inkMid,            // inkDim → inkMid
                 maxWidth: '360px',
               }}>
                 计算机工程 · 系统实践<br />
                 与 AI / 游戏探索
               </p>
 
-              {/* 链接组 - 奢华按钮风格 */}
+              {/* 链接组 — 导览入口风格 */}
               <div className="hero-buttons" style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px',
+                gap: '16px',
               }}>
                 {[
                   { label: '查看项目', href: '/projects', primary: true },
@@ -824,35 +867,38 @@ export default function HeroSection() {
                     href={item.href}
                     style={{
                       fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                      fontSize: '13px',
+                      fontSize: '12px',           // 13px → 12px（更精致）
                       fontWeight: 400,
-                      letterSpacing: '0.16em',
+                      letterSpacing: '0.18em',     // 0.16 → 0.18
                       color: item.primary ? C.ink : C.inkFaint,
                       textDecoration: 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '16px',
-                      transition: 'all 0.3s ease',
-                      paddingBottom: '6px',
+                      gap: '18px',                // 16px → 18px
+                      transition: 'all 0.35s ease',
+                      paddingTop: '8px',           // 新增，让按钮更修长
+                      paddingBottom: '10px',       // 6px → 10px
                       borderBottom: item.primary
-                        ? `0.5px solid ${C.gold}`
-                        : `0.5px solid rgba(90,85,90,0.25)`,
+                        ? `0.4px solid ${C.gold}`   // 0.5px → 0.4px（更精细）
+                        : `0.4px solid rgba(90,85,90,0.22)`,
                     }}
                     onMouseEnter={e => {
                       e.currentTarget.style.color = item.primary ? C.goldRich : C.inkMid
                       e.currentTarget.style.borderBottomColor = item.primary ? C.goldRich : C.inkDim
+                      e.currentTarget.style.transform = 'translateY(-1px)'  // 微抬升
                       const line = e.currentTarget.querySelector('.line') as HTMLElement
                       if (line) {
-                        line.style.width = item.primary ? '32px' : '24px'
+                        line.style.width = item.primary ? '34px' : '26px'
                         line.style.background = item.primary ? C.goldRich : C.inkDim
                       }
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.color = item.primary ? C.ink : C.inkFaint
-                      e.currentTarget.style.borderBottomColor = item.primary ? C.gold : 'rgba(90,85,90,0.25)'
+                      e.currentTarget.style.borderBottomColor = item.primary ? C.gold : 'rgba(90,85,90,0.22)'
+                      e.currentTarget.style.transform = 'translateY(0)'
                       const line = e.currentTarget.querySelector('.line') as HTMLElement
                       if (line) {
-                        line.style.width = '22px'
+                        line.style.width = '24px'
                         line.style.background = item.primary ? C.gold : C.inkFaint
                       }
                     }}
@@ -860,11 +906,11 @@ export default function HeroSection() {
                     <span
                       className="line"
                       style={{
-                        width: '22px',
-                        height: '0.5px',
+                        width: '24px',
+                        height: '0.4px',          // 0.5px → 0.4px
                         background: item.primary ? C.gold : C.inkFaint,
                         flexShrink: 0,
-                        transition: 'width 0.3s ease, background 0.3s ease',
+                        transition: 'width 0.35s ease, background 0.35s ease',
                       }}
                     />
                     {item.label}
@@ -900,7 +946,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* ── 底部：信息行 ── */}
+        {/* ── 底部：信息行 — 片尾档案信息风格 ── */}
         <div className="hero-footer" style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -915,21 +961,21 @@ export default function HeroSection() {
         }}>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '11px',
+            fontSize: '12px',             // 11px → 12px
             fontWeight: 400,
             letterSpacing: '0.1em',
-            color: C.inkFaint,
-            opacity: 0.7,
+            color: C.inkDim,              // inkFaint → inkDim
+            opacity: 0.85,                // 0.7 → 0.85
           }}>
             github.com/TCwenzhou1
           </p>
           <p style={{
             fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-            fontSize: '11px',
+            fontSize: '12px',             // 11px → 12px
             fontWeight: 400,
             letterSpacing: '0.08em',
-            color: C.inkFaint,
-            opacity: 0.7,
+            color: C.inkDim,              // inkFaint → inkDim
+            opacity: 0.85,                // 0.7 → 0.85
           }}>
             hello@tcwenzhou.site
           </p>
