@@ -782,13 +782,70 @@ export default function HeroSection() {
           paddingBottom: 'clamp(48px, 8vh, 100px)',
         }}>
 
-          {/* ── 左栏：标题与信息 ── */}
+          {/* ── 左栏：档案展框 + 标题与信息 ── */}
           <div className="hero-content" style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            position: 'relative',
+            paddingLeft: 'clamp(40px, 8vw, 100px)',
             order: 2, // Mobile: 卡片在上，内容在下
           }}>
+
+            {/* 左栏档案展框 — 与右侧卡牌呼应的装饰框架 */}
+            <div aria-hidden
+              className="hero-frame-left"
+              style={{
+                position: 'absolute',
+                left: '0',
+                top: '50%',
+                transform: `translateY(-50%) perspective(1000px) rotateX(${tilt.x * -0.15}deg) rotateY(${tilt.y * -0.15}deg)`,
+                width: '55%',
+                maxWidth: '220px',
+                aspectRatio: '2.5 / 3.5',
+                border: `0.4px solid ${C.goldPale}`,
+                borderRadius: '10px',
+                opacity: phase >= 3 ? 0.3 : 0,
+                transition: 'opacity 1.2s ease 0.3s, transform 0.15s cubic-bezier(0.12,1,0.24,1)',
+                zIndex: 0,
+                background: `linear-gradient(165deg, ${C.cardIvory} 0%, ${C.bgWarm} 100%)`,
+                boxShadow: `0 8px 32px rgba(0,0,0,0.04)`,
+                willChange: 'transform',
+              }}
+            >
+              {/* 内部细线 */}
+              <div style={{
+                position: 'absolute',
+                inset: '8px',
+                border: `0.3px solid ${C.goldPale}`,
+                borderRadius: '6px',
+                opacity: 0.5,
+              }} />
+              {/* 金属烫边 */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: '10%',
+                right: '10%',
+                height: '0.3px',
+                background: `linear-gradient(to right, transparent, ${C.goldChamp}, transparent)`,
+                opacity: 0.5,
+              }} />
+              {/* 档案编号 */}
+              <div style={{
+                position: 'absolute',
+                bottom: '20px',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                fontFamily: '"Jost", sans-serif',
+                fontSize: '5px',
+                letterSpacing: '0.3em',
+                color: C.inkDim,
+                textTransform: 'uppercase',
+                opacity: 0.5,
+              }}>A-00 · Archive</div>
+            </div>
             {/* 标签行 — Edition Mark 风格 */}
             <div className="hero-tag" style={{
               display: 'flex',
@@ -1206,6 +1263,12 @@ export default function HeroSection() {
 
         /* ── Mobile (< 768px) ── */
         @media (max-width: 767px) {
+          .hero-frame-left {
+            display: none !important;
+          }
+          .hero-content {
+            padding-left: 0 !important;
+          }
           .hero-main-grid {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
