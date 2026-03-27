@@ -4,13 +4,14 @@ import { useEffect, useState, useRef } from 'react'
 
 // ─── 配色 ───────────────────────────────────────────────────────────────────
 const C = {
-  bg:           '#F8F5EE',   // 暖象牙白
-  bgWarm:       '#F2EDE3',   // 暖灰底
-  bgDeep:       '#E8E2D6',   // 深暖层
-  ink:          '#0F0E10',   // 深墨色
-  inkMid:       '#2A282C',   // 中灰墨
-  inkDim:       '#5C585E',   // 次级灰
-  inkFaint:     '#9A9599',   // 极淡灰
+  bg:           '#EDE8DD',   // 暖象牙白 → 更有厚度的暖白
+  bgWarm:       '#E5DFD1',   // 暖灰底
+  bgDeep:       '#D9D2C4',   // 深暖层
+  bgTheater:    '#1C1A22',   // 新增：剧院深色（暗角/层次用）
+  ink:          '#0A090C',   // 深墨色 → 更深
+  inkMid:       '#252227',   // 中灰墨
+  inkDim:       '#524E54',   // 次级灰
+  inkFaint:     '#8A8589',   // 极淡灰
 
   // 高端金色系统 - muted, refined
   gold:         '#A88B55',   // 古典金
@@ -18,14 +19,16 @@ const C = {
   goldChamp:    '#D4BC8A',   // 香槟金
   goldPale:     '#E8DCC4',   // 极淡金
   goldGlow:     '#D4AF37',   // 亮金色
+  goldShine:    '#F5E6C0',   // 新增：金色高光
 
   // 收藏级材质
   cardIvory:    '#FAF8F3',   // 牌面象牙白
   cardShadow:   '#D8D0C0',   // 牌面阴影
   cardBorder:   '#C8BEA8',   // 牌边框
 
-  // 高光
-  spotlight:    '#FFF9F0',   // 聚光灯色
+  // 聚光灯色
+  spotlight:    '#FFFDF8',   // 更亮的聚光灯
+  spotlightWarm:'#FFF5E6',   // 暖色补光
 }
 
 // ─── 粒子组件 ─────────────────────────────────────────────────────────────────
@@ -74,44 +77,88 @@ function Sparkles() {
   )
 }
 
-// ─── 聚光灯效果 — 戏剧化片头版 ─────────────────────────────────────────────────
+// ─── 聚光灯效果 — 戏剧化片头版（增强版）────────────────────────────────────────────────
 function Spotlight({ phase }: { phase: number }) {
   return (
     <>
-      {/* 主聚光灯 — 先于一切出现，像舞台灯 */}
+      {/* 主聚光灯 — 戏剧化舞台灯，更强更集中 */}
       <div aria-hidden style={{
         position: 'absolute',
         left: '50%',
-        top: '-30%',
-        width: '50vw',
-        height: '100vh',
+        top: '-40%',
+        width: '60vw',
+        height: '120vh',
         transform: 'translateX(-50%)',
         borderRadius: '50%',
-        background: `radial-gradient(ellipse at center bottom, rgba(255,249,240,0.85) 0%, rgba(255,249,240,0.4) 20%, transparent 60%)`,
-        filter: 'blur(80px)',
+        background: `radial-gradient(ellipse at center bottom,
+          rgba(255,253,248,0.95) 0%,
+          rgba(255,249,240,0.7) 15%,
+          rgba(255,245,230,0.3) 30%,
+          transparent 55%)`,
+        filter: 'blur(100px)',
         pointerEvents: 'none',
         zIndex: 2,
-        opacity: phase >= 1 ? (phase >= 3 ? 0.7 : 0.3) : 0,
-        transition: 'opacity 1.5s ease',
+        opacity: phase >= 1 ? (phase >= 3 ? 0.9 : 0.4) : 0,
+        transition: 'opacity 1.8s ease',
       }} />
-      {/* 暖色补光 */}
+
+      {/* 光柱效果 — 从上往下的戏剧光柱 */}
       <div aria-hidden style={{
         position: 'absolute',
-        right: '5%',
-        bottom: '0%',
-        width: '35vw',
-        height: '60vh',
-        borderRadius: '50%',
-        background: `radial-gradient(ellipse at center, rgba(212,188,138,0.15) 0%, transparent 65%)`,
-        filter: 'blur(50px)',
+        left: '50%',
+        top: '0%',
+        width: '20vw',
+        height: '100%',
+        transform: 'translateX(-50%)',
+        background: `linear-gradient(
+          to bottom,
+          rgba(255,253,248,0.15) 0%,
+          rgba(255,249,240,0.08) 30%,
+          transparent 70%
+        )`,
+        filter: 'blur(40px)',
         pointerEvents: 'none',
         zIndex: 2,
-        opacity: phase >= 3 ? 0.8 : 0,
-        transition: 'opacity 1.2s ease 0.3s',
+        opacity: phase >= 2 ? 0.6 : 0,
+        transition: 'opacity 1.5s ease 0.3s',
       }} />
+
+      {/* 暖色补光 — 金色高光层 */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        right: '8%',
+        bottom: '5%',
+        width: '40vw',
+        height: '70vh',
+        borderRadius: '50%',
+        background: `radial-gradient(ellipse at center,
+          rgba(212,188,138,0.25) 0%,
+          rgba(200,165,110,0.12) 30%,
+          transparent 60%)`,
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 2,
+        opacity: phase >= 3 ? 0.9 : 0,
+        transition: 'opacity 1.4s ease 0.4s',
+      }} />
+
+      {/* 暗角效果 — 增强戏剧张力 */}
+      <div aria-hidden style={{
+        position: 'absolute',
+        inset: 0,
+        background: `radial-gradient(ellipse 90% 85% at 50% 50%,
+          transparent 30%,
+          rgba(28,26,34,0.12) 65%,
+          rgba(28,26,34,0.25) 100%)`,
+        pointerEvents: 'none',
+        zIndex: 2,
+        opacity: phase >= 2 ? 1 : 0,
+        transition: 'opacity 2.0s ease 0.5s',
+      }} />
+
       <style>{`
         @keyframes spotlightBreath {
-          0%, 100% { opacity: 0.85; }
+          0%, 100% { opacity: 0.9; }
           50% { opacity: 1; }
         }
       `}</style>
@@ -119,16 +166,13 @@ function Spotlight({ phase }: { phase: number }) {
   )
 }
 
-// ─── 皇家展柜卡牌 ─────────────────────────────────────────────────────────────────
-// 工艺型馆藏卡：纯版式、纯材质、纯收藏感
-// 不要像：游戏道具卡 / 塔罗牌 / 插画卡
-// 要像：博物馆馆藏卡 / 皇家牌册样张 / 奢华 edition card
+// ─── 皇家展柜卡牌（缩小为辅助装饰元素）────────────────────────────────────────────────
 function RoyalCard({ phase }: { phase: number }) {
   return (
     <div style={{
       position: 'relative',
       width: '100%',
-      maxWidth: '340px',
+      maxWidth: '220px',  // 缩小：340px → 220px，作为辅助装饰
       aspectRatio: '2.5 / 3.5',
       opacity: phase >= 3 ? 1 : 0,
       transform: phase >= 3 ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.90)',
@@ -622,7 +666,7 @@ export default function HeroSection() {
         zIndex: 1,
       }} />
 
-      {/* ♠ 背景大水印 — 呼吸感，像活的母题 */}
+      {/* ♠ 背景大水印 — 呼吸感，像活的母题（增强：更明显更有存在感） */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -630,20 +674,20 @@ export default function HeroSection() {
         transform: 'translate(50%, -50%)',
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
-        color: '#0A090E',
-        opacity: phase >= 2 ? 0.038 : 0,
+        color: '#1C1A22',  // 更深，带紫调
+        opacity: phase >= 2 ? 0.06 : 0,  // 增强：0.038 → 0.06
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
         transition: 'opacity 2.5s cubic-bezier(0.12,1,0.24,1)',
         zIndex: 1,
         letterSpacing: '-0.02em',
-        WebkitTextStroke: '0.3px rgba(180,160,110,0.06)',
-        filter: 'blur(0.5px)',
+        WebkitTextStroke: '0.4px rgba(180,160,110,0.08)',
+        filter: 'blur(0.8px)',  // 更模糊：0.5px → 0.8px
         animation: 'spadeBreath 6s ease-in-out infinite',
       }}>♠</div>
 
-      {/* ♠ 内发光 — 呼吸节奏 */}
+      {/* ♠ 内发光 — 呼吸节奏（增强） */}
       <div aria-hidden style={{
         position: 'absolute',
         right: `${markX}vw`,
@@ -652,7 +696,7 @@ export default function HeroSection() {
         fontSize: 'clamp(320px, 55vw, 800px)',
         lineHeight: 1,
         color: 'transparent',
-        opacity: phase >= 2 ? 0.04 : 0,
+        opacity: phase >= 2 ? 0.055 : 0,  // 增强：0.04 → 0.055
         fontFamily: '"Bodoni Moda", "Times New Roman", Georgia, serif',
         pointerEvents: 'none',
         userSelect: 'none',
@@ -660,10 +704,10 @@ export default function HeroSection() {
         zIndex: 2,
         letterSpacing: '-0.02em',
         textShadow: `
-          0 0 80px rgba(212,175,55,0.15),
-          0 0 150px rgba(184,149,74,0.1)
+          0 0 100px rgba(212,175,55,0.2),   // 增强：80px → 100px
+          0 0 180px rgba(184,149,74,0.15)  // 增强：150px → 180px
         `,
-        filter: 'blur(1px)',
+        filter: 'blur(1.2px)',  // 更模糊：1px → 1.2px
         animation: 'spadeGlow 6s ease-in-out 1s infinite',
       }}>♠</div>
 
@@ -768,28 +812,29 @@ export default function HeroSection() {
 
         {/* ══════════════════════════════════════════════════
             中部：主内容区 - 三端响应式布局
-            Desktop (>= 1200px): 两栏网格
+            戏剧张力型：标题成为绝对主角，卡牌作为精致辅助
+            Desktop (>= 1200px): 两栏网格（标题50%+卡牌30%）
             Tablet (768px-1199px): 上下双段
             Mobile (< 768px): 单列竖排
         ══════════════════════════════════════════════════ */}
         <div className="hero-main-grid" style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
+          gridTemplateColumns: '1.2fr 0.8fr',  // 标题为主：1.2:0.8
           gap: 'clamp(40px, 6vw, 80px)',
           alignItems: 'center',
           paddingTop: 'clamp(48px, 8vh, 100px)',
           paddingBottom: 'clamp(48px, 8vh, 100px)',
         }}>
 
-          {/* ── 左栏：档案展框 + 标题与信息 ── */}
+          {/* ── 左栏：标题与信息（主角） ── */}
           <div className="hero-content" style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             position: 'relative',
             paddingLeft: 'clamp(40px, 8vw, 100px)',
-            order: 2, // Mobile: 卡片在上，内容在下
+            order: 1,  // Desktop: 标题在左（主要视觉）
           }}>
 
             {/* 左栏档案展框 — 与右侧卡牌呼应的装饰框架 */}
@@ -872,7 +917,7 @@ export default function HeroSection() {
               }}>TCwenzhou · Royal Edition</p>
             </div>
 
-            {/* 主标题 — 聚光灯后显 */}
+            {/* 主标题 — 聚光灯后显（增强版：更大更有力） */}
             <div className="hero-title" style={{
               opacity: phase >= 4 ? 1 : 0,
               transform: phase >= 4 ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.97)',
@@ -880,13 +925,19 @@ export default function HeroSection() {
             }}>
               <h1 style={{
                 fontFamily: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
-                fontSize: 'clamp(48px, 8vw, 152px)',
-                fontWeight: 400,
-                lineHeight: 0.88,
-                letterSpacing: '-0.03em',
+                fontSize: 'clamp(56px, 10vw, 180px)',  // 更大：152px → 180px
+                fontWeight: 600,                        // 加粗：400 → 600
+                lineHeight: 0.85,
+                letterSpacing: '-0.035em',
                 color: C.ink,
                 marginBottom: '0',
                 position: 'relative',
+                // 金色高光描边 — 戏剧化「烫金」效果
+                textShadow: `
+                  0 0 40px rgba(212,175,55,0.15),
+                  0 2px 3px rgba(0,0,0,0.08),
+                  0 0 80px rgba(212,175,55,0.08)
+                `,
               }}>
                 TCwenzhou
               </h1>
@@ -1005,13 +1056,13 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* ── 右栏：皇家展柜卡牌 ── */}
+          {/* ── 右栏：缩小后的皇家展柜卡牌（辅助装饰） ── */}
           <div className="hero-card" style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             position: 'relative',
-            order: 1, // Mobile: 卡片在上
+            order: 2,  // Desktop: 卡牌在右（辅助装饰）
           }}>
             {/* 展柜装饰框架 — 随主牌同倾斜 */}
             <div style={{
@@ -1220,13 +1271,14 @@ export default function HeroSection() {
             grid-template-columns: 1fr !important;
             gap: 48px !important;
           }
-          .hero-card {
-            order: 1 !important;
-          }
           .hero-content {
-            order: 2 !important;
+            order: 1 !important;
             align-items: center;
             text-align: center;
+            padding-left: 0 !important;
+          }
+          .hero-card {
+            order: 2 !important;
           }
           .hero-tag {
             justify-content: center;
@@ -1268,6 +1320,7 @@ export default function HeroSection() {
           }
           .hero-content {
             padding-left: 0 !important;
+            order: 1 !important;
           }
           .hero-main-grid {
             grid-template-columns: 1fr !important;
@@ -1279,17 +1332,12 @@ export default function HeroSection() {
             justify-content: center !important;
           }
           .hero-card {
-            order: 1 !important;
-            max-width: 240px;
+            order: 2 !important;
+            max-width: 200px;  /* 更小的卡牌 */
             margin: 0 auto;
           }
           .hero-card > div:first-child {
             inset: -12px !important;
-          }
-          .hero-content {
-            order: 2 !important;
-            align-items: center;
-            text-align: center;
           }
           .hero-tag {
             justify-content: center;
