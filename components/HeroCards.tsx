@@ -813,15 +813,15 @@ export default function HeroSection() {
         {/* ══════════════════════════════════════════════════
             中部：主内容区 - 三端响应式布局
             戏剧张力型：标题成为绝对主角，卡牌作为精致辅助
-            Desktop (>= 1200px): 两栏网格（标题50%+卡牌30%）
+            Desktop (>= 1200px): 两栏网格
             Tablet (768px-1199px): 上下双段
             Mobile (< 768px): 单列竖排
         ══════════════════════════════════════════════════ */}
         <div className="hero-main-grid" style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1.2fr 0.8fr',  // 标题为主：1.2:0.8
-          gap: 'clamp(40px, 6vw, 80px)',
+          gridTemplateColumns: '1fr 1fr',  // 1:1 均等分布
+          gap: 'clamp(30px, 4vw, 50px)',  // 减小间隙
           alignItems: 'center',
           paddingTop: 'clamp(48px, 8vh, 100px)',
           paddingBottom: 'clamp(48px, 8vh, 100px)',
@@ -833,7 +833,7 @@ export default function HeroSection() {
             flexDirection: 'column',
             justifyContent: 'center',
             position: 'relative',
-            paddingLeft: 'clamp(40px, 8vw, 100px)',
+            paddingLeft: 'clamp(20px, 4vw, 60px)',  // 减小左边距
             order: 1,  // Desktop: 标题在左（主要视觉）
           }}>
 
@@ -842,7 +842,8 @@ export default function HeroSection() {
               className="hero-frame-left"
               style={{
                 position: 'absolute',
-                left: '0',
+                left: '-10px',  // 超出容器边界
+                top: '50%',
                 top: '50%',
                 transform: `translateY(-50%) perspective(1000px) rotateX(${tilt.x * -0.15}deg) rotateY(${tilt.y * -0.15}deg)`,
                 width: '55%',
@@ -1059,18 +1060,19 @@ export default function HeroSection() {
           {/* ── 右栏：缩小后的皇家展柜卡牌（辅助装饰） ── */}
           <div className="hero-card" style={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',  // 左对齐，不再居中
             alignItems: 'center',
             position: 'relative',
             order: 2,  // Desktop: 卡牌在右（辅助装饰）
+            paddingLeft: 'clamp(20px, 5vw, 60px)',  // 适当左移
           }}>
             {/* 展柜装饰框架 — 随主牌同倾斜 */}
             <div style={{
               position: 'absolute',
-              inset: '-20px',
+              inset: '-15px',  // 减小 insets，让边框更贴近卡牌
               border: `0.5px solid ${C.goldPale}`,
-              borderRadius: '20px',
-              opacity: phase >= 3 ? 0.3 : 0,
+              borderRadius: '16px',
+              opacity: phase >= 3 ? 0.25 : 0,
               transform: phase >= 3
                 ? `perspective(800px) rotateX(${tilt.x * 0.3}deg) rotateY(${tilt.y * 0.3}deg)`
                 : 'none',
