@@ -1,0 +1,188 @@
+/* VocabularyCard 组件样式 */
+
+.card {
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+}
+
+.cardInner {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.cardInner.flipped {
+  transform: rotateY(180deg);
+}
+
+.front,
+.back {
+  position: absolute;
+  width: 100%;
+  min-height: 200px;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--archive-cream, #F5F0E8);
+  border: 1px solid var(--archive-border, #E5DED4);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.front {
+  /* 正面样式 */
+}
+
+.back {
+  transform: rotateY(180deg);
+  background: var(--archive-bg, #FAF7F2);
+  border-color: var(--archive-gold, #C4A35A);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.levelBadge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.posTag {
+  font-size: 10px;
+  color: var(--archive-text-muted, #7A756D);
+}
+
+.masteredBadge {
+  font-size: 10px;
+  color: #C4A35A;
+  margin-left: auto;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.word {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--archive-text, #3D3A36);
+  margin: 0 0 4px 0;
+}
+
+.reading {
+  font-size: 14px;
+  color: var(--archive-text-muted, #7A756D);
+  margin: 0 0 4px 0;
+}
+
+.romaji {
+  font-size: 12px;
+  color: var(--archive-text-muted, #7A756D);
+  margin: 0;
+}
+
+.tone {
+  font-size: 11px;
+  color: var(--archive-gold, #C4A35A);
+  margin-top: 4px;
+}
+
+.meaning {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--archive-text, #3D3A36);
+  margin: 0;
+}
+
+.example {
+  margin-top: 12px;
+  padding: 10px;
+  background: var(--archive-cream, #F5F0E8);
+  border-radius: 2px;
+  text-align: left;
+}
+
+.exampleText {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: var(--archive-text, #3D3A36);
+}
+
+.exampleMeaning {
+  font-size: 12px;
+  color: var(--archive-text-muted, #7A756D);
+  margin: 0;
+}
+
+.collocation,
+.examTip {
+  font-size: 11px;
+  color: var(--archive-text-muted, #7A756D);
+  margin-top: 8px;
+  text-align: left;
+}
+
+.detailLabel {
+  color: var(--archive-gold, #C4A35A);
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--archive-text-muted, #7A756D);
+  text-align: center;
+  margin: 12px 0 0 0;
+}
+
+.actions {
+  position: absolute;
+  bottom: -36px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.card:hover .actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.actionBtn {
+  padding: 6px 16px;
+  background: var(--archive-gold, #C4A35A);
+  border: none;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: var(--archive-gold-light, #D4B86A);
+}
+
+.actionBtn.mastered {
+  background: var(--archive-text-muted, #7A756D);
+}

@@ -1,272 +1,684 @@
-// 考研日语学习数据 - 合并增强版
-// 涵盖 N5-N1 / 考研 等级词汇和语法
-// 合并了原有的 N5-N3 数据和新增强的 N2/N1/考研 数据
+/**
+ * 日语学习系统 - 类型定义
+ */
 
-export type JLPTLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
-export type StudyCategory = 'jlpt' | 'exam'
+// ==================== 词汇相关类型 ====================
 
-// 例句结构
-export interface ExampleSentence {
-  jp: string
-  kana: string
-  zh: string
-}
+export type Level = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
 
-// 统一词汇接口（兼容新旧两种格式）
 export interface VocabularyItem {
   id: string
-  word: string
-  kana: string // 假名
-  romaji?: string // 罗马音（新增字段）
-  meaning: string
-  level: JLPTLevel
-  category: StudyCategory
-  partOfSpeech: string
-  pronunciation?: string // 发音提示（新增字段）
-  usageCore?: string // 核心用法（新增字段）
-  usagePatterns?: string[] // 高频句型（新增字段）
-  collocations?: string[] // 常见搭配（新增字段）
-  examFocus?: string // 考试提醒（新增字段）
-  examples?: ExampleSentence[] // 例句（新增字段）
-  tags?: string[] // 标签（新增字段）
-  // 兼容旧字段
-  reading?: string // 旧字段：假名（alias for kana）
-  example?: string // 旧字段：例句
-  exampleMeaning?: string // 旧字段：例句翻译
+  word: string           // 日语单词
+  reading: string        // 假名/罗马音
+  meaning: string        // 中文意思
+  tone?: string          // 音调
+  partOfSpeech: '名' | '动' | '形' | '副' | '助' | '接' | '叹' | '连体' | '连语'
+  example?: string       // 例句
+  exampleMeaning?: string // 例句翻译
+  collocation?: string[]  // 高频搭配
+  synonym?: string        // 同义词
+  antonym?: string        // 反义词
+  note?: string          // 记忆笔记
+  // 新增字段
+  romaji?: string         // 罗马音
+  pronunciationTip?: string // 发音提示
+  usage?: string          // 使用场景/核心用法
+  examTip?: string         // 考试提醒
+  frequency?: '高' | '中' | '低'  // 频率
+  level: Level
 }
 
-// 语法接口（兼容新旧两种格式）
+// ==================== 语法相关类型 ====================
+
 export interface GrammarPoint {
   id: string
-  pattern: string // 语法句型（也用 title）
-  title?: string // 新格式用 title
-  meaning: string
-  level: JLPTLevel
-  explanation?: string // 新格式用 explanation（也用 usage）
-  usage?: string // 新格式
-  example?: string
-  exampleMeaning?: string
-  examTip?: string // 考试提醒（新增）
+  pattern: string       // 语法 pattern/句型
+  meaning: string        // 意思
+  formation: string      // 构成
+  level: Level
+  explanation?: string  // 解释
+  example?: string       // 例句
+  exampleMeaning?: string // 例句翻译
+  note?: string         // 备注
 }
 
-// ─── N5 级别词汇 ─────────────────────────────────────────────────────────────────
-export const n5Vocabulary: VocabularyItem[] = [
-  { id: 'n5-001', word: '本', kana: 'ほん', romaji: 'hon', meaning: '书', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'ほん，注意长音。', usageCore: '最基础的词汇之一', usagePatterns: ['本を読みます'], collocations: ['本屋', '小説'], examFocus: 'N5 基础词汇', examples: [{ jp: '本を読みます', kana: 'ほん を よみます', zh: '读书' }], tags: ['N5基础'] },
-  { id: 'n5-002', word: '日本人', kana: 'にほんじん', romaji: 'nihonjin', meaning: '日本人', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'に-ほん-じん', usageCore: '表示日本国籍的人', usagePatterns: ['日本人は〜です'], collocations: ['日本人は優しい'], examFocus: 'N5 基础词汇', examples: [{ jp: '日本人は優しいです', kana: 'にほんじん は やさしいです', zh: '日本人很温柔' }], tags: ['N5基础'] },
-  { id: 'n5-003', word: '学生', kana: 'がくせい', romaji: 'gakusei', meaning: '学生', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'がく-せい，长音要读满。', usageCore: '学校在校生', usagePatterns: ['私は学生です'], collocations: ['大学生', '留学生'], examFocus: 'N5 基础词汇', examples: [{ jp: '私は学生です', kana: 'わたし は がくせい です', zh: '我是学生' }], tags: ['N5基础'] },
-  { id: 'n5-004', word: '先生', kana: 'せんせい', romaji: 'sensei', meaning: '老师', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'せん-せい', usageCore: '对教师、医生、律师等专业人士的尊称', usagePatterns: ['先生が来ます'], collocations: ['日本語先生'], examFocus: 'N5 基础词汇', examples: [{ jp: '先生が来ました', kana: 'せんせい が きました', zh: '老师来了' }], tags: ['N5基础', '尊称'] },
-  { id: 'n5-005', word: '学校', kana: 'がっこう', romaji: 'gakkou', meaning: '学校', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'がっ-こう，两个促音要短促。', usageCore: '教育机构', usagePatterns: ['学校に行きます'], collocations: ['学校生活'], examFocus: 'N5 基础词汇', examples: [{ jp: '学校に行きます', kana: 'がっこう に いきます', zh: '去学校' }], tags: ['N5基础'] },
-  { id: 'n5-006', word: '友達', kana: 'ともだち', romaji: 'tomodachi', meaning: '朋友', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'とも-だち', usageCore: '朋友、友人', usagePatterns: ['友達と遊びます'], collocations: ['友達紹介'], examFocus: 'N5 基础词汇', examples: [{ jp: '友達と遊びます', kana: 'ともだち と あそびます', zh: '和朋友玩' }], tags: ['N5基础', '人际关系'] },
-  { id: 'n5-007', word: '今日', kana: 'きょう', romaji: 'kyou', meaning: '今天', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'きょう，长音要读满。', usageCore: '当前这一天', usagePatterns: ['今日は〜です'], collocations: ['今日会います'], examFocus: 'N5 基础词汇', examples: [{ jp: '今日は晴れです', kana: 'きょう は はれ です', zh: '今天是晴天' }], tags: ['N5基础', '时间'] },
-  { id: 'n5-008', word: '明日', kana: 'あした', romaji: 'ashita', meaning: '明天', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'あ-した', usageCore: '当前的明天', usagePatterns: ['明日会います'], collocations: ['明日出発'], examFocus: 'N5 基础词汇', examples: [{ jp: '明日会います', kana: 'あした あいます', zh: '明天见面' }], tags: ['N5基础', '时间'] },
-  { id: 'n5-009', word: '昨日', kana: 'きのう', romaji: 'kinou', meaning: '昨天', level: 'N5', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'き-の-う', usageCore: '当前的昨天', usagePatterns: ['昨日は〜でした'], collocations: ['昨日寒かった'], examFocus: 'N5 基础词汇', examples: [{ jp: '昨日は寒かったです', kana: 'きのう は さむかったです', zh: '昨天很冷' }], tags: ['N5基础', '时间'] },
-  { id: 'n5-010', word: '食べる', kana: 'たべる', romaji: 'taberu', meaning: '吃', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'た-べ-る，注意一段动词变形。', usageCore: '摄入食物的动作', usagePatterns: ['〜を食べます'], collocations: ['朝ごはんを食べます'], examFocus: 'N5 基础词汇', examples: [{ jp: '朝ごはんを食べます', kana: 'あさごはん を たべます', zh: '吃早饭' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-011', word: '飲む', kana: 'のむ', romaji: 'nomu', meaning: '喝', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'の-む', usageCore: '摄入液体的动作', usagePatterns: ['〜を飲みます'], collocations: ['水を飲みます'], examFocus: 'N5 基础词汇', examples: [{ jp: '水を飲みます', kana: 'みず を のみます', zh: '喝水' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-012', word: '行く', kana: 'いく', romaji: 'iku', meaning: '去', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'い-く，五段动词。', usageCore: '从某地前往另一地', usagePatterns: ['〜に行きます'], collocations: ['東京に行きます'], examFocus: 'N5 基础词汇', examples: [{ jp: '東京に行きます', kana: 'とうきょう に いきます', zh: '去东京' }], tags: ['N5基础', '动词', '高频'] },
-  { id: 'n5-013', word: '来る', kana: 'くる', romaji: 'kuru', meaning: '来', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'く-る，特殊变形动词。', usageCore: '从别处来到此地', usagePatterns: ['〜に来ます'], collocations: ['家に来てください'], examFocus: 'N5 基础词汇', examples: [{ jp: '家に来てください', kana: 'いえ に きて ください', zh: '请来我家' }], tags: ['N5基础', '动词', '高频'] },
-  { id: 'n5-014', word: '見る', kana: 'みる', romaji: 'miru', meaning: '看', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'み-る，一段动词。', usageCore: '用眼睛看的动作', usagePatterns: ['〜を見ます'], collocations: ['映画を見ます'], examFocus: 'N5 基础词汇', examples: [{ jp: '映画を見ます', kana: 'えいが を みます', zh: '看电影' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-015', word: '聞く', kana: 'きく', romaji: 'kiku', meaning: '听/问', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'き-く，多义词：听声音或问问题。', usageCore: '用耳朵听，或向人询问', usagePatterns: ['音楽を聞きます', '名前を聞きます'], collocations: ['音楽を聞きます'], examFocus: 'N5 基础词汇', examples: [{ jp: '音楽を聞きます', kana: 'おんがく を ききます', zh: '听音乐' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-016', word: '話す', kana: 'はなす', romaji: 'hanasu', meaning: '说', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'は-な-す，五段动词。', usageCore: '用语言表达', usagePatterns: ['日本語を話します'], collocations: ['日本語を話します'], examFocus: 'N5 基础词汇', examples: [{ jp: '日本語を話します', kana: 'にほんご を はなします', zh: '说日语' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-017', word: '書く', kana: 'かく', romaji: 'kaku', meaning: '写', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'か-く，五段动词。', usageCore: '用笔书写或电子输入', usagePatterns: ['手紙を書きます'], collocations: ['手紙を書きます'], examFocus: 'N5 基础词汇', examples: [{ jp: '手紙を書きます', kana: 'てがみ を かきます', zh: '写信' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-018', word: '読む', kana: 'よむ', romaji: 'yomu', meaning: '读', level: 'N5', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'よ-む，五段动词。', usageCore: '阅读文字内容', usagePatterns: ['本を読みます'], collocations: ['本を読みます'], examFocus: 'N5 基础词汇', examples: [{ jp: '本を読みます', kana: 'ほん を よみます', zh: '读书' }], tags: ['N5基础', '动词'] },
-  { id: 'n5-019', word: '大きい', kana: 'おおきい', romaji: 'ookii', meaning: '大的', level: 'N5', category: 'jlpt', partOfSpeech: '形容词', pronunciation: 'お-お-き-い，注意第一个「お」要拉长。', usageCore: '表示体积、规模大', usagePatterns: ['大きい犬'], collocations: ['大きい家'], examFocus: 'N5 基础词汇', examples: [{ jp: '大きい犬', kana: 'おおきい いぬ', zh: '大的狗' }], tags: ['N5基础', '形容词'] },
-  { id: 'n5-020', word: '小さい', kana: 'ちいさい', romaji: 'chiisai', meaning: '小的', level: 'N5', category: 'jlpt', partOfSpeech: '形容词', pronunciation: 'ち-い-さ-い', usageCore: '表示体积、规模小', usagePatterns: ['小さい子供'], collocations: ['小さい車'], examFocus: 'N5 基础词汇', examples: [{ jp: '小さい子供', kana: 'ちいさい こども', zh: '小孩' }], tags: ['N5基础', '形容词'] },
-  { id: 'n5-021', word: '新しい', kana: 'あたらしい', romaji: 'atarashii', meaning: '新的', level: 'N5', category: 'jlpt', partOfSpeech: '形容词', pronunciation: 'あ-た-ら-し-い', usageCore: '表示刚出现或刚获得不久', usagePatterns: ['新しい車'], collocations: ['新しい時代'], examFocus: 'N5 基础词汇', examples: [{ jp: '新しい車', kana: 'あたらしい くるま', zh: '新车' }], tags: ['N5基础', '形容词'] },
-  { id: 'n5-022', word: '古い', kana: 'ふるい', romaji: 'furui', meaning: '旧的/老的', level: 'N5', category: 'jlpt', partOfSpeech: '形容词', pronunciation: 'ふ-る-い', usageCore: '表示存在时间长或使用已久', usagePatterns: ['古い家'], collocations: ['古い友達'], examFocus: 'N5 基础词汇', examples: [{ jp: '古い家', kana: 'ふるい いえ', zh: '老房子' }], tags: ['N5基础', '形容词'] },
-  { id: 'n5-023', word: '美味しい', kana: 'おいしい', romaji: 'oishii', meaning: '好吃的', level: 'N5', category: 'jlpt', partOfSpeech: '形容词', pronunciation: 'お-い-し-い', usageCore: '食物味道好', usagePatterns: ['美味しい食べ物'], collocations: ['美味しい和食'], examFocus: 'N5 基础词汇', examples: [{ jp: '美味しい食べ物', kana: 'おいしい たべもの', zh: '好吃的食物' }], tags: ['N5基础', '形容词'] },
-  { id: 'n5-024', word: '静かな', kana: 'しずかな', romaji: 'shizuka', meaning: '安静的', level: 'N5', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'し-ず-か-な', usageCore: '没有声音或很少声音', usagePatterns: ['静かな公園'], collocations: ['静かな町'], examFocus: 'N5 基础词汇', examples: [{ jp: '静かな公園', kana: 'しずかな こうえん', zh: '安静的公园' }], tags: ['N5基础', '形容动词'] },
-  { id: 'n5-025', word: 'とても', kana: 'とても', romaji: 'totemo', meaning: '非常', level: 'N5', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'と-も-と，长音要读满。', usageCore: '强调程度高', usagePatterns: ['とても美味しい'], collocations: ['とても難しい'], examFocus: 'N5 基础词汇', examples: [{ jp: 'とても美味しい', kana: 'とても おいしい', zh: '非常好吃' }], tags: ['N5基础', '副词'] },
-  { id: 'n5-026', word: '一緒に', kana: 'いっしょに', romaji: 'isshoni', meaning: '一起', level: 'N5', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'いっ-しょ-に，注意促音。', usageCore: '与他人共同做某事', usagePatterns: ['一緒に食べましょう'], collocations: ['一緒に頑張る'], examFocus: 'N5 基础词汇', examples: [{ jp: '一緒に食べましょう', kana: 'いっしょに たべましょう', zh: '一起吃吧' }], tags: ['N5基础', '副词'] },
-  { id: 'n5-027', word: 'まだ', kana: 'まだ', romaji: 'mada', meaning: '还', level: 'N5', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'ま-だ', usageCore: '表示尚未完成或继续', usagePatterns: ['まだ決めていません'], collocations: ['まだ来ていません'], examFocus: 'N5 基础词汇', examples: [{ jp: 'まだ決めていません', kana: 'まだ きめて いません', zh: '还没决定' }], tags: ['N5基础', '副词'] },
-  { id: 'n5-028', word: 'もう一度', kana: 'もういちど', romaji: 'mouichido', meaning: '再一次', level: 'N5', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'もう-いち-ど', usageCore: '重复或再次做某事', usagePatterns: ['もう一度言ってください'], collocations: ['もう一度見る'], examFocus: 'N5 基础词汇', examples: [{ jp: 'もう一度言ってください', kana: 'もういちど いって ください', zh: '请再说一遍' }], tags: ['N5基础', '副词'] },
-  { id: 'n5-029', word: 'ありがとう', kana: 'ありがとう', romaji: 'arigatou', meaning: '谢谢', level: 'N5', category: 'jlpt', partOfSpeech: '寒暄', pronunciation: 'あ-り-が-と-う', usageCore: '表示感谢的寒暄语', usagePatterns: ['ありがとうございます'], collocations: ['ありがとう存じます'], examFocus: 'N5 基础词汇', examples: [{ jp: 'ありがとうございます', kana: 'ありがとうございます', zh: '谢谢' }], tags: ['N5基础', '寒暄'] },
-  { id: 'n5-030', word: 'ごめんなさい', kana: 'ごめんなさい', romaji: 'gomennasai', meaning: '对不起', level: 'N5', category: 'jlpt', partOfSpeech: '寒暄', pronunciation: 'ご-め-ん-な-さ-い', usageCore: '道歉或请求原谅', usagePatterns: ['ごめんなさい、遅れました'], collocations: ['ごめんなさいね'], examFocus: 'N5 基础词汇', examples: [{ jp: 'ごめんなさい、遅れました', kana: 'ごめんなさい、おくれました', zh: '对不起，我迟到了' }], tags: ['N5基础', '寒暄'] },
-]
+// ==================== 记忆相关类型 ====================
 
-// ─── N4 级别词汇 ─────────────────────────────────────────────────────────────────
-export const n4Vocabulary: VocabularyItem[] = [
-  { id: 'n4-001', word: '経験', kana: 'けいけん', romaji: 'keiken', meaning: '经验', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'けい-けん，长音要读满。', usageCore: '通过实践获得的知识和技能', usagePatterns: ['経験がある', '経験を積む'], collocations: ['生活経験', '工作经验'], examFocus: 'N4 阅读高频词', examples: [{ jp: '経験があります', kana: 'けいけん が あります', zh: '有经验' }], tags: ['N4', '高频'] },
-  { id: 'n4-002', word: '関係', kana: 'かんけい', romaji: 'kankei', meaning: '关系', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'かん-けい，长音要读满。', usageCore: '两个事物之间的联系', usagePatterns: ['〜と関係がある', '関係を持つ'], collocations: ['環境と関係があります'], examFocus: 'N4 阅读高频词', examples: [{ jp: '環境と関係があります', kana: 'かんきょう と かんけい が あります', zh: '与环境有关' }], tags: ['N4', '高频'] },
-  { id: 'n4-003', word: '結果', kana: 'けっか', romaji: ' kekka', meaning: '结果', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'けっ-か，促音要短促。', usageCore: '某事结束后的状态', usagePatterns: ['結果的に', '結果を見る'], collocations: ['結果報告'], examFocus: 'N4 阅读高频词', examples: [{ jp: '結果的に成功了', kana: 'けっかてきに せいこうしました', zh: '结果成功了' }], tags: ['N4', '高频'] },
-  { id: 'n4-004', word: '理由', kana: 'りゆう', romaji: 'riyuu', meaning: '理由', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'り-ゆう，注意长音。', usageCore: '做某事或判断的原因', usagePatterns: ['理由がない', '理由を聞く'], collocations: ['理由を説明'], examFocus: 'N4 阅读高频词', examples: [{ jp: '理由を聞きたい', kana: 'りゆう を ききたい', zh: '想问理由' }], tags: ['N4', '高频'] },
-  { id: 'n4-005', word: '問題', kana: 'もんだい', romaji: 'mondai', meaning: '问题', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'もん-だい', usageCore: '需要解决的课题或考试题', usagePatterns: ['問題を解く', '問題点'], collocations: ['社会問題'], examFocus: 'N4 阅读超高频', examples: [{ jp: '問題を解きます', kana: 'もんだい を ときます', zh: '解题' }], tags: ['N4', '超高频'] },
-  { id: 'n4-006', word: '方法', kana: 'ほうほう', romaji: 'houhou', meaning: '方法', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'ほう-ほう，双长音。', usageCore: '做某事的手段或方式', usagePatterns: ['方法を使う', '良い方法'], collocations: ['解決方法'], examFocus: 'N4 阅读高频词', examples: [{ jp: '良い方法があります', kana: 'よい ほうほう が あります', zh: '有好方法' }], tags: ['N4', '高频'] },
-  { id: 'n4-007', word: '研究', kana: 'けんきゅう', romaji: 'kenkyuu', meaning: '研究', level: 'N4', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'けん-きゅう，双长音。', usageCore: '系统性探索和研究', usagePatterns: ['研究する', '研究を重ねる'], collocations: ['科学研究'], examFocus: 'N4 阅读高频词', examples: [{ jp: '研究を重ねる', kana: 'けんきゅう を かさなげる', zh: '反复研究' }], tags: ['N4', '高频', '学术'] },
-  { id: 'n4-008', word: '準備', kana: 'じゅんび', romaji: 'junbi', meaning: '准备', level: 'N4', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'じゅん-び，长音要读满。', usageCore: '为某事提前做的准备', usagePatterns: ['準備する', '準備が整う'], collocations: ['事前準備'], examFocus: 'N4 阅读高频词', examples: [{ jp: '準備が整いました', kana: 'じゅんび が ととのいました', zh: '准备就绪' }], tags: ['N4', '高频'] },
-  { id: 'n4-009', word: '説明', kana: 'せつめい', romaji: 'setsumei', meaning: '说明', level: 'N4', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'せつ-めい，长音要读满。', usageCore: '向他人解释或阐述', usagePatterns: ['説明する', '説明を読む'], collocations: ['产品説明'], examFocus: 'N4 阅读高频词', examples: [{ jp: '説明してください', kana: 'せつめい して ください', zh: '请说明' }], tags: ['N4', '高频'] },
-  { id: 'n4-010', word: '状態', kana: 'じょうたい', romaji: 'joutai', meaning: '状态', level: 'N4', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'じょう-たい，长音要读满。', usageCore: '某人或某物的情况', usagePatterns: ['状態が悪い', '健康状態'], collocations: ['生活状態'], examFocus: 'N4 阅读高频词', examples: [{ jp: '状態が悪い', kana: 'じょうたい が わるい', zh: '状态不好' }], tags: ['N4', '高频'] },
-  { id: 'n4-011', word: '影響', kana: 'えいきょう', romaji: 'eikyou', meaning: '影响', level: 'N4', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'えい-きょう，长音要读满。', usageCore: '某事物对另一事物产生作用', usagePatterns: ['影響を受ける', '影響を与える'], collocations: ['環境に影響'], examFocus: 'N4/N3 阅读超高频', examples: [{ jp: '環境に影響します', kana: 'かんきょう に えいきょう します', zh: '影响环境' }], tags: ['N4', '超高频'] },
-  { id: 'n4-012', word: '考える', kana: 'かんがえる', romaji: 'kangaeru', meaning: '考虑', level: 'N4', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'かん-が-える，一段动词。', usageCore: '思考、琢磨', usagePatterns: ['考える必要がある', 'よく考えて'], collocations: ['自分で考える'], examFocus: 'N4 阅读高频词', examples: [{ jp: 'よく考えてください', kana: 'よく かんがえて ください', zh: '请好好考虑' }], tags: ['N4', '高频', '动词'] },
-  { id: 'n4-013', word: '始める', kana: 'はじめる', romaji: 'hajimeru', meaning: '开始', level: 'N4', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'はじ-める，一段动词。', usageCore: '某动作或状态开始', usagePatterns: ['〜を始める'], collocations: ['勉強を始めます'], examFocus: 'N4 语法高频', examples: [{ jp: '勉強を始めます', kana: 'べんきょう を はじめます', zh: '开始学习' }], tags: ['N4', '高频', '动词'] },
-  { id: 'n4-014', word: '続ける', kana: 'つづける', romaji: 'tsuzukeru', meaning: '继续', level: 'N4', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'つず-ける，一段动词。', usageCore: '不间断地持续做某事', usagePatterns: ['〜を続ける'], collocations: ['読み続ける'], examFocus: 'N4 语法高频', examples: [{ jp: '読み続けます', kana: 'よみ つづけます', zh: '继续读' }], tags: ['N4', '高频', '动词'] },
-  { id: 'n4-015', word: '現れる', kana: 'あらわれる', romaji: 'arawareru', meaning: '出现', level: 'N4', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'あら-われる，一段动词。', usageCore: '原本没有的事物显现出来', usagePatterns: ['姿が現れる', '出現する'], collocations: ['機会が現れます'], examFocus: 'N4 阅读高频词', examples: [{ jp: '機会が現れます', kana: 'きかい が あらわれます', zh: '机会出现' }], tags: ['N4', '高频', '动词'] },
-  { id: 'n4-016', word: '伝える', kana: 'つたえる', romaji: 'tsutaeru', meaning: '传达', level: 'N4', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'つた-える，一段动词。', usageCore: '将信息、感情等转达给他人', usagePatterns: ['〜伝える', 'お伝えする'], collocations: ['言葉を伝えます'], examFocus: 'N4 阅读高频词', examples: [{ jp: '言葉を伝えます', kana: 'ことを つたえます', zh: '传达话语' }], tags: ['N4', '高频', '动词'] },
-  { id: 'n4-017', word: '重要な', kana: 'じゅうような', romaji: 'juuyou', meaning: '重要的', level: 'N4', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'じゅう-よう-な', usageCore: '非常必要或有很大意义', usagePatterns: ['重要な問題', '重要なポイント'], collocations: ['重要な発見'], examFocus: 'N4 阅读超高频', examples: [{ jp: '重要な問題', kana: 'じゅうよう な もんだい', zh: '重要的问题' }], tags: ['N4', '超高频', '形容动词'] },
-  { id: 'n4-018', word: '必要な', kana: 'ひつような', romaji: 'hitsuyou', meaning: '必要的', level: 'N4', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'ひつ-よう-な', usageCore: '必须有或不可缺少', usagePatterns: ['〜必要的', '必要最小限'], collocations: ['必要な準備'], examFocus: 'N4 阅读高频词', examples: [{ jp: '必要な準備', kana: 'ひつよう な じゅんび', zh: '必要的准备' }], tags: ['N4', '高频', '形容动词'] },
-  { id: 'n4-019', word: '面倒な', kana: 'めんどいな', romaji: 'mendokona', meaning: '麻烦的', level: 'N4', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'めん-ど-い-な', usageCore: '处理起来复杂或费事', usagePatterns: ['面倒な手続き', '面倒を見る'], collocations: ['面倒な問題'], examFocus: 'N4 阅读高频词', examples: [{ jp: '面倒な手続き', kana: 'めんどい て続き', zh: '麻烦的手续' }], tags: ['N4', '高频', '形容动词'] },
-  { id: 'n4-020', word: '複雑な', kana: 'ふくざつな', romaji: 'fukuzatsu', meaning: '复杂的', level: 'N4', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'ふく-ざつ-な', usageCore: '涉及多个要素，不简单', usagePatterns: ['複雑な問題', '複雑な構造'], collocations: ['複雑な状況'], examFocus: 'N4 阅读高频词', examples: [{ jp: '複雑な問題', kana: 'ふくざつ な もんだい', zh: '复杂的问题' }], tags: ['N4', '高频', '形容动词'] },
-  { id: 'n4-021', word: '幸せな', kana: 'しあわせな', romaji: 'shiawase', meaning: '幸福的', level: 'N4', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'し-あ-わ-せ-な', usageCore: '生活美满、满足', usagePatterns: ['幸せな生活', '幸せだ'], collocations: ['幸せな家族'], examFocus: 'N4 阅读高频词', examples: [{ jp: '幸せな生活', kana: 'しあわせ な せいかつ', zh: '幸福的生活' }], tags: ['N4', '高频', '形容动词'] },
-  { id: 'n4-022', word: '確かに', kana: 'たしかに', romaji: 'tashikani', meaning: '确实', level: 'N4', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'た-し-か-に', usageCore: '肯定地、确实地', usagePatterns: ['確かに存在する', '確かにそうだ'], collocations: ['確かに覚えて'], examFocus: 'N4 阅读高频词', examples: [{ jp: '確かに存在します', kana: 'たしかに そんざい します', zh: '确实存在' }], tags: ['N4', '高频', '副词'] },
-  { id: 'n4-023', word: '特に', kana: 'ことに', romaji: 'tokuni', meaning: '特别', level: 'N4', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'と-く-に', usageCore: '强调其中某个特别突出', usagePatterns: ['特に重要', '特に好き'], collocations: ['特に注意'], examFocus: 'N4 阅读超高频', examples: [{ jp: '特に大切です', kana: 'とく に たいせつ です', zh: '特别重要' }], tags: ['N4', '超高频', '副词'] },
-  { id: 'n4-024', word: '結局', kana: 'けっきょく', romaji: 'kekkyoku', meaning: '最终', level: 'N4', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'けっ-きょく，促音要短促。', usageCore: '经过各种经过后的最终结果', usagePatterns: ['結局〜になった', '結局失敗'], collocations: ['結局同じ'], examFocus: 'N4 阅读高频词', examples: [{ jp: '結局失敗しました', kana: 'けっきょく しっぱい しました', zh: '最终失败了' }], tags: ['N4', '高频', '副词'] },
-]
+export type MemoryState = 'new' | 'learning' | 'reviewing' | 'mastered'
 
-// ─── N3 级别词汇 ─────────────────────────────────────────────────────────────────
-export const n3Vocabulary: VocabularyItem[] = [
-  { id: 'n3-001', word: '主張', kana: 'しゅちょう', romaji: 'shuchou', meaning: '主张', level: 'N3', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'しゅ-ちょう，长音要读满。', usageCore: '坚持自己的观点或立场', usagePatterns: ['〜を主張する', '自分の主張'], collocations: ['意見主張'], examFocus: 'N3 阅读高频', examples: [{ jp: '自分の主張を通す', kana: 'じぶん の しゅちょう を とおす', zh: '坚持自己的主张' }], tags: ['N3', '高频', '观点'] },
-  { id: 'n3-002', word: '意識', kana: 'いしき', romaji: 'ishiki', meaning: '意识', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'い-しき，长音要读满。', usageCore: '人的知觉、觉悟程度', usagePatterns: ['〜を認識する', '意識が高い'], collocations: ['環境意識'], examFocus: 'N3 阅读高频', examples: [{ jp: '環境意識が高まりました', kana: 'かんきょう いしき が たかまりました', zh: '环境意识提高了' }], tags: ['N3', '高频', '社会'] },
-  { id: 'n3-003', word: '格差', kana: 'かくさ', romaji: 'kakusa', meaning: '差距', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'かく-さ', usageCore: '社会成员之间的差异', usagePatterns: ['格差が広がる', '格差がある'], collocations: ['貧富の格差'], examFocus: 'N3 阅读高频', examples: [{ jp: '格差が広がっています', kana: 'かくさ が ひろがって います', zh: '差距在扩大' }], tags: ['N3', '高频', '社会'] },
-  { id: 'n3-004', word: '傾向', kana: 'けいこう', romaji: 'keikou', meaning: '倾向', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'けい-こう，双长音。', usageCore: '事物发展的趋势', usagePatterns: ['〜の傾向がある', '増加傾向'], collocations: ['増加傾向'], examFocus: 'N3 阅读超高频', examples: [{ jp: '増加傾向があります', kana: 'ぞうか けいこう が あります', zh: '呈增加趋势' }], tags: ['N3', '超高频', '趋势'] },
-  { id: 'n3-005', word: '背景', kana: 'はいけい', romaji: 'haikei', meaning: '背景', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'はい-けい，长音要读满。', usageCore: '事物发生的环境或缘由', usagePatterns: ['時代背景', '事件的背景'], collocations: ['歴史的背景'], examFocus: 'N3 阅读高频', examples: [{ jp: '時代背景を理解する', kana: 'じだい はいけい を りかい する', zh: '理解时代背景' }], tags: ['N3', '高频'] },
-  { id: 'n3-006', word: '概念', kana: 'がいねん', romaji: 'gainen', meaning: '概念', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'がい-ねん，长音要读满。', usageCore: '对事物本质的抽象认识', usagePatterns: ['概念を理解する', '新しい概念'], collocations: ['基本概念'], examFocus: 'N3 阅读高频', examples: [{ jp: '新しい概念', kana: 'あたらしい がいねん', zh: '新概念' }], tags: ['N3', '高频', '学术'] },
-  { id: 'n3-007', word: '本質', kana: 'ほんしつ', romaji: 'honshitsu', meaning: '本质', level: 'N3', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'ほん-しつ，长音要读满。', usageCore: '事物最核心的性质', usagePatterns: ['本質を見抜く', '本質的な問題'], collocations: ['問題の本質'], examFocus: 'N3 阅读高频', examples: [{ jp: '本質を見抜く', kana: 'ほんしつ を みぬく', zh: '看穿本质' }], tags: ['N3', '高频', '学术'] },
-  { id: 'n3-008', word: '対する', kana: 'たいする', romaji: 'taisuru', meaning: '对于', level: 'N3', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'たい-する', usageCore: '对某事物的态度或动作', usagePatterns: ['〜に対する', '問題に対する'], collocations: ['問題に対する態度'], examFocus: 'N3 阅读超高频', examples: [{ jp: '問題に対する態度', kana: 'もんだい に たいする たいど', zh: '对问题的态度' }], tags: ['N3', '超高频', '语法'] },
-  { id: 'n3-009', word: '属する', kana: 'ぞくする', romaji: 'zokusuru', meaning: '属于', level: 'N3', category: 'jlpt', partOfSpeech: 'サ变', pronunciation: 'ぞく-する', usageCore: '归类于某个群体', usagePatterns: ['〜に属する', 'グループに属する'], collocations: ['このグループに属する'], examFocus: 'N3 阅读高频', examples: [{ jp: 'このグループに属する', kana: 'この グループ に ぞくする', zh: '属于这个 group' }], tags: ['N3', '高频', '语法'] },
-  { id: 'n3-010', word: '不可欠', kana: 'ふかけつ', romaji: 'fukaketsu', meaning: '不可或缺', level: 'N3', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'ふ-か-けつ', usageCore: '必不可少，无法替代', usagePatterns: ['〜に不可欠', '不可欠な要素'], collocations: ['不可缺少'], examFocus: 'N3 阅读高频', examples: [{ jp: '不可欠の条件', kana: 'ふかけつ な じょうけん', zh: '不可或缺的条件' }], tags: ['N3', '高频', '形容动词'] },
-  { id: 'n3-011', word: '潜在的な', kana: 'せんざいてきな', romaji: 'senzai', meaning: '潜在的', level: 'N3', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'せん-ざい-てき-な', usageCore: '现在尚不显著但可能发展', usagePatterns: ['潜在的な危険', '潜在能力'], collocations: ['潜在的な問題'], examFocus: 'N3 阅读高频', examples: [{ jp: '潜在的な危険', kana: 'せんざいてき な きけん', zh: '潜在的危险' }], tags: ['N3', '高频', '形容动词'] },
-  { id: 'n3-012', word: '広範な', kana: 'こうはん', romaji: 'kouhan', meaning: '广泛的', level: 'N3', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'こう-はん，长音要读满。', usageCore: '涉及范围广泛', usagePatterns: ['広範な影響', '広範に存在する'], collocations: ['影響が広範囲'], examFocus: 'N3 阅读高频', examples: [{ jp: '広範な影響', kana: 'こうはん な えいきょう', zh: '广泛的影响' }], tags: ['N3', '高频', '形容动词'] },
-  { id: 'n3-013', word: '例えば', kana: 'たとえば', romaji: 'tatoeba', meaning: '例如', level: 'N3', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'た-と-え-ば', usageCore: '举出具体例子', usagePatterns: ['例えば〜', '例として'], collocations: ['例えばこんなこと'], examFocus: 'N3 阅读超高频', examples: [{ jp: '例えば、この場合', kana: 'たとえば この ばあい', zh: '例如，这种情况' }], tags: ['N3', '超高频', '副词'] },
-  { id: 'n3-014', word: '同時に', kana: 'どうじに', romaji: 'doujini', meaning: '同时', level: 'N3', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'どう-じ-に，长音要读满。', usageCore: '两个以上的事物同时发生', usagePatterns: ['同時に进行する', '〜と同時に'], collocations: ['同時に発生'], examFocus: 'N3 阅读高频', examples: [{ jp: '同時に進行する', kana: 'どうじに しんこう する', zh: '同时进行' }], tags: ['N3', '高频', '副词'] },
-  { id: 'n3-015', word: '次第に', kana: 'しだいに', romaji: 'shidaini', meaning: '逐渐', level: 'N3', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'し-だ-いに', usageCore: '按照顺序渐渐变化', usagePatterns: ['次第に改善する', '次第に減る'], collocations: ['次第に回復'], examFocus: 'N3 阅读高频', examples: [{ jp: '次第に改善される', kana: 'しだいに かいぜん される', zh: '逐渐改善' }], tags: ['N3', '高频', '副词'] },
-  { id: 'n3-016', word: 'そもそも', kana: 'そもそも', romaji: 'somosomo', meaning: '本来', level: 'N3', category: 'jlpt', partOfSpeech: '副词', pronunciation: 'そ-も-そ-も', usageCore: '谈论事物的起点或根源', usagePatterns: ['そもそも〜だ', 'そもそも問題だ'], collocations: ['そもそも考え'], examFocus: 'N3 阅读高频', examples: [{ jp: 'そもそも違う', kana: 'そもそも ちがう', zh: '本来就不同' }], tags: ['N3', '高频', '副词'] },
-]
-
-// ─── N2 级别词汇（新增）────────────────────────────────────────────────────────────────
-export const n2Vocabulary: VocabularyItem[] = [
-  { id: 'n2-001', word: '影響', kana: 'えいきょう', romaji: 'eikyou', meaning: '影响', level: 'N2', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'えい-きょう，注意长音「きょう」要拉开。', usageCore: '多用于书面表达，表示对人、事、结果产生作用。', usagePatterns: ['〜に影響する', '〜へ影響を与える', '影響が大きい'], collocations: ['経済に影響する', '社会へ影響を与える', '悪い影響'], examFocus: '阅读里常和「環境」「経済」「社会」搭配，常考因果关系。', examples: [{ jp: '気候の変化は農業に大きな影響を与える。', kana: 'きこう の へんか は のうぎょう に おおきな えいきょう を あたえる。', zh: '气候变化会对农业产生很大影响。' }, { jp: 'その事件は人々の考え方に影響した。', kana: 'その じけん は ひとびと の かんがえかた に えいきょう した。', zh: '那起事件影响了人们的思考方式。' }], tags: ['高频阅读', '因果', '书面语'] },
-  { id: 'n2-002', word: '制度', kana: 'せいど', romaji: 'seido', meaning: '制度，体制', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'せい-ど，前长后短。', usageCore: '表示社会、组织或国家层面的规则体系。', usagePatterns: ['制度を導入する', '制度を見直す', '制度が整っている'], collocations: ['教育制度', '社会制度', '新しい制度'], examFocus: '考研阅读中常和教育、福祉、雇用主题一起出现。', examples: [{ jp: '新しい制度を導入する前に十分な議論が必要だ。', kana: 'あたらしい せいど を どうにゅう する まえ に じゅうぶんな ぎろん が ひつよう だ。', zh: '在引入新制度之前需要充分讨论。' }, { jp: 'その国の教育制度は地域によって異なる。', kana: 'その くに の きょういく せいど は ちいき に よって ことなる。', zh: '那个国家的教育制度因地区而异。' }], tags: ['社会主题', '制度类', '书面语'] },
-  { id: 'n2-003', word: '傾向', kana: 'けいこう', romaji: 'keikou', meaning: '倾向，趋势', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'けい-こう，两个长音都要读满。', usageCore: '表示某种持续出现的方向、特点或变化趋势。', usagePatterns: ['〜の傾向がある', '増加傾向', '〜する傾向にある'], collocations: ['若者の傾向', '消費の傾向', '保守的な傾向'], examFocus: '常与图表、社会调查、消费行为一起出现。', examples: [{ jp: '答えは一つではない。', kana: 'こたえ は ひとつ ではない。', zh: '答案不是唯一的。' }], tags: ['趋势', '数据阅读', '高频'] },
-  { id: 'n2-004', word: '現状', kana: 'げんじょう', romaji: 'genjou', meaning: '现状，目前情况', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'げん-じょう，后半部分是长音。', usageCore: '用于说明当前状态，常与分析、问题意识一起出现。', usagePatterns: ['現状では', '現状を把握する', '現状の問題点'], collocations: ['現状分析', '現状維持', '現状認識'], examFocus: '写作和阅读都很常见，常作为论述的起点。', examples: [{ jp: '現状ではこの計画を実行するのは難しい。', kana: 'げんじょう では この けいかく を じっこう する の は むずかしい。', zh: '就目前情况而言，很难执行这个计划。' }, { jp: 'まず現状を正確に把握することが大切だ。', kana: 'まず げんじょう を せいかく に はあく する こと が たいせつ だ。', zh: '首先准确把握现状很重要。' }], tags: ['写作常用', '问题分析', '书面语'] },
-  { id: 'n2-005', word: '拡大', kana: 'かくだい', romaji: 'kakudai', meaning: '扩大，扩张', level: 'N2', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'かく-だい，第二拍发音清楚。', usageCore: '表示范围、规模、影响力等变大。', usagePatterns: ['規模を拡大する', '被害が拡大する', '拡大傾向'], collocations: ['市場を拡大する', '、感染拡大', '需要拡大'], examFocus: '新闻、社会、经济类文本的常见词。', examples: [{ jp: '被害の拡大を防ぐため、早急な対応が求められる。', kana: 'ひがい の かくだい を ふせぐ ため、そうきゅう な たいおう が もとめられる。', zh: '为了防止损害扩大，需要迅速应对。' }], tags: ['经济', '社会', '高频'] },
-  { id: 'n2-006', word: '目的', kana: 'もくてき', romaji: 'mokuteki', meaning: '目的', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'もく-てき，后半清晰收音。', usageCore: '说明行为、制度或研究的目标。', usagePatterns: ['〜を目的として', '目的を達成する', '目的意識'], collocations: ['教育の目的', '利用目的', '明確な目的'], examFocus: '说明文里常用于定义段和结论句。', examples: [{ jp: 'この制度は高齢者の生活を支えることを目的としている。', kana: 'この せいど は こうれいしゃ の せいかつ を ささえる こと を もくてき として いる。', zh: '这一制度以支持老年人的生活为目的。' }], tags: ['定义句', '高频', '写作'] },
-  { id: 'n2-007', word: '費やす', kana: 'ついやす', romaji: 'tsuiyasu', meaning: '花费，耗费（时间/精力/金钱）', level: 'N2', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'つ-い-や-す，注意不是「つかう」。', usageCore: '强调为某事投入较多资源。', usagePatterns: ['時間を費やす', '努力を費やす', '多額の費用を費やす'], collocations: ['研究に費やす', '準備に費やす', '人生を費やす'], examFocus: '文章里常带有"投入巨大"语气色彩。', examples: [{ jp: '彼はその研究に十年以上を費やした。', kana: 'かれ は その けんきゅう に じゅうねん いじょう を ついやした。', zh: '他为那项研究花费了十多年。' }], tags: ['动词', '投入', '书面表达'] },
-  { id: 'n2-008', word: '維持', kana: 'いじ', romaji: 'iji', meaning: '维持', level: 'N2', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'い-じ，短而稳。', usageCore: '表示保持现有状态、水平或关系。', usagePatterns: ['現状を維持する', '秩序を維持する', '維持が難しい'], collocations: ['体力を維持する', '関係維持', '品質維持'], examFocus: '经常和「向上」「改善」对照出现。', examples: [{ jp: '健康を維持するためには適度な運動が必要だ。', kana: 'けんこう を いじ する ため に は てきど な うんどう が ひつよう だ。', zh: '为了维持健康，需要适度运动。' }], tags: ['对比词', '常考', '书面语'] },
-  { id: 'n2-009', word: '課題', kana: 'かだい', romaji: 'kadai', meaning: '课题，问题，任务', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'か-だい，后半长音明显。', usageCore: '既可指作业任务，也常指社会/研究层面的课题。', usagePatterns: ['課題を抱える', '今後の課題', '課題に取り組む'], collocations: ['教育課題', '共通の課題', '重要な課題'], examFocus: '考研阅读里非常高频，多用第二层"社会问题"的意思。', examples: [{ jp: '少子高齢化は日本社会の大きな課題である。', kana: 'しょうし こうれいか は にほん しゃかい の おおきな かだい で ある。', zh: '少子高龄化是日本社会的一大课题。' }], tags: ['超高频', '社会问题', '写作'] },
-  { id: 'n2-010', word: '重視', kana: 'じゅうし', romaji: 'juushi', meaning: '重视', level: 'N2', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'じゅう-し，首拍长音。', usageCore: '强调将某个要素放在重要位置。', usagePatterns: ['〜を重視する', '重視される', '効率を重視する'], collocations: ['個性を重視する', '結果を重視する', '安全を重視する'], examFocus: '常和教育理念、企业经营、价值判断搭配。', examples: [{ jp: '最近の教育では思考力が重視されている。', kana: 'さいきん の きょういく では しこうりょく が じゅうし されて いる。', zh: '最近的教育中，思考能力受到重视。' }], tags: ['价值判断', '高频', '写作'] },
-  { id: 'n2-011', word: '明らか', kana: 'あきらか', romaji: 'akiraka', meaning: '明显，明确', level: 'N2', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'あ-き-ら-か，平稳念出四拍。', usageCore: '用于说明事实、差异、原因等变得清楚。', usagePatterns: ['明らかになる', '明らかにする', '明らかな違い'], collocations: ['事実が明らかになる', '原因を明らかにする', '明らかな変化'], examFocus: '论文摘要、调查报告、说明文中都很高频。', examples: [{ jp: '調査の結果、新たな問題点が明らかになった。', kana: 'ちょうさ の けっかあらたな もんだいてん が あきらか に なった。', zh: '调查结果显示，新的问题点变得明确了。' }], tags: ['说明文', '常考', '结果表达'] },
-  { id: 'n2-012', word: '実態', kana: 'じったい', romaji: 'jittai', meaning: '实际情况，真实状态', level: 'N2', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'じっ-たい，促音要短促有力。', usageCore: '强调与表面说法不同的真实情况。', usagePatterns: ['実態を調べる', '実態が見えにくい', '実態調査'], collocations: ['生活実態', '雇用実態', '実態把握'], examFocus: '常出现在社会调查、纪实和批判性文章中。', examples: [{ jp: '外国人労働者の実態を正しく理解する必要がある。', kana: 'がいこくじん ろうどうしゃ の じったい を ただしく りかい する ひつよう が ある。', zh: '有必要正确理解外国劳动者的实际情况。' }], tags: ['调查类', '社会议题', '高频'] },
-]
-
-// ─── N1 级别词汇（新增）────────────────────────────────────────────────────────────────
-export const n1Vocabulary: VocabularyItem[] = [
-  { id: 'n1-001', word: '顕著', kana: 'けんちょ', romaji: 'kencho', meaning: '显著，明显', level: 'N1', category: 'jlpt', partOfSpeech: '形容动词', pronunciation: 'けん-ちょ，第二拍要短。', usageCore: '书面程度高，用于突出变化或差异非常明显。', usagePatterns: ['顕著な変化', '顕著に表れる', '差が顕著だ'], collocations: ['地域差が顕著', '顕著な傾向', '成果が顕著に現れる'], examFocus: 'N1阅读与学术说明文常见，替代普通的「明らか」。', examples: [{ jp: '都市と地方の格差は近年愈来愈顕著になっている。', kana: 'とし と ちほう の かくさ は きんねん ますます けんちょ に なって いる。', zh: '近年城市与地方的差距越来越显著。' }], tags: ['N1高频', '学术书面', '替换词'] },
-  { id: 'n1-002', word: '促進', kana: 'そくしん', romaji: 'sokushin', meaning: '促进，推进', level: 'N1', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'そく-しん，促音短。', usageCore: '常用于政策、交流、发展等正式语境。', usagePatterns: ['交流を促進する', '促進策', '利用促進'], collocations: ['地域活性化を促進する', '理解促進', '成長促進'], examFocus: '政策类文本、作文正式表达里非常好用。', examples: [{ jp: '文化交流は相互理解を促進する役割を果たす。', kana: 'ぶんか こうりゅう は そうご りかい を そくしん する やくわり を はたす。', zh: '文化交流起到促进相互理解的作用。' }], tags: ['政策类', '作文高级词', 'N1'] },
-  { id: 'n1-003', word: '見解', kana: 'けんかい', romaji: 'kenkai', meaning: '见解，看法', level: 'N1', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'けん-かい，尾音拉开。', usageCore: '比「意見」更正式，常用于学者、机构、作者观点。', usagePatterns: ['見解を示す', '〜という見解', '見解の相違'], collocations: ['政府の見解', '専門家の見解', '公式見解'], examFocus: '阅读主旨题中经常用来引出作者或机构态度。', examples: [{ jp: '専門家の間でもその点について見解が分かれている。', kana: 'せんもんか の あいだ でも その てん について けんかい が わかれて いる。', zh: '即使在专家之间，对于这一点的见解也存在分歧。' }], tags: ['观点题', '阅读理解', '书面'] },
-  { id: 'n1-004', word: '枠組み', kana: 'わくぐみ', romaji: 'wakugumi', meaning: '框架，体系', level: 'N1', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'わ-く-ぐ-み，四拍分明。', usageCore: '指思考框架、制度结构、分析体系。', usagePatterns: ['枠組みを作る', '既存の枠組み', '新たな枠組み'], collocations: ['制度の枠組み', '分析の枠組み', '国際的枠組み'], examFocus: '学术文章和社会评论中频繁出现。', examples: [{ jp: '従来の枠組みではこの問題を十分に説明できない。', kana: 'じゅうらい の わくぐみ では この もんだい を じゅうぶん に せつめい できない。', zh: '用传统框架无法充分说明这个问题。' }], tags: ['抽象名词', '学术阅读', 'N1'] },
-  { id: 'n1-005', word: '担う', kana: 'になう', romaji: 'ninau', meaning: '承担，担负', level: 'N1', category: 'jlpt', partOfSpeech: '动词', pronunciation: 'に-な-う，尾音长。', usageCore: '多用于承担责任、角色、功能，书面色彩强。', usagePatterns: ['役割を担う', '将来を担う', '責任|Fee担う'], collocations: ['社会を担う若者', '中核|Fee担う', '重要な役割|Fee担う'], examFocus: '阅读和作文都很常见，常与"若者""教育"搭配。', examples: [{ jp: '若者は次の時代|Fee担う存在だと言われている。', kana: 'わかもの は つぎ の じだい を になう そんざい だ と いわれて いる。', zh: '年轻人被认为是肩负下一个时代的存在。' }], tags: ['作文加分', '责任', '高频'] },
-  { id: 'n1-006', word: '過程', kana: 'かてい', romaji: 'katei', meaning: '过程', level: 'N1', category: 'jlpt', partOfSpeech: '名词', pronunciation: 'か-てい，后长音。', usageCore: '强调变化、形成或解决问题的过程本身。', usagePatterns: ['形成の過程', '過程において', '発達過程'], collocations: ['学習過程', '議論の過程', '変化の過程'], examFocus: '常出现在论证过程、研究过程、成长过程描述中。', examples: [{ jp: '結果だけでなく、その過程を評価することが大切だ。', kana: 'けっか だけ で なく、その かてい を ひょうか する こと が たいせつ だ。', zh: '不仅结果，评价其过程也很重要。' }], tags: ['论证', '过程题', 'N1'] },
-  { id: 'n1-007', word: '実践', kana: 'じっせん', romaji: 'jissen', meaning: '实践，实行', level: 'N1', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'じっ-せん，促音清晰。', usageCore: '表示将理论、方法、理念付诸实施。', usagePatterns: ['理論を実践する', '実践例', '実践的な知識'], collocations: ['教育実践', '実践力', '実践活動'], examFocus: '教育类、研究类、方法论文章高频。', examples: [{ jp: '知識を社会で実践できる人材が求められている。', kana: 'ちしき を しゃかい で じっせん できる じんざい が もとめられて いる。', zh: '社会需要能够将知识付诸实践的人才。' }], tags: ['教育类', '理论实践', '高频'] },
-  { id: 'n1-008', word: '検証', kana: 'けんしょう', romaji: 'kenshou', meaning: '验证，检验', level: 'N1', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'けん-しょう，后半长音。', usageCore: '多指对观点、假设、政策、效果进行验证。', usagePatterns: ['効果を検証する', '検証結果', '仮説を検証する'], collocations: ['実証的に検証する', '政策検証', '検証作業'], examFocus: '论文摘要、实验说明、研究方法题中常见。', examples: [{ jp: 'その仮説が正しいかどうかを検証する必要がある。', kana: 'その かせつ が ただしい か どうか を けんしょう する ひつよう が ある。', zh: '有必要验证那个假设是否正确。' }], tags: ['学术', '研究', 'N1'] },
-  { id: 'n1-009', word: '転換', kana: 'てんかん', romaji: 'tenkan', meaning: '转换，转变', level: 'N1', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'てん-かん，尾音收紧。', usageCore: '表示方向、政策、思路、模式等的改变。', usagePatterns: ['発想を転換する', '政策転換', '大きな転換点'], collocations: ['<minimax:tool_call>', '方向転換', '意識の転換'], examFocus: '评论文中常用来描述时代变化或观念变化。', examples: [{ jp: 'これからは量より質を重視する方向への転換が必要だ。', kana: 'これから は りょう より しつ を じゅうし する ほうこう への てんかん が ひつよう だ。', zh: '今后有必要转向重视质量而非数量。' }], tags: ['转折', '观点变化', 'N1'] },
-  { id: 'n1-010', word: '一貫', kana: 'いっかん', romaji: 'ikkan', meaning: '一贯，始终一致', level: 'N1', category: 'jlpt', partOfSpeech: '名词/副词/サ变', pronunciation: 'いっ-かん，促音短。', usageCore: '表示立场、方针、态度、内容前后一致。', usagePatterns: ['一貫して', '一貫性がある', '方針を一貫させる'], collocations: ['一貫した態度', '一貫した方針', '論理の一貫性'], examFocus: '主旨题、论证结构题中很好用。', examples: [{ jp: '彼は教育の平等を一貫して主張してきた。', kana: 'かれ は きょういく の びょうどう を いっかん して しゅちょう して きた。', zh: '他始终一贯地坚持教育平等。' }], tags: ['结构题', '逻辑', 'N1'] },
-  { id: 'n1-011', word: '示唆', kana: 'しさ', romaji: 'shisa', meaning: '启示，暗示', level: 'N1', category: 'jlpt', partOfSpeech: '名词/サ变', pronunciation: 'し-さ，两拍干净。', usageCore: '表示间接提示某种意义、方向或结论。', usagePatterns: ['〜を示唆する', '示唆に富む', '結果が示唆する'], collocations: ['重要な示唆', '研究が示唆する', '将来を示唆する'], examFocus: '推论题、研究结论题中非常常见。', examples: [{ jp: 'この調査結果は教育格差の拡大を示唆している。', kana: 'この ちょうさ けっか は きょういく かくさ の かくだい を しさ して いる。', zh: '这项调查结果暗示了教育差距正在扩大。' }], tags: ['推论', '研究结论', 'N1'] },
-]
-
-// ─── 考研核心词汇（新增）────────────────────────────────────────────────────────────────
-export const examVocabulary: VocabularyItem[] = [
-  { id: 'exam-001', word: '把握', kana: 'はあく', romaji: 'haaku', meaning: '把握，掌握', level: '考研', category: 'exam', partOfSpeech: '名词/サ变', pronunciation: 'は-あ-く，中间长音要自然过渡。', usageCore: '高频用于"准确掌握情况、重点、数据、主旨"。', usagePatterns: ['実態を把握する', '要点を把握する', '正確に把握する'], collocations: ['現状把握', '状況を把握する', '全体を把握する'], examFocus: '做阅读时经常对应"主旨把握""信息把握"类题眼。', examples: [{ jp: 'まず文章全体の流れを把握してから細部を見るべきだ。', kana: 'まず ぶんしょう ぜんたい の ながれ を はあく して から さいぶ を みる べき だ。', zh: '应先把握文章整体脉络，再看细节。' }, { jp: '現状を正確に把握しなければ対策は立てられない。', kana: 'げんじょう を せいかく に はあく しなければ たいさく は たてられない。', zh: '如果不能准确把握现状，就无法制定对策。' }], tags: ['考研核心', '阅读技巧', '超高频'] },
-  { id: 'exam-002', word: '指摘', kana: 'してき', romaji: 'shiteki', meaning: '指出，指摘', level: '考研', category: 'exam', partOfSpeech: '名词/サ变', pronunciation: 'し-てき，读得利落。', usageCore: '表示作者、学者、文章对问题或事实进行指出。', usagePatterns: ['問題点を指摘する', '著者が指摘する', '以前から指摘されている'], collocations: ['欠点を指摘する', '鋭く指摘する', '繰り返し指摘される'], examFocus: '题干里经常会问"作者指出了什么"。', examples: [{ jp: '僕は現代教育の問題点を鋭く指摘している。', kana: 'ひっしゃ は げんだい きょういく の もんだいてん を するどく してき して いる。', zh: '作者尖锐地指出了现代教育的问题点。' }, { jp: '以前からその危険性が指摘されてきた。', kana: 'いぜん から その きけんせい が してき されて きた。', zh: '其危险性从以前开始就一直被指出。' }], tags: ['作者观点', '阅读题眼', '高频'] },
-  { id: 'exam-003', word: '捉える', kana: 'とらえる', romaji: 'toraeru', meaning: '把握，捕捉，看待', level: '考研', category: 'exam', partOfSpeech: '动词', pronunciation: 'と-ら-え-る，注意「え」不要吞掉。', usageCore: '除"抓住"外，阅读里更常表示"理解、看待某事物"。', usagePatterns: ['本質を捉える', '〜と捉える', '多面的に捉える'], collocations: ['問題を捉える', '変化を捉える', '正しく捉える'], examFocus: '主旨题和作者态度题的核心动词。', examples: [{ jp: '現象だけでなく背景まで捉える必要がある。', kana: 'げんしょう だけ で なく はいけい まで とらえる ひつよう が ある。', zh: '不仅要看到现象，还要把握其背景。' }, { jp: '僕は失敗を成長の機会として捉えている。', kana: 'ひっしゃ は しっぱい を せいちょう の きかい として とらえて いる。', zh: '作者将失败看作成长的机会。' }], tags: ['主旨理解', '态度题', '高频'] },
-  { id: 'exam-004', word: '論じる', kana: 'ろんじる', romaji: 'ronjiru', meaning: '论述，讨论', level: '考研', category: 'exam', partOfSpeech: '动词', pronunciation: 'ろん-じ-る，鼻音后接浊音要清楚。', usageCore: '用于正式讨论某个主题，比「話す」高级得多。', usagePatterns: ['〜について論じる', '詳しく論じる', '多角的に論じる'], collocations: ['社会問題を論じる', '教育を論じる', '歴史的に論じる'], examFocus: '经常出现在文章目的、结构题中。', examples: [{ jp: 'この文章は都市化の影響について論じている。', kana: 'この ぶんしょう は としか の えいきょう について ろんじて いる。', zh: '这篇文章论述了城市化的影响。' }, { jp: '僕はその問題を多角的に論じている。', kana: 'ひっしゃ は その もんだい を たかくてき に ろんじて いる。', zh: '作者从多角度论述了这个问题。' }], tags: ['文章结构', '论述文', '核心'] },
-  { id: 'exam-005', word: '見なす', kana: 'みなす', romaji: 'minasu', meaning: '看作，视为', level: '考研', category: 'exam', partOfSpeech: '动词', pronunciation: 'み-な-す，短促有力。', usageCore: '表示将A判断为B，常用于观点和定义。', usagePatterns: ['AをBと見なす', '〜と見なされる', '一般に見なす'], collocations: ['成功と見なす', '重要と見なす', '例外と見なす'], examFocus: '定义题、态度题、作者立场题高频。', examples: [{ jp: '彼は失敗を貴重な経験と見なしている。', kana: 'かれ は しっぱい を きちょう な けいけん と みなして いる。', zh: '他把失败视为宝贵经验。' }, { jp: 'その行為は社会的に問題があると見なされる。', kana: 'その こうい は しゃかいてき に もんだい が ある と みなされる。', zh: '那种行为被视为在社会层面有问题。' }], tags: ['观点判断', '定义', '高频'] },
-  { id: 'exam-006', word: '裏付ける', kana: 'うらづける', romaji: 'urazukeru', meaning: '证实，佐证', level: '考研', category: 'exam', partOfSpeech: '动词', pronunciation: 'う-ら-づ-け-る，浊音要清楚。', usageCore: '表示某数据、事实、例子对观点形成支撑。', usagePatterns: ['データが裏付ける', '事実に裏付けられる', '根拠を裏付ける'], collocations: ['研究結果が裏付ける', '証拠に裏付けられる', '仮説を裏付ける'], examFocus: '推论题和论证结构题核心词。', examples: [{ jp: 'その主張は多くの調査結果によって裏付けられている。', kana: 'その しゅちょう は おおく の ちょうさ けっか に よって うらづけられて いる。', zh: '那个主张被许多调查结果所证实。' }, { jp: '具体例が僕の考えを裏付けている。', kana: 'ぐたいれい が ひっしゃ の かんがえ を うらづけて いる。', zh: '具体例佐证了作者的观点。' }], tags: ['论证', '佐证', '高频'] },
-  { id: 'exam-007', word: '妥当', kana: 'だとう', romaji: 'datou', meaning: '妥当，恰当', level: '考研', category: 'exam', partOfSpeech: '形容动词', pronunciation: 'だ-とう，后长音。', usageCore: '表示评价、判断、解释是否合理。', usagePatterns: ['妥当な判断', '妥当である', '妥当性がある'], collocations: ['妥当な結論', '妥当な評価', '妥当性を欠く'], examFocus: '选项判断题非常实用。', examples: [{ jp: 'この結論は一定の条件の下では妥当だと言える。', kana: 'この けつろん は いってい の じょうけん の もと では だとう だ と いえる。', zh: '可以说这个结论在一定条件下是妥当的。' }, { jp: 'その説明は一見妥当だが、十分ではない。', kana: 'その せつめい は いっけん だとう だ が、じゅうぶん では ない。', zh: '那个解释乍看之下妥当，但并不充分。' }], tags: ['选项分析', '评价', '高频'] },
-  { id: 'exam-008', word: '妨げる', kana: 'さまたげる', romaji: 'samatageru', meaning: '妨碍，阻碍', level: '考研', category: 'exam', partOfSpeech: '动词', pronunciation: 'さ-ま-た-げ-る，节奏均匀。', usageCore: '书面语，表示某因素对发展、理解、交流形成阻碍。', usagePatterns: ['発展を妨げる', '理解を妨げる', '〜を妨げない'], collocations: ['成長を妨げる', '交通を妨げる', '要因を妨げる'], examFocus: '社会问题、教育、沟通主题文章高频。', examples: [{ jp: '過度な競争は子どもの主体性を妨げることがある。', kana: 'かど な きょうそう は こども の しゅたいせい を さまたげる こと が ある。', zh: '过度竞争有时会妨碍孩子的主体性。' }, { jp: '偏見は相互理解を妨げる大きな要因だ。', kana: 'へんけん は そうご りかい を さまたげる おおきな よういん だ。', zh: '偏见是妨碍相互理解的重要因素。' }], tags: ['社会问题', '阻碍', '高频'] },
-  { id: 'exam-009', word: '根拠', kana: 'こんきょ', romaji: 'konkyo', meaning: '根据，依据', level: '考研', category: 'exam', partOfSpeech: '名词', pronunciation: 'こん-きょ，尾音轻短。', usageCore: '表示判断、主张、推论的依据。', usagePatterns: ['根拠に基づく', '根拠を示す', '根拠が乏しい'], collocations: ['科学的根拠', '十分な根拠', '法的根拠'], examFocus: '选项题中常考"有无根据""根据是否充分"。', examples: [{ jp: 'その主張には十分な根拠が示されていない。', kana: 'その しゅちょう に は じゅうぶんな こんきょ が しめされて いない。', zh: '那个主张没有给出充分依据。' }, { jp: '私たちは感情ではなく根拠に基づいて判断すべきだ。', kana: 'わたしたち は かんじょう では なく こんきょ に もとづいて はんだん すべき だ。', zh: '我们应基于依据而不是感情做判断。' }], tags: ['论证', '选项题', '超高频'] },
-  { id: 'exam-010', word: '先行', kana: 'せんこう', romaji: 'senkou', meaning: '先行，优先于；先行研究', level: '考研', category: 'exam', partOfSpeech: '名词/サ变', pronunciation: 'せん-こう，后长音。', usageCore: '学术文和评论文中表示先一步展开或已存在的相关研究。', usagePatterns: ['先行研究', '〜が先行する', '意識が先行する'], collocations: ['先行事例', '先行投資', '先行条件'], examFocus: '学术说明文里见到率很高。', examples: [{ jp: 'このテーマについては多くの先行研究がある。', kana: 'この テーマ について は おおく の せんこう けんきゅう が ある。', zh: '关于这个主题已经有很多先行研究。' }, { jp: '結果ばかりを求める意識が先行している。', kana: 'けっか ばかり を もとめる いしき が せんこう して いる。', zh: '只追求结果的意识走在前面了。' }], tags: ['学术文', '研究', '高频'] },
-  { id: 'exam-011', word: '有効', kana: 'ゆうこう', romaji: 'yuukou', meaning: '有效', level: '考研', category: 'exam', partOfSpeech: '形容动词', pronunciation: 'ゆう-こう，双长音。', usageCore: '表示方法、对策、制度有效可行。', usagePatterns: ['有効な手段', '有効に活用する', '有効性を高める'], collocations: ['有効な対策', '有効利用', '有効性の検証'], examFocus: '对策题、结论句、政策说明都高频。', examples: [{ jp: '地域の活性化には住民参加が有効だと考えられる。', kana: 'ちいき の かっせいか に は じゅうみん さんか が ゆうこう だ と かんがえられる。', zh: '一般认为居民参与对地区振兴是有效的。' }, { jp: 'その方法がすべての場面で有効とは限らない。', kana: 'その ほうほう が すべて の ばめん で ゆうこう と は かぎらない。', zh: '那种方法并不一定在所有场景都有效。' }], tags: ['对策', '结论', '高频'] },
-  { id: 'exam-012', word: '適応', kana: 'てきおう', romaji: 'tekiou', meaning: '适应', level: '考研', category: 'exam', partOfSpeech: '名词/サ变', pronunciation: 'てき-おう，后长音。', usageCore: '多指个体、制度、组织对环境变化作出适应。', usagePatterns: ['環境に適応する', '社会適応', '適応能力'], collocations: ['変化に適応する', '適応力を高める', '新環境に適応する'], examFocus: '教育、心理、社会变迁话题高频。', examples: [{ jp: '人は環境の変化に適応しながら生きている。', kana: 'ひと は かんきょう の へんか に てきおう しながら いきて いる。', zh: '人是一边适应环境变化一边生活的。' }, { jp: '新しい技術に適応できない歇歇是生き残れない。', kana: 'あたらしい ぎじゅつ に てきおう できない きぎょう は いきのこれない。', zh: '无法适应新技术的企业无法生存。' }], tags: ['变化', '教育心理', '高频'] },
-]
-
-// ─── 考研日语语法（合并+N2/N1/考研新增）────────────────────────────────────────────────────────────────
-export const grammarPoints: GrammarPoint[] = [
-  // N5 语法
-  { id: 'gram-n5-01', pattern: '〜は〜です', meaning: '〜是〜', level: 'N5', explanation: '判断句的基本句型，表示等同或归属', example: '私は学生です', exampleMeaning: '我是学生' },
-  { id: 'gram-n5-02', pattern: '〜は〜ではありません', meaning: '〜不是〜', level: 'N5', explanation: '否定判断句', example: '彼は先生ではありません', exampleMeaning: '他不是老师' },
-  { id: 'gram-n5-03', pattern: '〜を〜ます（动词）', meaning: '做〜', level: 'N5', explanation: '动词现在时肯定式', example: '本を読みます', exampleMeaning: '读书' },
-  { id: 'gram-n5-04', pattern: '〜てください', meaning: '请〜', level: 'N5', explanation: '请求对方做某事', example: '教えてください', exampleMeaning: '请告诉我' },
-  { id: 'gram-n5-05', pattern: '〜たいです', meaning: '想〜', level: 'N5', explanation: '表达愿望', example: '日本に行きたいです', exampleMeaning: '我想去日本' },
-  { id: 'gram-n5-06', pattern: '〜ましょう', meaning: '〜吧', level: 'N5', explanation: '劝诱或提议', example: '一緒に食べましょう', exampleMeaning: '一起吃吧' },
-  { id: 'gram-n5-07', pattern: '〜と思います', meaning: '我认为〜', level: 'N5', explanation: '表达想法', example: '美味しいと思います', exampleMeaning: '我觉得好吃' },
-  { id: 'gram-n5-08', pattern: '〜があります/います', meaning: '有〜', level: 'N5', explanation: '存在句，无生命用「あります」，有生命用「います」', example: '猫がいます', exampleMeaning: '有猫' },
-
-  // N4 语法
-  { id: 'gram-n4-01', pattern: '〜てくださいました', meaning: '（别人）为我〜', level: 'N4', explanation: '动词て形 + くれます，表示别人为自己做某事', example: '先生が教えてくださいました', exampleMeaning: '老师教我了' },
-  { id: 'gram-n4-02', pattern: '〜ようになります', meaning: '变得〜', level: 'N4', explanation: '表示能力、状态的变化', example: '泳げるようになりました', exampleMeaning: '变得会游泳了' },
-  { id: 'gram-n4-03', pattern: '〜そうです', meaning: '看起来〜', level: 'N4', explanation: '样态推测', example: '雨が降りそうです', exampleMeaning: '看起来要下雨' },
-  { id: 'gram-n4-04', pattern: '〜ようです', meaning: '好像〜', level: 'N4', explanation: '比喻或推测', example: '病気のようですね', exampleMeaning: '好像生病了' },
-  { id: 'gram-n4-05', pattern: '〜ために', meaning: '为了〜', level: 'N4', explanation: '表示目的或原因', example: '試験のために勉強する', exampleMeaning: '为了考试而学习' },
-  { id: 'gram-n4-06', pattern: '〜によると', meaning: '根据〜', level: 'N4', explanation: '表示信息来源', example: '天気予報によると、明日は晴れです', exampleMeaning: '根据天气预报，明天是晴天' },
-  { id: 'gram-n4-07', pattern: '〜ことが大切です', meaning: '〜很重要', level: 'N4', explanation: '表示重要性', example: '続けることが大切です', exampleMeaning: '坚持很重要' },
-  { id: 'gram-n4-08', pattern: '〜と言われています', meaning: '被称为〜', level: 'N4', explanation: '表示普遍认识', example: '日本人は勤勉と言われています', exampleMeaning: '日本人被称为勤劳' },
-
-  // N3 语法
-  { id: 'gram-n3-01', pattern: '〜。一方で', meaning: '另一方面〜', level: 'N3', explanation: '对比两个相反的事实', example: '経済は成長一方的で、環境は悪化しています', exampleMeaning: '经济在增长，另一方面环境在恶化' },
-  { id: 'gram-n3-02', pattern: '〜反面', meaning: '〜相反', level: 'N3', explanation: '同一事物的正反两面', example: '便利な反面、プライバシーに問題があります', exampleMeaning: '方便的同时，也有隐私问题' },
-  { id: 'gram-n3-03', pattern: '〜を通じて/〜を通して', meaning: '通过〜', level: 'N3', explanation: '表示手段或媒介', example: '経験を通じて学ぶ', exampleMeaning: '通过经验学习' },
-  { id: 'gram-n3-04', pattern: '〜にもかかわらず', meaning: '尽管〜', level: 'N3', explanation: '表示逆接', example: '努力にもかかわらず、失敗しました', exampleMeaning: '尽管努力了，还是失败了' },
-  { id: 'gram-n3-05', pattern: '〜と言えます', meaning: '可以说〜', level: 'N3', explanation: '表示评价', example: '環境問題深刻化と言えます', exampleMeaning: '可以说环境问题日益严重' },
-  { id: 'gram-n3-06', pattern: '〜に他なりません', meaning: '不外乎是〜', level: 'N3', explanation: '强调必然性', example: '成功は努力に他なりません', exampleMeaning: '成功不外乎是努力' },
-  { id: 'gram-n3-07', pattern: '〜ざるを得ない', meaning: '不得不〜', level: 'N3', explanation: '表示无奈的选择', example: '止めざるを得ない', exampleMeaning: '不得不停止' },
-  { id: 'gram-n3-08', pattern: '〜ものです', meaning: '确实是〜', level: 'N3', explanation: '表示本质或感慨', example: '人は失敗するものですね', exampleMeaning: '人确实是会失败的' },
-  { id: 'gram-n3-09', pattern: '〜かけです', meaning: '〜到一半', level: 'N3', explanation: '表示动作刚开始或进行中', example: '読みかけた本', exampleMeaning: '读到一半的书' },
-  { id: 'gram-n3-10', pattern: '〜を踏まえて', meaning: '基于〜', level: 'N3', explanation: '表示根据', example: '事実を踏まえて判断する', exampleMeaning: '基于事实判断' },
-
-  // N2 语法（新增）
-  { id: 'gram-n2-01', pattern: '〜にすぎない', meaning: '只不过，仅仅', level: 'N2', explanation: '名词/普通形 + にすぎない。用来降低评价或限定范围。', example: 'それは一つの例にすぎない。', exampleMeaning: '那只不过是一个例子。', examTip: '常用于作者弱化表面现象，提示不要过度解读。' },
-  { id: 'gram-n2-02', pattern: '〜とされています', meaning: '被认为，被视为', level: 'N2', explanation: '普通形 + とされています。书面表达，用于客观陈述一般看法。', example: '日本では協調性が重視されるとされています。', exampleMeaning: '一般认为在日本重视协调性。', examTip: '阅读里常用来淡化主语，制造客观感。' },
-
-  // N1 语法（新增）
-  { id: 'gram-n1-01', pattern: '〜に他ならない', meaning: '无非就是，正是', level: 'N1', explanation: '名词 + に他ならない。用于强烈下定义。', example: '教育とは人間理解の営みに他ならない。', exampleMeaning: '教育无非就是理解人的活动。', examTip: '很适合判断作者核心定义。' },
-  { id: 'gram-n1-02', pattern: '〜ないことには', meaning: '如果不……就……', level: 'N1', explanation: '动词未然形 + ないことには。表示前提不成立，后项无法实现。', example: '実態を把握しないことには、対策は立てられない。', exampleMeaning: '如果不掌握实际情况，就无法制定对策。', examTip: '适合记成因果句型，写作也好用。' },
-
-  // 考研日语语法（新增）
-  { id: 'gram-exam-01', pattern: '〜をめぐって', meaning: '围绕……', level: '考研', explanation: '名词 + をめぐって。表示围绕某问题展开讨论、对立、争论。', example: '少子化対策をめぐって議論が続いている。', exampleMeaning: '围绕少子化对策的讨论仍在继续。', examTip: '新闻类、社会议题类文章高频。' },
-  { id: 'gram-exam-02', pattern: '〜に基づいて', meaning: '根据，基于', level: '考研', explanation: '名词 + に基づいて。表示以某依据、原则、资料为基础。', example: 'データに基づいて判断すべきだ。', exampleMeaning: '应该根据数据来判断。', examTip: '和「根拠」「調査結果」一起记忆。' },
-]
-
-// ─── 获取所有词汇（合并）────────────────────────────────────────────────────────────────
-export const allVocabulary = [
-  ...n5Vocabulary,
-  ...n4Vocabulary,
-  ...n3Vocabulary,
-  ...n2Vocabulary,
-  ...n1Vocabulary,
-  ...examVocabulary,
-]
-
-// ─── 按等级分组 ─────────────────────────────────────────────────────────────────
-export const vocabularyByLevel = {
-  N5: n5Vocabulary,
-  N4: n4Vocabulary,
-  N3: n3Vocabulary,
-  N2: n2Vocabulary,
-  N1: n1Vocabulary,
-  '考研': examVocabulary,
+export interface WordProgress {
+  wordId: string
+  level: Level
+  state: MemoryState
+  easeFactor: number       // 艾宾浩斯简易度因子 (1.3 - 2.5)
+  interval: number          // 复习间隔（天）
+  repetitions: number       // 连续正确次数
+  nextReviewDate: string    // 下次复习日期 (ISO string)
+  lastReviewDate: string   // 最后复习日期
+  correctCount: number      // 正确次数
+  wrongCount: number         // 错误次数
 }
 
-// ─── 语法按等级分组 ─────────────────────────────────────────────────────────────────
-export const grammarByLevel = {
-  N5: grammarPoints.filter(g => g.level === 'N5'),
-  N4: grammarPoints.filter(g => g.level === 'N4'),
-  N3: grammarPoints.filter(g => g.level === 'N3'),
-  N2: grammarPoints.filter(g => g.level === 'N2'),
-  N1: grammarPoints.filter(g => g.level === 'N1'),
-  '考研': grammarPoints.filter(g => g.level === '考研'),
+// ==================== 学习计划类型 ====================
+
+export interface DailyPlan {
+  date: string              // 日期 (YYYY-MM-DD)
+  newWords: string[]        // 今日新词 ID 列表
+  reviewWords: string[]     // 今日复习词 ID 列表
+  completedNew: number      // 已完成新词数
+  completedReview: number   // 已完成复习数
+  totalNew: number          // 计划新词数
+  totalReview: number       // 计划复习词数
 }
 
-// ─── 等级列表 ─────────────────────────────────────────────────────────────────
-export const vocabularyLevels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1', '考研']
+export interface StudyPlan {
+  dailyNewWords: number     // 每日新词数量 (默认 20)
+  dailyReviewWords: number  // 每日复习词数量 (默认 50)
+  startDate: string        // 开始日期
+  currentLevel: Level      // 当前学习级别
+  targetLevel: Level       // 目标级别
+}
 
-// ─── 获取词汇统计 ─────────────────────────────────────────────────────────────────
+// ==================== 自测相关类型 ====================
+
+export type QuizType = 'choice' | 'fill' | 'listen' | 'reverse'
+
+export interface QuizQuestion {
+  wordId: string
+  type: QuizType
+  question: string          // 题目
+  options?: string[]         // 选项（选择题用）
+  correctAnswer: string     // 正确答案
+  userAnswer?: string        // 用户答案
+  isCorrect?: boolean       // 是否正确
+}
+
+// ==================== 学习统计类型 ====================
+
+export interface StudyStats {
+  totalWordsLearned: number     // 已学单词总数
+  totalWordsMastered: number     // 已掌握单词数
+  totalQuizzesTaken: number      // 已做测验数
+  totalCorrectAnswers: number    // 正确答题数
+  streakDays: number             // 连续学习天数
+  lastStudyDate: string          // 最后学习日期
+  studyTimeByLevel: Record<Level, number>  // 各级别学习时间
+  wordsLearnedByLevel: Record<Level, number> // 各级别已学词数
+}
+
+// ==================== 学习模式类型 ====================
+
+export type StudyMode = 'browse' | 'card' | 'quiz' | 'plan'
+
+export interface StudySession {
+  mode: StudyMode
+  startTime: string
+  endTime?: string
+  wordsStudied: string[]
+  quizzesAnswered: number
+  correctAnswers: number
+}
+
+// ==================== 导出默认词汇数据 ====================
+
+export const VOCABULARY_N5: Omit<VocabularyItem, 'id'>[] = [
+  // 名词
+  { word: '日本', reading: 'にほん', meaning: '日本', partOfSpeech: '名', level: 'N5', romaji: 'nihon', usage: '表示日本这个国家', examTip: 'N5考试必背基础词汇' },
+  { word: '中国人', reading: 'ちゅうごくじん', meaning: '中国人', partOfSpeech: '名', level: 'N5', example: '私は中国人です', exampleMeaning: '我是中国人', examTip: '常与「です」连用' },
+  { word: '先生', reading: 'せんせい', meaning: '老师', partOfSpeech: '名', level: 'N5', examTip: '对老师、医生、律师等的尊称' },
+  { word: '学生', reading: 'がくせい', meaning: '学生', partOfSpeech: '名', level: 'N5', example: '私は学生です', exampleMeaning: '我是学生', examTip: '大学及以下学生使用' },
+  { word: '友達', reading: 'ともだち', meaning: '朋友', partOfSpeech: '名', level: 'N5', example: '友達と遊園地に行きました', exampleMeaning: '和朋友去了游乐园', examTip: '「と」表示伴随' },
+  { word: '家族', reading: 'かぞく', meaning: '家人、家族', partOfSpeech: '名', level: 'N5', example: '家族は4人います', exampleMeaning: '家里有4口人', examTip: '谓语用「います」表示存在生物' },
+  { word: '父', reading: 'ちち', meaning: '父亲', partOfSpeech: '名', level: 'N5', example: '父は会社で働いています', exampleMeaning: '父亲在公司工作', examTip: '自谦语，对外人可用' },
+  { word: '母', reading: 'はは', meaning: '母亲', partOfSpeech: '名', level: 'N5', example: '母は料理が上手です', exampleMeaning: '妈妈很擅长做饭', examTip: '自谦语' },
+  { word: '学校', reading: 'がっこう', meaning: '学校', partOfSpeech: '名', level: 'N5', example: '学校はどこですか', exampleMeaning: '学校在哪里', examTip: '常与「に」表示存在地点' },
+  { word: '教室', reading: 'きょうしつ', meaning: '教室', partOfSpeech: '名', level: 'N5', example: '教室は2階にあります', exampleMeaning: '教室在2楼', frequency: '高' },
+  { word: '食堂', reading: 'しょくどう', meaning: '食堂、餐厅', partOfSpeech: '名', level: 'N5', example: '食堂でお昼を食べます', exampleMeaning: '在食堂吃午饭', frequency: '中' },
+  { word: '部屋', reading: 'へや', meaning: '房间', partOfSpeech: '名', level: 'N5', example: '私の部屋は狭いです', exampleMeaning: '我的房间很小', examTip: '「狭い」反义词「広い」' },
+  { word: '家', reading: 'いえ', meaning: '家、房子', partOfSpeech: '名', level: 'N5', example: '家は駅に近いです', exampleMeaning: '家离车站近', frequency: '高' },
+  { word: '庭', reading: 'にわ', meaning: '庭院、院子', partOfSpeech: '名', level: 'N5', example: '庭に花が咲いています', exampleMeaning: '院子里开着花', frequency: '中' },
+  { word: '本', reading: 'ほん', meaning: '书', partOfSpeech: '名', level: 'N5', example: '本を読みます', exampleMeaning: '读书', frequency: '高' },
+  { word: '新聞', reading: 'しんぶん', meaning: '报纸', partOfSpeech: '名', level: 'N5', example: '毎朝新聞を読みます', exampleMeaning: '每天早上看报纸', frequency: '中' },
+  { word: '雑誌', reading: 'ざっし', meaning: '杂志', partOfSpeech: '名', level: 'N5', example: '雑誌を置いています', exampleMeaning: '放着杂志', frequency: '中' },
+  { word: '手紙', reading: 'てがみ', meaning: '信、信件', partOfSpeech: '名', level: 'N5', example: '手紙を書きます', exampleMeaning: '写信', examTip: '注意和「てぶくろ（手套）」区分' },
+  { word: '電話', reading: 'でんわ', meaning: '电话', partOfSpeech: '名', level: 'N5', example: '電話をかけます', exampleMeaning: '打电话', frequency: '高' },
+  { word: '時計', reading: 'とけい', meaning: '钟、表', partOfSpeech: '名', level: 'N5', example: '時計が遅れています', exampleMeaning: '表慢了', examTip: '注意和「とけい（冬季）」区分' },
+  { word: '傘', reading: 'かさ', meaning: '伞', partOfSpeech: '名', level: 'N5', example: '傘を忘れました', exampleMeaning: '忘了带伞', frequency: '中' },
+  { word: '鍵', reading: 'かぎ', meaning: '钥匙', partOfSpeech: '名', level: 'N5', example: '鍵をかけます', exampleMeaning: '锁门', frequency: '中' },
+  { word: '靴', reading: 'くつ', meaning: '鞋子', partOfSpeech: '名', level: 'N5', example: '靴を脱ぎます', exampleMeaning: '脱鞋', frequency: '中' },
+  { word: '帽子', reading: 'ぼうし', meaning: '帽子', partOfSpeech: '名', level: 'N5', example: '帽子をかぶります', exampleMeaning: '戴帽子', frequency: '低' },
+  { word: '時計', reading: 'とけい', meaning: '时钟、手表', partOfSpeech: '名', level: 'N5', frequency: '高' },
+
+  // 动词
+  { word: '食べる', reading: 'たべる', meaning: '吃', partOfSpeech: '动', level: 'N5', tone: '②', example: '朝ごはんを食べます', exampleMeaning: '吃早饭', examTip: '一段动词' },
+  { word: '飲む', reading: 'のむ', meaning: '喝', partOfSpeech: '动', level: 'N5', tone: '①', example: '水を飲みます', exampleMeaning: '喝水', examTip: '五段动词' },
+  { word: '見る', reading: 'みる', meaning: '看', partOfSpeech: '动', level: 'N5', tone: '①', example: 'テレビを見ます', exampleMeaning: '看电视', examTip: '一段动词' },
+  { word: '聞く', reading: 'きく', meaning: '听、问', partOfSpeech: '动', level: 'N5', tone: '①', example: '音楽を聞きます', exampleMeaning: '听音乐', examTip: '五段动词' },
+  { word: '行く', reading: 'いく', meaning: '去', partOfSpeech: '动', level: 'N5', tone: '②①', example: '学校に行きます', exampleMeaning: '去学校', examTip: '特殊五段动词，去语气' },
+  { word: '来る', reading: 'くる', meaning: '来', partOfSpeech: '动', level: 'N5', tone: '②', example: '友達が家に来ます', exampleMeaning: '朋友来我家', examTip: '特殊一段动词' },
+  { word: '帰る', reading: 'かえる', meaning: '回来、回去', partOfSpeech: '动', level: 'N5', tone: '②①', example: '家に戻ります', exampleMeaning: '回家', examTip: '五段动词' },
+  { word: '書く', reading: 'かく', meaning: '写', partOfSpeech: '动', level: 'N5', tone: '①', example: '手紙を書きます', exampleMeaning: '写信', examTip: '五段动词' },
+  { word: '読む', reading: 'よむ', meaning: '读', partOfSpeech: '动', level: 'N5', tone: '①', example: '本を読みます', exampleMeaning: '读书', examTip: '五段动词' },
+  { word: '話す', reading: 'はなす', meaning: '说、谈话', partOfSpeech: '动', level: 'N5', tone: '②', example: '日本語を話します', exampleMeaning: '说日语', examTip: '五段动词' },
+  { word: '聞く', reading: 'きく', meaning: '听、问', partOfSpeech: '动', level: 'N5', tone: '①', example: '先生の話を聞きます', exampleMeaning: '听老师的话', examTip: '五段动词，多义词' },
+  { word: '買う', reading: 'かう', meaning: '买', partOfSpeech: '动', level: 'N5', tone: '①', example: '野菜を買います', exampleMeaning: '买菜', examTip: '五段动词' },
+  { word: '取る', reading: 'とる', meaning: '拿、取', partOfSpeech: '动', level: 'N5', tone: '①', example: '写真を取ります', exampleMeaning: '拍照', examTip: '五段动词' },
+  { word: '持つ', reading: 'もつ', meaning: '拿、带', partOfSpeech: '动', level: 'N5', tone: '①', example: '鍵を持ちます', exampleMeaning: '拿着钥匙', examTip: '五段动词' },
+  { word: '座る', reading: 'すわる', meaning: '坐', partOfSpeech: '动', level: 'N5', tone: '②', example: 'ここに座ってください', exampleMeaning: '请坐这里', examTip: '一段动词' },
+  { word: '立つ', reading: 'たつ', meaning: '站、立', partOfSpeech: '动', level: 'N5', tone: '①', example: '立って答えなさい', exampleMeaning: '站起来回答', examTip: '五段动词' },
+  { word: '寝る', reading: 'ねる', meaning: '睡觉', partOfSpeech: '动', level: 'N5', tone: '②', example: '早く寝ます', exampleMeaning: '早点睡', examTip: '一段动词' },
+  { word: '起きる', reading: 'おきる', meaning: '起床、醒来', partOfSpeech: '动', level: 'N5', tone: '②', example: '6時に起きます', exampleMeaning: '6点起床', examTip: '一段动词' },
+  { word: '始める', reading: 'はじめる', meaning: '开始', partOfSpeech: '动', level: 'N5', tone: '③②', example: '勉強を始めます', exampleMeaning: '开始学习', examTip: '一段动词，使役形' },
+  { word: '終わる', reading: 'おわる', meaning: '结束', partOfSpeech: '动', level: 'N5', tone: '③', example: '授業が終わりました', exampleMeaning: '下课了', examTip: '五段动词' },
+  { word: '作る', reading: 'つくる', meaning: '做、制造', partOfSpeech: '动', level: 'N5', tone: '②', example: '料理を作ります', exampleMeaning: '做菜', examTip: '五段动词' },
+  { word: '洗う', reading: 'あらう', meaning: '洗', partOfSpeech: '动', level: 'N5', tone: '②', example: '手を洗います', exampleMeaning: '洗手', examTip: '五段动词' },
+  { word: '磨く', reading: 'みがく', meaning: '刷、擦', partOfSpeech: '动', level: 'N5', tone: '②', example: '歯を磨きます', exampleMeaning: '刷牙', frequency: '中' },
+  { word: '切る', reading: 'きる', meaning: '切、剪', partOfSpeech: '动', level: 'N5', tone: '①', example: '野菜を切ります', exampleMeaning: '切菜', frequency: '中' },
+
+  // 形容词
+  { word: '大きい', reading: 'おおきい', meaning: '大的', partOfSpeech: '形', level: 'N5', tone: '③', example: '大きい部屋がほしい', exampleMeaning: '想要大房间', examTip: 'い形容词' },
+  { word: '小さい', reading: 'ちいさい', meaning: '小的', partOfSpeech: '形', level: 'N5', tone: '③', example: '小さい字で見えません', exampleMeaning: '字太小看不见', examTip: 'い形容词' },
+  { word: '新しい', reading: 'あたらしい', meaning: '新的', partOfSpeech: '形', level: 'N5', tone: '④', example: '新しい車を買いました', exampleMeaning: '买了新车', examTip: 'い形容词' },
+  { word: '古い', reading: 'ふるい', meaning: '旧的、老的', partOfSpeech: '形', level: 'N5', tone: '②', example: '古い友達', exampleMeaning: '老朋友', examTip: 'い形容词' },
+  { word: '良い', reading: 'よい', meaning: '好的', partOfSpeech: '形', level: 'N5', tone: '①', example: '天気が良い', exampleMeaning: '天气好', examTip: 'い形容词，「いい」是口语形式' },
+  { word: '悪い', reading: 'わるい', meaning: '坏的、不好的', partOfSpeech: '形', level: 'N5', tone: '②', example: '態度が悪い', exampleMeaning: '态度不好', examTip: 'い形容词' },
+  { word: '高い', reading: 'たかい', meaning: '高的、贵的', partOfSpeech: '形', level: 'N5', tone: '②', example: '山が高いです', exampleMeaning: '山很高', examTip: 'い形容词，多义词' },
+  { word: '低い', reading: 'ひくい', meaning: '低的', partOfSpeech: '形', level: 'N5', tone: '②②', example: '温度が低い', exampleMeaning: '温度低', frequency: '中' },
+  { word: '安い', reading: 'やすい', meaning: '便宜的', partOfSpeech: '形', level: 'N5', tone: '②', example: 'この水果は安いです', exampleMeaning: '这个水果便宜', examTip: 'い形容词' },
+  { word: '短い', reading: 'みじかい', meaning: '短的、少的', partOfSpeech: '形', level: 'N5', tone: '③', example: '髪が短いです', exampleMeaning: '头发短', frequency: '中' },
+  { word: '長い', reading: 'ながい', meaning: '长的', partOfSpeech: '形', level: 'N5', tone: '②', example: '道长いです', exampleMeaning: '路很长', examTip: 'い形容词' },
+  { word: '広い', reading: 'ひろい', meaning: '宽阔的', partOfSpeech: '形', level: 'N5', tone: '②', example: '部屋が広いです', exampleMeaning: '房间宽敞', examTip: 'い形容词' },
+  { word: '狭い', reading: 'せまい', meaning: '狭窄的', partOfSpeech: '形', level: 'N5', tone: '②', example: '道が狭いです', exampleMeaning: '路窄', examTip: 'い形容词' },
+  { word: '白い', reading: 'しろい', meaning: '白色的', partOfSpeech: '形', level: 'N5', tone: '②', example: '雪が白い', exampleMeaning: '雪白', frequency: '中' },
+  { word: '黒い', reading: 'くろい', meaning: '黑色的', partOfSpeech: '形', level: 'N5', tone: '②', example: '髪が黒い', exampleMeaning: '头发黑', frequency: '中' },
+  { word: '赤い', reading: 'あかい', meaning: '红色的', partOfSpeech: '形', level: 'N5', tone: '②', example: 'リンゴが赤い', exampleMeaning: '苹果红', frequency: '中' },
+  { word: '青い', reading: 'あおい', meaning: '蓝色的', partOfSpeech: '形', level: 'N5', tone: '②', example: '海が青い', exampleMeaning: '海蓝', frequency: '中' },
+  { word: '忙しい', reading: 'いそがしい', meaning: '忙碌的', partOfSpeech: '形', level: 'N5', tone: '④', example: '毎日忙です', exampleMeaning: '每天很忙', examTip: 'い形容词' },
+  { word: '赤い', reading: 'あかい', meaning: '红的', partOfSpeech: '形', level: 'N5', tone: '②', frequency: '高' },
+  { word: '美味しい', reading: 'おいしい', meaning: '好吃的、美味的', partOfSpeech: '形', level: 'N5', tone: '③', example: '料理が美味しい', exampleMeaning: '菜好吃', examTip: 'い形容词' },
+  { word: '眠い', reading: 'ねむい', meaning: '困的、想睡觉的', partOfSpeech: '形', level: 'N5', tone: '②', example: '眠くて何も見えない', exampleMeaning: '困得什么都看不见', frequency: '中' },
+  { word: '冷たい', reading: 'つめたい', meaning: '冰冷的', partOfSpeech: '形', level: 'N5', tone: '③②', example: '手が冷たい', exampleMeaning: '手冷', examTip: 'い形容词' },
+  { word: '温かい', reading: 'あたたかい', meaning: '温热的、暖和的', partOfSpeech: '形', level: 'N5', tone: '④', example: 'お粥が温かい', exampleMeaning: '粥是热的', frequency: '中' },
+  { word: '難しい', reading: 'むずかしい', meaning: '难的', partOfSpeech: '形', level: 'N5', tone: '④③', example: 'この問題は難しい', exampleMeaning: '这个问题难', examTip: 'い形容词' },
+
+  // 形容动词
+  { word: '綺麗', reading: 'きれい', meaning: '漂亮的、干净的', partOfSpeech: '形', level: 'N5', tone: '①', example: '部屋が綺麗です', exampleMeaning: '房间干净', examTip: 'な形容词' },
+  { word: '静か', reading: 'しずか', meaning: '安静的', partOfSpeech: '形', level: 'N5', tone: '①', example: '図書館は静かです', exampleMeaning: '图书馆安静', examTip: 'な形容词' },
+  { word: '便利', reading: 'べんり', meaning: '方便的', partOfSpeech: '形', level: 'N5', tone: '①', example: 'この地铁は便利です', exampleMeaning: '这个地铁方便', examTip: 'な形容词' },
+  { word: '不便', reading: 'ふべん', meaning: '不方便的', partOfSpeech: '形', level: 'N5', tone: '①', example: '此地不便です', exampleMeaning: '这里不方便', examTip: 'な形容词' },
+  { word: '好き', reading: 'すき', meaning: '喜欢的', partOfSpeech: '形', level: 'N5', tone: '①', example: '海鲜が好きです', exampleMeaning: '喜欢海鲜', examTip: 'な形容词' },
+  { word: '嫌い', reading: 'きらい', meaning: '讨厌的', partOfSpeech: '形', level: 'N5', tone: '①', example: '彼は嫌いです', exampleMeaning: '讨厌他', examTip: 'な形容词' },
+  { word: '簡単', reading: 'かんたん', meaning: '简单的', partOfSpeech: '形', level: 'N5', tone: '①', example: '簡単な問題', exampleMeaning: '简单的问题', examTip: 'な形容词' },
+  { word: '有名', reading: 'ゆうめい', meaning: '有名的', partOfSpeech: '形', level: 'N5', tone: '①', example: '此地有 名です', exampleMeaning: '这里有名', examTip: 'な形容词' },
+  { word: '元気', reading: 'げんき', meaning: '精神好的、健康的', partOfSpeech: '形', level: 'N5', tone: '①', example: 'お爺さんは元気です', exampleMeaning: '爷爷精神很好', examTip: 'な形容词' },
+  { word: '暇', reading: 'ひま', meaning: '空闲的', partOfSpeech: '形', level: 'N5', tone: '①', example: '今日暇です', exampleMeaning: '今天有空', examTip: 'な形容词' },
+  { word: '親切', reading: 'しんせつ', meaning: '亲切的、热心的', partOfSpeech: '形', level: 'N5', tone: '①', example: ' человек が親切です', exampleMeaning: '那个人很热心', examTip: 'な形容词' },
+  { word: '危険', reading: 'きけん', meaning: '危险的', partOfSpeech: '形', level: 'N5', tone: '①', example: '此処は危険です', exampleMeaning: '这里危险', frequency: '中' },
+  { word: '安全', reading: 'あんぜん', meaning: '安全的', partOfSpeech: '形', level: 'N5', tone: '①', example: '此地安全です', exampleMeaning: '这里安全', frequency: '中' },
+  { word: '好き', reading: 'すき', meaning: '喜欢', partOfSpeech: '形', level: 'N5', tone: '①', frequency: '高' },
+
+  // 代词/副词/连词
+  { word: 'これ', reading: 'これ', meaning: '这、这个', partOfSpeech: '名', level: 'N5', example: 'これは本です', exampleMeaning: '这是书', examTip: '近称指示词' },
+  { word: 'それ', reading: 'それ', meaning: '那、那个', partOfSpeech: '名', level: 'N5', example: 'それは誰の伞ですか', exampleMeaning: '那是谁的伞', examTip: '中称指示词' },
+  { word: 'あれ', reading: 'あれ', meaning: '那、那个（远称）', partOfSpeech: '名', level: 'N5', example: 'あれは何ですか', exampleMeaning: '那是什么', examTip: '远称指示词' },
+  { word: 'どれ', reading: 'どれ', meaning: '哪个', partOfSpeech: '名', level: 'N5', example: 'あなたの本はどれですか', exampleMeaning: '你的书是哪本', examTip: '疑问指示词' },
+  { word: 'この', reading: 'この', meaning: '这、这个', partOfSpeech: '连体', level: 'N5', example: 'この猫は可愛です', exampleMeaning: '这只猫可爱', examTip: '修饰名词' },
+  { word: 'その', reading: 'その', meaning: '那、那个', partOfSpeech: '连体', level: 'N5', example: 'その辞物は新しいですか', exampleMeaning: '那本字典是新的吗', examTip: '修饰名词' },
+  { word: 'あの', reading: 'あの', meaning: '那、那个（远称）', partOfSpeech: '连体', level: 'N5', example: 'あの山は富士山です', exampleMeaning: '那座山是富士山', examTip: '修饰名词' },
+  { word: 'どんな', reading: 'どんな', meaning: '什么样的', partOfSpeech: '连体', level: 'N5', example: 'どんな先生が好きですか', exampleMeaning: '喜欢什么样的老师', examTip: '连体词' },
+  { word: 'どこ', reading: 'どこ', meaning: '哪里', partOfSpeech: '副', level: 'N5', example: '食堂はどこですか', exampleMeaning: '食堂在哪里', examTip: '疑问词' },
+  { word: '誰', reading: 'だれ', meaning: '谁', partOfSpeech: '副', level: 'N5', example: '彼は誰ですか', exampleMeaning: '他是谁', examTip: '疑问词' },
+  { word: '何', reading: 'なに', meaning: '什么', partOfSpeech: '副', level: 'N5', example: 'これは何ですか', exampleMeaning: '这是什么', examTip: '疑问词' },
+  { word: '何时', reading: 'いつ', meaning: '什么时候', partOfSpeech: '副', level: 'N5', example: '彼女はいつ来ますか', exampleMeaning: '她什么时候来', examTip: '疑问词' },
+  { word: '何故', reading: 'なぜ', meaning: '为什么', partOfSpeech: '副', level: 'N5', example: '何故泣いていますか', exampleMeaning: '为什么哭', examTip: '书面语，口语用「なんで」' },
+  { word: '此処', reading: 'ここ', meaning: '这里', partOfSpeech: '副', level: 'N5', example: 'ここはどこですか', exampleMeaning: '这里是什么地方', examTip: '近称' },
+  { word: '其処', reading: 'そこ', meaning: '那里', partOfSpeech: '副', level: 'N5', example: '其処に行きます', exampleMeaning: '去那里', examTip: '中称' },
+  { word: '良く', reading: 'よく', meaning: '经常、好好地', partOfSpeech: '副', level: 'N5', example: 'よく遊園地に行きます', exampleMeaning: '经常去游乐园', examTip: '副词' },
+  { word: '少し', reading: 'すこし', meaning: '一点、少许', partOfSpeech: '副', level: 'N5', example: '少し休憩しましょう', exampleMeaning: '休息一下吧', examTip: '副词' },
+  { word: '大変', reading: 'たいへん', meaning: '非常、很、了不起', partOfSpeech: '副', level: 'N5', example: '今夜大便意です', exampleMeaning: '今晚非常冷', frequency: '高' },
+  { word: '是非', reading: 'ぜひ', meaning: '务必、一定', partOfSpeech: '副', level: 'N5', example: '是非来てください', exampleMeaning: '请务必来', frequency: '中' },
+  { word: '多分', reading: 'たぶん', meaning: '大概、可能', partOfSpeech: '副', level: 'N5', example: '明日は多分晴れです', exampleMeaning: '明天大概是晴天', frequency: '高' },
+  { word: '更に', reading: 'さらに', meaning: '更加、进一步', partOfSpeech: '副', level: 'N5', example: '更に美しくなりました', exampleMeaning: '变得更加漂亮了', frequency: '中' },
+  { word: '如何', reading: 'どう', meaning: '怎样、如何', partOfSpeech: '副', level: 'N5', example: '彼女のことが如何ですか', exampleMeaning: '你觉得她怎么样', examTip: '疑问词' },
+  { word: '左', reading: 'ひだり', meaning: '左、左侧', partOfSpeech: '名', level: 'N5', example: '左に曲がってください', exampleMeaning: '请左转', frequency: '中' },
+  { word: '右', reading: 'みぎ', meaning: '右、右侧', partOfSpeech: '名', level: 'N5', example: '右側を通ってください', exampleMeaning: '请走右侧', frequency: '中' },
+  { word: '前', reading: 'まえ', meaning: '前、前面', partOfSpeech: '名', level: 'N5', example: '前に并んでください', exampleMeaning: '请在前面排队', examTip: '时间或空间上的"前"' },
+  { word: '後ろ', reading: 'うしろ', meaning: '后、后面', partOfSpeech: '名', level: 'N5', example: '私の後ろに座ってください', exampleMeaning: '请坐在我后面', frequency: '中' },
+  { word: '上', reading: 'うえ', meaning: '上、上面', partOfSpeech: '名', level: 'N5', example: '棚の上に置きます', exampleMeaning: '放在架子上', examTip: '空间上的"上"' },
+  { word: '下', reading: 'した', meaning: '下、下面', partOfSpeech: '名', level: 'N5', example: '机の下に入ってください', exampleMeaning: '请钻进桌子下面', examTip: '空间上的"下"' },
+  { word: '中', reading: 'なか', meaning: '中、里面', partOfSpeech: '名', level: 'N5', example: '部屋の中にいます', exampleMeaning: '在房间里', examTip: '空间上的"中"' },
+  { word: '外', reading: 'そと', meaning: '外、外面', partOfSpeech: '名', level: 'N5', example: '外に出てください', exampleMeaning: '请出去', examTip: '空间上的"外"' },
+]
+
+export const VOCABULARY_N4: Omit<VocabularyItem, 'id'>[] = [
+  // N4 词汇 - 日常生活
+  { word: '料理', reading: 'りょうり', meaning: '烹饪、菜肴', partOfSpeech: '名', level: 'N4', example: '日本料理を習いたい', exampleMeaning: '想学日本料理', examTip: '可作动词「料理する」' },
+  { word: '食事', reading: 'しょくじ', meaning: '吃饭、用餐', partOfSpeech: '名', level: 'N4', example: '食事の準備をしましょう', exampleMeaning: '来做饭准备吧', frequency: '高' },
+  { word: '朝食', reading: 'ちょうしょく', meaning: '早饭', partOfSpeech: '名', level: 'N4', example: '朝食を食べましたか', exampleMeaning: '吃早饭了吗', examTip: '同「朝ごはん」' },
+  { word: '夕食', reading: 'ゆうしょく', meaning: '晚饭', partOfSpeech: '名', level: 'N4', example: '夕食は何時に食べますか', exampleMeaning: '晚饭几点吃', frequency: '高' },
+  { word: '肉', reading: 'にく', meaning: '肉', partOfSpeech: '名', level: 'N4', example: '肉を食べませんか', exampleMeaning: '吃肉吗', frequency: '中' },
+  { word: '魚', reading: 'さかな', meaning: '鱼', partOfSpeech: '名', level: 'N4', example: '魚料理が得意です', exampleMeaning: '擅长做鱼', frequency: '中' },
+  { word: '野菜', reading: 'やさい', meaning: '蔬菜', partOfSpeech: '名', level: 'N4', example: '野菜を育てています', exampleMeaning: '在种菜', frequency: '中' },
+  { word: '果物', reading: 'くだもの', meaning: '水果', partOfSpeech: '名', level: 'N4', example: '果物が好きです', exampleMeaning: '喜欢水果', frequency: '中' },
+  { word: 'ご飯', reading: 'ごはん', meaning: '米饭、饭', partOfSpeech: '名', level: 'N4', example: 'ご飯を炊きます', exampleMeaning: '煮饭', frequency: '高' },
+  { word: '卵', reading: 'たまご', meaning: '鸡蛋', partOfSpeech: '名', level: 'N4', example: '卵を茹でます', exampleMeaning: '煮鸡蛋', frequency: '中' },
+  { word: '牛乳', reading: 'ぎゅうにゅう', meaning: '牛奶', partOfSpeech: '名', level: 'N4', example: '牛乳を飲みます', exampleMeaning: '喝牛奶', frequency: '中' },
+  { word: '駅', reading: 'えき', meaning: '车站', partOfSpeech: '名', level: 'N4', example: '駅まで歩いて行きます', exampleMeaning: '走到车站', examTip: '铁路车站' },
+  { word: '病院', reading: 'びょういん', meaning: '医院', partOfSpeech: '名', level: 'N4', example: '病院に通っています', exampleMeaning: '经常去医院', frequency: '高' },
+  { word: '銀行', reading: 'ぎんこう', meaning: '银行', partOfSpeech: '名', level: 'N4', example: '銀行からお金を下ろします', exampleMeaning: '从银行取钱', frequency: '高' },
+  { word: '邮局', reading: 'ゆうびんきょく', meaning: '邮局', partOfSpeech: '名', level: 'N4', example: '邮局で切手を買います', exampleMeaning: '在邮局买邮票', frequency: '中' },
+  { word: '映画館', reading: 'えいがかん', meaning: '电影院', partOfSpeech: '名', level: 'N4', example: '映画館で映画を見ます', exampleMeaning: '在电影院看电影', frequency: '中' },
+  { word: '博物館', reading: 'はくぶつかん', meaning: '博物馆', partOfSpeech: '名', level: 'N4', example: '博物館参观は有趣です', exampleMeaning: '参观博物馆很有趣', frequency: '低' },
+  { word: '美术馆', reading: 'びじゅつかん', meaning: '美术馆', partOfSpeech: '名', level: 'N4', frequency: '低' },
+  { word: '神社', reading: 'じんじゃ', meaning: '神社', partOfSpeech: '名', level: 'N4', example: '初詣で神社へ行きます', exampleMeaning: '新年参拜去神社', frequency: '中' },
+  { word: '寺院', reading: 'じいん', meaning: '寺院', partOfSpeech: '名', level: 'N4', frequency: '中' },
+  { word: '旅行', reading: 'りょこう', meaning: '旅行', partOfSpeech: '名', level: 'N4', example: '旅行の計画を立てる', exampleMeaning: '制定旅行计划', examTip: '可作动词「旅行する」' },
+  { word: '観光', reading: 'かんこう', meaning: '观光、旅游', partOfSpeech: '名', level: 'N4', example: '京都を観光します', exampleMeaning: '观光京都', frequency: '中' },
+  { word: '工事', reading: 'こうじ', meaning: '工程、施工', partOfSpeech: '名', level: 'N4', example: '道が工事中です', exampleMeaning: '道路施工中', frequency: '中' },
+  { word: '会議', reading: 'かいぎ', meaning: '会议', partOfSpeech: '名', level: 'N4', example: '会議に出席します', exampleMeaning: '出席会议', examTip: '商务用语' },
+  { word: '会社', reading: 'かいしゃ', meaning: '公司', partOfSpeech: '名', level: 'N4', example: '会社で働いています', exampleMeaning: '在公司工作', frequency: '高' },
+  { word: '仕事', reading: 'しごと', meaning: '工作', partOfSpeech: '名', level: 'N4', example: '仕事厌倦', exampleMeaning: '工作很无聊', frequency: '高' },
+  { word: '経験', reading: 'けいけん', meaning: '经验、经历', partOfSpeech: '名', level: 'N4', example: 'いろ皱な経験をした', exampleMeaning: '经历了各种事情', frequency: '高' },
+  { word: '興味', reading: 'きょうみ', meaning: '兴趣', partOfSpeech: '名', level: 'N4', example: '日本文化に興味があります', exampleMeaning: '对日本文化有兴趣', examTip: '常与「が」连用' },
+  { word: '約束', reading: 'やくそく', meaning: '约定、诺言', partOfSpeech: '名', level: 'N4', example: '約束を破らないで', exampleMeaning: '不要打破约定', examTip: '可作动词「約束する」' },
+  { word: '説明', reading: 'せつめい', meaning: '说明、解释', partOfSpeech: '名', level: 'N4', example: '簡単に説明してください', exampleMeaning: '请简单地说明', frequency: '高' },
+
+  // N4 动词
+  { word: '始める', reading: 'はじめる', meaning: '开始', partOfSpeech: '动', level: 'N4', tone: '③②', example: '勉強を始めましょう', exampleMeaning: '开始学习吧', examTip: '一段动词的使役形式' },
+  { word: '終わる', reading: 'おわる', meaning: '结束', partOfSpeech: '动', level: 'N4', tone: '③', example: '授業が終わる', exampleMeaning: '下课', examTip: '五段动词' },
+  { word: '続ける', reading: 'つつける', meaning: '继续、持续', partOfSpeech: '动', level: 'N4', tone: '③②', example: '食べ続ける', exampleMeaning: '继续吃', examTip: '一段动词' },
+  { word: '止まる', reading: 'とまる', meaning: '停止、停下', partOfSpeech: '动', level: 'N4', tone: '②①', example: '時計が止まった', exampleMeaning: '表停了', examTip: '五段动词' },
+  { word: '変える', reading: 'かえる', meaning: '改变', partOfSpeech: '动', level: 'N4', tone: '②③', example: '計画を変えます', exampleMeaning: '改变计划', examTip: '一段动词' },
+  { word: '出る', reading: 'でる', meaning: '出来、离开', partOfSpeech: '动', level: 'N4', tone: '②①', example: '部屋を出ます', exampleMeaning: '离开房间', examTip: '一段动词' },
+  { word: '入れる', reading: 'いれる', meaning: '放进、加入', partOfSpeech: '动', level: 'N4', tone: '③②', example: '冷蔵庫に入れます', exampleMeaning: '放进冰箱', examTip: '一段动词' },
+  { word: '立つ', reading: 'たつ', meaning: '站、立', partOfSpeech: '动', level: 'N4', tone: '①', example: 'まっすぐ立ちなさい', exampleMeaning: '站直', examTip: '五段动词' },
+  { word: '並ぶ', reading: 'ならぶ', meaning: '排队、并列', partOfSpeech: '动', level: 'N4', tone: '②①', example: '并んで待つ', exampleMeaning: '排队等', examTip: '五段动词' },
+  { word: '集的', reading: 'あつまる', meaning: '集合、聚集', partOfSpeech: '动', level: 'N4', tone: '③', example: '广场に集的する', exampleMeaning: '在广场集合', examTip: '五段动词' },
+  { word: '変える', reading: 'かえる', meaning: '换、交换', partOfSpeech: '动', level: 'N4', tone: '②①', example: ' 자리를 바꾸다', exampleMeaning: '换座位', examTip: '一段动词' },
+  { word: '送る', reading: 'おくる', meaning: '送、寄', partOfSpeech: '动', level: 'N4', tone: '②①', example: '荷物を送る', exampleMeaning: '寄包裹', examTip: '五段动词' },
+  { word: '持つ', reading: 'もつ', meaning: '拿、有', partOfSpeech: '动', level: 'N4', tone: '①', example: '責任を持つ', exampleMeaning: '承担责任', examTip: '五段动词' },
+  { word: '書く', reading: 'かく', meaning: '写', partOfSpeech: '动', level: 'N4', tone: '①', example: '日记を書く', exampleMeaning: '写日记', examTip: '五段动词' },
+  { word: '話す', reading: 'はなす', meaning: '说', partOfSpeech: '动', level: 'N4', tone: '②', example: 'ゆっくり話してください', exampleMeaning: '请慢慢说', examTip: '五段动词' },
+  { word: '答える', reading: 'こたえる', meaning: '回答', partOfSpeech: '动', level: 'N4', tone: '③②', example: '質問に答えます', exampleMeaning: '回答问题', examTip: '一段动词' },
+  { word: '笑う', reading: 'わらう', meaning: '笑', partOfSpeech: '动', level: 'N4', tone: '②①', example: '憋的笑う', exampleMeaning: '苦笑', examTip: '五段动词' },
+  { word: '泣く', reading: 'なく', meaning: '哭', partOfSpeech: '动', level: 'N4', tone: '①', example: '婴acherな泣く', exampleMeaning: '婴儿哭', examTip: '五段动词' },
+  { word: '探す', reading: 'さがす', meaning: '找、寻找', partOfSpeech: '动', level: 'N4', tone: '②①', example: '仕事を探す', exampleMeaning: '找工作', examTip: '五段动词' },
+  { word: '待つ', reading: 'まつ', meaning: '等、等待', partOfSpeech: '动', level: 'N4', tone: '①', example: 'ここで待ちます', exampleMeaning: '在这里等', examTip: '五段动词' },
+  { word: '知る', reading: 'しる', meaning: '知道、认识', partOfSpeech: '动', level: 'N4', tone: '①', example: '彼を知っています', exampleMeaning: '认识他', examTip: '五段动词' },
+  { word: '思う', reading: 'おもう', meaning: '想、认为', partOfSpeech: '动', level: 'N4', tone: '②①', example: 'そう思います', exampleMeaning: '我也这么想', examTip: '五段动词' },
+  { word: '考える', reading: 'かんがえる', meaning: '想、思考', partOfSpeech: '动', level: 'N4', tone: '④③', example: 'ゆっくり考えてください', exampleMeaning: '请慢慢想', examTip: '一段动词' },
+  { word: '寝る', reading: 'ねる', meaning: '睡', partOfSpeech: '动', level: 'N4', tone: '②', example: '早く寝てください', exampleMeaning: '请早点睡', examTip: '一段动词' },
+  { word: '降ろす', reading: 'おろす', meaning: '降下、卸下', partOfSpeech: '动', level: 'N4', tone: '②③', example: '屁股降ろす', exampleMeaning: '让婴儿下（车）', examTip: '五段动词' },
+
+  // N4 形容词
+  { word: '甘い', reading: 'あまい', meaning: '甜的', partOfSpeech: '形', level: 'N4', tone: '②②', example: 'このお菓子は甘いです', exampleMeaning: '这个点心甜', examTip: 'い形容词' },
+  { word: '辛い', reading: 'からい', meaning: '辣的、咸的', partOfSpeech: '形', level: 'N4', tone: '②②', example: 'このカレーは辛いです', exampleMeaning: '这个咖喱辣', examTip: 'い形容词' },
+  { word: '苦い', reading: 'にがい', meaning: '苦的', partOfSpeech: '形', level: 'N4', tone: '②', example: 'コーヒーが苦い', exampleMeaning: '咖啡苦', frequency: '中' },
+  { word: '酸い', reading: 'すい', meaning: '酸的', partOfSpeech: '形', level: 'N4', tone: '①', example: '柠檬が酸い', exampleMeaning: '柠檬酸', frequency: '中' },
+  { word: '署い', reading: 'あつい', meaning: '热的、烫的', partOfSpeech: '形', level: 'N4', tone: '②', example: 'お茶が署い', exampleMeaning: '茶烫', examTip: 'い形容词，温度高' },
+  { word: '寒い', reading: 'さむい', meaning: '冷的（天气）', partOfSpeech: '形', level: 'N4', tone: '②', example: '今日は寒いです', exampleMeaning: '今天冷', examTip: 'い形容词，天气冷' },
+  { word: '温い', reading: 'ぬくい', meaning: '微温的', partOfSpeech: '形', level: 'N4', tone: '②②', example: '署い日に温い함이心地よい', exampleMeaning: '热天微温让人舒服', frequency: '低' },
+  { word: '詳しい', reading: 'くわしい', meaning: '详细的、熟悉的', partOfSpeech: '形', level: 'N4', tone: '③', example: '地形に詳いい', exampleMeaning: '熟悉地形', frequency: '中' },
+  { word: '嫌な', reading: 'いやな', meaning: '讨厌的、不愉快的', partOfSpeech: '形', level: 'N4', tone: '③', example: '嫌な天気', exampleMeaning: '讨厌的天气', frequency: '中' },
+  { word: '新鮮な', reading: 'しんせんな', meaning: '新鲜的', partOfSpeech: '形', level: 'N4', tone: '①', example: '新鮮な魚介類', exampleMeaning: '新鲜的海鲜', frequency: '高' },
+  { word: '複雑な', reading: 'ふくざつな', meaning: '复杂的', partOfSpeech: '形', level: 'N4', tone: '①', example: '複雑な問題', exampleMeaning: '复杂的问题', frequency: '高' },
+  { word: '余計な', reading: 'よけいな', meaning: '多余的', partOfSpeech: '形', level: 'N4', tone: '①', example: '余計な心配をする', exampleMeaning: '多余的担心', frequency: '中' },
+  { word: '特別な', reading: 'とくべつな', meaning: '特别的', partOfSpeech: '形', level: 'N4', tone: '①', example: '特別な事情', exampleMeaning: '特别的事情', frequency: '高' },
+  { word: '個人的な', reading: 'こじんてきな', meaning: '个人的', partOfSpeech: '形', level: 'N4', tone: '①', example: '個人的な意見', exampleMeaning: '个人意见', frequency: '高' },
+  { word: '旺旺', reading: 'おうおう', meaning: '往往、常常', partOfSpeech: '副', level: 'N4', example: '旺旺失敗する', exampleMeaning: '往往失败', frequency: '中' },
+  { word: '既に', reading: 'すでに', meaning: '已经', partOfSpeech: '副', level: 'N4', example: '既に始まりました', exampleMeaning: '已经开始了', frequency: '高' },
+  { word: '絶対に', reading: 'ぜったいに', meaning: '绝对、一定', partOfSpeech: '副', level: 'N4', example: '絶対に諦めない', exampleMeaning: '绝对不放弃', frequency: '高' },
+  { word: '思わず', reading: 'おもわず', meaning: '不由得、无意中', partOfSpeech: '副', level: 'N4', example: '思わず笑った', exampleMeaning: '不由得笑了', frequency: '中' },
+  { word: 'arder', reading: 'がつやりと', meaning: '凉、冰冷', partOfSpeech: '副', level: 'N4', example: 'aderっと冷える', exampleMeaning: '冰冷地冷下去', frequency: '低' },
+]
+
+export const VOCABULARY_N3: Omit<VocabularyItem, 'id'>[] = [
+  // N3 词汇
+  { word: '人心', reading: 'じんしん', meaning: '人心', partOfSpeech: '名', level: 'N3', example: '人心掌握が鍵です', exampleMeaning: '掌握人心是关键', frequency: '低' },
+  { word: '世代', reading: 'せだい', meaning: '世代、一代', partOfSpeech: '名', level: 'N3', example: '若者の世代', exampleMeaning: '年轻一代', frequency: '高' },
+  { word: '象', reading: 'ぞう', meaning: '象、象征', partOfSpeech: '名', level: 'N3', example: '像征的な建物', exampleMeaning: '象征性的建筑', frequency: '中' },
+  { word: '状沉', reading: 'じょうきょう', meaning: '状况、情况', partOfSpeech: '名', level: 'N3', example: '現在の状沉は', exampleMeaning: '现在的情况是', frequency: '高' },
+  { word: '結果', reading: 'けっか', meaning: '结果', partOfSpeech: '名', level: 'N3', example: '結果的に良かった', exampleMeaning: '结果很好', frequency: '高' },
+  { word: '理由', reading: 'りゆう', meaning: '理由、原因', partOfSpeech: '名', level: 'N3', example: '理由は明白です', exampleMeaning: '理由很明显', frequency: '高' },
+  { word: '意味', reading: 'いみ', meaning: '意思、意义', partOfSpeech: '名', level: 'N3', example: 'この言葉の意味は何ですか', exampleMeaning: '这个词的意思是什么', frequency: '高' },
+  { word: '関係', reading: 'かんけい', meaning: '关系', partOfSpeech: '名', level: 'N3', example: '関係があります', exampleMeaning: '有关系', frequency: '高' },
+  { word: '場合', reading: 'ばあい', meaning: '情况、场合', partOfSpeech: '名', level: 'N3', example: '病気の場合', exampleMeaning: '生病的情况下', frequency: '高' },
+  { word: '状態', reading: 'じょうたい', meaning: '状态', partOfSpeech: '名', level: 'N3', example: '状态が悪いです', exampleMeaning: '状态不好', frequency: '高' },
+  { word: '社会', reading: 'しゃかい', meaning: '社会', partOfSpeech: '名', level: 'N3', example: '社会貢献', exampleMeaning: '社会贡献', frequency: '高' },
+  { word: '環境', reading: 'かんきょう', meaning: '环境', partOfSpeech: '名', level: 'N3', example: '環境を守ります', exampleMeaning: '保护环境', frequency: '高' },
+  { word: '生活', reading: 'せいかつ', meaning: '生活', partOfSpeech: '名', level: 'N3', example: '日常生活', exampleMeaning: '日常生活', frequency: '高' },
+  { word: '人生', reading: 'じんせい', meaning: '人生', partOfSpeech: '名', level: 'N3', example: '人生 везде', exampleMeaning: '人生各种各样', frequency: '高' },
+  { word: '価値', reading: 'かち', meaning: '价值', partOfSpeech: '名', level: 'N3', example: '価値観', exampleMeaning: '价值观', frequency: '高' },
+  { word: '目的', reading: 'もくてき', meaning: '目的', partOfSpeech: '名', level: 'N3', example: '目的を達成する', exampleMeaning: '达到目的', frequency: '高' },
+  { word: '理由', reading: 'りゆう', meaning: '理由', partOfSpeech: '名', level: 'N3', frequency: '高' },
+  { word: '興味', reading: 'きょうみ', meaning: '兴趣', partOfSpeech: '名', level: 'N3', example: '興味深いです', exampleMeaning: '很感兴趣', frequency: '高' },
+  { word: '日記', reading: 'にっき', meaning: '日记', partOfSpeech: '名', level: 'N3', example: '日記をつける', exampleMeaning: '写日记', frequency: '中' },
+  { word: '作文', reading: 'さくぶん', meaning: '作文', partOfSpeech: '名', level: 'N3', example: '作文を書きます', exampleMeaning: '写作文', frequency: '中' },
+  { word: '小説', reading: 'しょうせつ', meaning: '小说', partOfSpeech: '名', level: 'N3', example: '小説を読みます', exampleMeaning: '读小说', frequency: '中' },
+  { word: '物語', reading: 'ものがたり', meaning: '故事', partOfSpeech: '名', level: 'N3', example: '古老しい物語', exampleMeaning: '古老的故事', frequency: '中' },
+  { word: '歴史', reading: 'れきし', meaning: '历史', partOfSpeech: '名', level: 'N3', example: '日本の歴史', exampleMeaning: '日本历史', frequency: '高' },
+  { word: '文化', reading: 'ぶんか', meaning: '文化', partOfSpeech: '名', level: 'N3', example: '日本文化', exampleMeaning: '日本文化', frequency: '高' },
+  { word: '伝統', reading: 'でんとう', meaning: '传统', partOfSpeech: '名', level: 'N3', example: '伝統を守る', exampleMeaning: '守护传统', frequency: '高' },
+
+  // N3 动词
+  { word: '感じる', reading: 'かんじる', meaning: '感觉、感到', partOfSpeech: '动', level: 'N3', tone: '④③', example: '興味を感じました', exampleMeaning: '感到有兴趣', examTip: '一段动词' },
+  { word: '信じる', reading: 'しんじる', meaning: '相信', partOfSpeech: '动', level: 'N3', tone: '③②', example: 'もっと信じるべきです', exampleMeaning: '应该更加相信', examTip: '一段动词' },
+  { word: '感じる', reading: 'かんじる', meaning: '感觉', partOfSpeech: '动', level: 'N3', tone: '④③', frequency: '高' },
+  { word: '考える', reading: 'かんがえる', meaning: '思考、考虑', partOfSpeech: '动', level: 'N3', tone: '④③', example: 'よく考えてください', exampleMeaning: '请好好考虑一下', frequency: '高' },
+  { word: '始める', reading: 'はじめる', meaning: '开始', partOfSpeech: '动', level: 'N3', tone: '③②', example: '勉強を始めます', exampleMeaning: '开始学习', frequency: '高' },
+  { word: '続ける', reading: 'つつける', meaning: '继续', partOfSpeech: '动', level: 'N3', tone: '③②', example: '食べ続ける', exampleMeaning: '继续吃', frequency: '高' },
+  { word: '終える', reading: 'おえる', meaning: '完成、结束', partOfSpeech: '动', level: 'N3', tone: '③②', example: '使命を終えた', exampleMeaning: '完成了使命', frequency: '高' },
+  { word: '変える', reading: 'かえる', meaning: '改变', partOfSpeech: '动', level: 'N3', tone: '②③', example: '观念を変えます', exampleMeaning: '改变观念', frequency: '高' },
+  { word: '高める', reading: 'たかめる', meaning: '提高', partOfSpeech: '动', level: 'N3', tone: '③②', example: '水位を高めます', exampleMeaning: '提高水位', frequency: '中' },
+  { word: '集める', reading: 'あつめる', meaning: '收集', partOfSpeech: '动', level: 'N3', tone: '③②', example: '情報を集める', exampleMeaning: '收集信息', frequency: '高' },
+  { word: '保つ', reading: 'たもつ', meaning: '保持、维持', partOfSpeech: '动', level: 'N3', tone: '②①', example: '平衡を保つ', exampleMeaning: '保持平衡', frequency: '中' },
+  { word: '及ぼす', reading: 'およぼす', meaning: '波及、影响到', partOfSpeech: '动', level: 'N3', tone: '②③', example: '影響及ぼします', exampleMeaning: '施加影响', frequency: '低' },
+  { word: '含む', reading: 'ふくむ', meaning: '包含、含有', partOfSpeech: '动', level: 'N3', tone: '②①', example: '水を含有する', exampleMeaning: '含有水分', frequency: '高' },
+  { word: '異なる', reading: 'ことなる', meaning: '不同、不一样', partOfSpeech: '动', level: 'N3', tone: '③', example: '環境が異なる', exampleMeaning: '环境不同', frequency: '高' },
+  { word: '応じる', reading: 'おうじる', meaning: '响应、适应', partOfSpeech: '动', level: 'N3', tone: '③②', example: '需要に応じる', exampleMeaning: '响应需求', frequency: '高' },
+  { word: '及ぼす', reading: 'およぼす', meaning: '使...受到影响', partOfSpeech: '动', level: 'N3', tone: '③②', frequency: '中' },
+  { word: '得万', reading: 'うる', meaning: '得到、获得', partOfSpeech: '动', level: 'N3', tone: '①', example: '知識を得る', exampleMeaning: '获得知识', examTip: '文语动词，口语说「える」' },
+  { word: '失う', reading: 'うしなう', meaning: '失去、丢失', partOfSpeech: '动', level: 'N3', tone: '②①', example: '命を失う', exampleMeaning: '丧命', examTip: '五段动词' },
+  { word: '満たす', reading: 'みたす', meaning: '满足、填满', partOfSpeech: '动', level: 'N3', tone: '②③', example: '条件を満たします', exampleMeaning: '满足条件', frequency: '高' },
+  { word: '超える', reading: 'こえる', meaning: '超过、超越', partOfSpeech: '动', level: 'N3', tone: '②①', example: '100方を超えます', exampleMeaning: '超过100万', frequency: '高' },
+  { word: '限る', reading: 'かざる', meaning: '限于、限制', partOfSpeech: '动', level: 'N3', tone: '②①', example: '三日に限ります', exampleMeaning: '限于三天', frequency: '高' },
+  { word: '基つく', reading: 'もとづく', meaning: '基于、根据', partOfSpeech: '动', level: 'N3', tone: '③', example: '事実に基づきます', exampleMeaning: '基于事实', frequency: '高' },
+  { word: '至る', reading: 'いたる', meaning: '到达、达到', partOfSpeech: '动', level: 'N3', tone: '②', example: '結果に至る', exampleMeaning: '导致结果', frequency: '高' },
+  { word: '沿う', reading: 'そう', meaning: '沿着、按照', partOfSpeech: '动', level: 'N3', tone: '①', example: '道路に沿って歩く', exampleMeaning: '沿着道路走', frequency: '中' },
+
+  // N3 形容词/形容动词
+  { word: '必要な', reading: 'ひつような', meaning: '必要的、需要的', partOfSpeech: '形', level: 'N3', tone: '①', example: '必要なものだ', exampleMeaning: '需要的东西', frequency: '高' },
+  { word: '様々な', reading: 'さまざまな', meaning: '各种各样的', partOfSpeech: '形', level: 'N3', tone: '④', example: '様々な問題', exampleMeaning: '各种各样的问题', frequency: '高' },
+  { word: '複雑な', reading: 'ふくざつな', meaning: '复杂的', partOfSpeech: '形', level: 'N3', tone: '①', example: '複雑な心情', exampleMeaning: '复杂的心情', frequency: '高' },
+  { word: '重要な', reading: 'じゅうような', meaning: '重要的', partOfSpeech: '形', level: 'N3', tone: '①', example: '重要な案件', exampleMeaning: '重要的案件', frequency: '高' },
+  { word: '必要な', reading: 'ひつような', meaning: '必要的', partOfSpeech: '形', level: 'N3', tone: '①', frequency: '高' },
+  { word: '静かな', reading: 'しずかな', meaning: '安静的', partOfSpeech: '形', level: 'N3', tone: '①', example: '静か公园', exampleMeaning: '安静的公园', frequency: '高' },
+  { word: '嫌な', reading: 'いやな', meaning: '讨厌的', partOfSpeech: '形', level: 'N3', tone: '③', example: '嫌な匐い', exampleMeaning: '讨厌的气味', frequency: '中' },
+  { word: '新しい', reading: 'あたらしい', meaning: '新的', partOfSpeech: '形', level: 'N3', tone: '④', example: '新しい発見', exampleMeaning: '新发现', frequency: '高' },
+  { word: '懐かしい', reading: 'なつかしい', meaning: '怀念的、令人思念的', partOfSpeech: '形', level: 'N3', tone: '④', example: '故郷が懐かしい', exampleMeaning: '怀念故乡', frequency: '中' },
+  { word: '恐ろしい', reading: 'おそろしい', meaning: '可怕的、惊人的', partOfSpeech: '形', level: 'N3', tone: '④', example: '恐ろしい速さ', exampleMeaning: '惊人的速度', frequency: '中' },
+  { word: '冷たい', reading: 'つめたい', meaning: '冷淡的、冰冷的', partOfSpeech: '形', level: 'N3', tone: '③②', example: '冷たい仕草', exampleMeaning: '冷淡的态度', frequency: '中' },
+  { word: '甘い', reading: 'あまい', meaning: '甜的、宽松的', partOfSpeech: '形', level: 'N3', tone: '②②', example: '甘い考え', exampleMeaning: '天真的想法', frequency: '中' },
+  { word: '酸い', reading: 'すい', meaning: '酸痛的', partOfSpeech: '形', level: 'N3', tone: '①', example: '酸い息', exampleMeaning: '喘不过气来', frequency: '低' },
+  { word: '苦い', reading: 'にがい', meaning: '痛苦的', partOfSpeech: '形', level: 'N3', tone: '②', example: '苦い経験', exampleMeaning: '痛苦的经历', frequency: '中' },
+  { word: '可惜的', reading: 'あつなが可惜', meaning: '遗憾的，可惜的', partOfSpeech: '形', level: 'N3', tone: '①', example: '可惜此刻', exampleMeaning: '可惜的是', frequency: '中' },
+  { word: '甚だしい', reading: 'はなはだしい', meaning: '非常、很', partOfSpeech: '形', level: 'N3', tone: '⑤', example: '甚だしい誤解', exampleMeaning: '很大的误解', frequency: '低' },
+]
+
+export const VOCABULARY_N2: Omit<VocabularyItem, 'id'>[] = [
+  // N2 高频词汇
+  { word: '現象', reading: 'げんしょう', meaning: '现象', partOfSpeech: '名', level: 'N2', example: '自然現象', exampleMeaning: '自然现象', frequency: '高' },
+  { word: '事実', reading: 'じじつ', meaning: '事实', partOfSpeech: '名', level: 'N2', example: '事実を確認します', exampleMeaning: '确认事实', frequency: '高' },
+  { word: '結果', reading: 'けっか', meaning: '结果、后果', partOfSpeech: '名', level: 'N2', example: '結果的に良かった', exampleMeaning: '结果很好', frequency: '高' },
+  { word: '原因', reading: 'げんいん', meaning: '原因', partOfSpeech: '名', level: 'N2', example: '原因を調べます', exampleMeaning: '调查原因', frequency: '高' },
+  { word: '結果', reading: 'けっか', meaning: '结果', partOfSpeech: '名', level: 'N2', frequency: '高' },
+  { word: '影響', reading: 'えいきょう', meaning: '影响', partOfSpeech: '名', level: 'N2', example: '影響を受ける', exampleMeaning: '受到影响', frequency: '高' },
+  { word: '目的', reading: 'もくてき', meaning: '目的', partOfSpeech: '名', level: 'N2', example: '目的を達成する', exampleMeaning: '达到目的', frequency: '高' },
+  { word: '理由', reading: 'りゆう', meaning: '理由', partOfSpeech: '名', level: 'N2', example: '理由説明する', exampleMeaning: '说明理由', frequency: '高' },
+  { word: '状態', reading: 'じょうたい', meaning: '状态', partOfSpeech: '名', level: 'N2', example: '状沉不妙', exampleMeaning: '状态不妙', frequency: '高' },
+  { word: '意味', reading: 'いみ', meaning: '意思、意义', partOfSpeech: '名', level: 'N2', example: '意味がない', exampleMeaning: '没有意义', frequency: '高' },
+  { word: '関係', reading: 'かんけい', meaning: '关系', partOfSpeech: '名', level: 'N2', example: '関係が深い', exampleMeaning: '关系很深', frequency: '高' },
+  { word: '自体', reading: 'じたい', meaning: '本身、自己', partOfSpeech: '名', level: 'N2', example: '问题自体', exampleMeaning: '问题本身', frequency: '高' },
+  { word: '結果', reading: 'けっか', meaning: '结果', partOfSpeech: '名', level: 'N2', frequency: '高' },
+  { word: '以上', reading: 'いじょう', meaning: '以上、不少于', partOfSpeech: '名', level: 'N2', example: '100人以上', exampleMeaning: '100人以上', frequency: '高' },
+  { word: '以下', reading: 'いか', meaning: '以下、不超过', partOfSpeech: '名', level: 'N2', example: '18歳以下', exampleMeaning: '18岁以下', frequency: '高' },
+  { word: '自体', reading: 'じたい', meaning: '自身', partOfSpeech: '名', level: 'N2', frequency: '高' },
+  { word: '一方', reading: 'いつぽう', meaning: '一方面、一方', partOfSpeech: '名', level: 'N2', example: '一方では...他方では', exampleMeaning: '一方面...另一方面...', frequency: '高' },
+  { word: '反面', reading: 'はんめん', meaning: '反面、另一面', partOfSpeech: '名', level: 'N2', example: '懒惰的反面', exampleMeaning: '懒惰的反面', frequency: '中' },
+  { word: '態度', reading: 'たいど', meaning: '态度', partOfSpeech: '名', level: 'N2', example: '態度を変えます', exampleMeaning: '改变态度', frequency: '高' },
+  { word: '印象', reading: 'いんしょう', meaning: '印象', partOfSpeech: '名', level: 'N2', example: '印象に残ります', exampleMeaning: '留下印象', frequency: '高' },
+  { word: '感情', reading: 'かんじょう', meaning: '感情', partOfSpeech: '名', level: 'N2', example: '感情をコントロールする', exampleMeaning: '控制感情', frequency: '高' },
+  { word: '心理', reading: 'しんり', meaning: '心理', partOfSpeech: '名', level: 'N2', example: '心理学', exampleMeaning: '心理学', frequency: '中' },
+  { word: '意識', reading: 'いしき', meaning: '意识', partOfSpeech: '名', level: 'N2', example: '意識が低い', exampleMeaning: '意识薄弱', frequency: '高' },
+  { word: '目的', reading: 'もくてき', meaning: '目的', partOfSpeech: '名', level: 'N2', frequency: '高' },
+  { word: '彼此', reading: 'あれこれ', meaning: '这个那个、种种', partOfSpeech: '名', level: 'N2', example: '彼此錯誤する', exampleMeaning: '纠缠不清', frequency: '中' },
+
+  // N2 动词
+  { word: '行う', reading: 'おこなう', meaning: '进行、举办', partOfSpeech: '动', level: 'N2', tone: '②①', example: '試合を行う', exampleMeaning: '进行比赛', examTip: '五段动词' },
+  { word: '得る', reading: 'うる', meaning: '得到、获得', partOfSpeech: '动', level: 'N2', tone: '①', example: '了解を得る', exampleMeaning: '获得理解', examTip: '文语动词，口语用「える」' },
+  { word: '言う', reading: 'いう', meaning: '说', partOfSpeech: '动', level: 'N2', tone: '①', example: '结构だと言う', exampleMeaning: '说辛苦了', frequency: '高' },
+  { word: '示す', reading: 'しめす', meaning: '表示、显示', partOfSpeech: '动', level: 'N2', tone: '②①', example: '答えを示します', exampleMeaning: '给出答案', frequency: '高' },
+  { word: '認める', reading: 'みとめる', meaning: '承认、认可', partOfSpeech: '动', level: 'N2', tone: '③②', example: '間違いを認めます', exampleMeaning: '承认错误', frequency: '高' },
+  { word: '保つ', reading: 'たもつ', meaning: '保持、维持', partOfSpeech: '动', level: 'N2', tone: '②①', example: '冷静を保つ', exampleMeaning: '保持冷静', frequency: '高' },
+  { word: '接触', reading: 'せっしょく', meaning: '接触', partOfSpeech: '动', level: 'N2', tone: '①', example: '接触を持つ', exampleMeaning: '有接触', frequency: '高' },
+  { word: '対応', reading: 'たいおう', meaning: '对应、应对', partOfSpeech: '动', level: 'N2', tone: '①', example: '状況に対応します', exampleMeaning: '应对情况', frequency: '高' },
+  { word: '実現', reading: 'じつげん', meaning: '实现', partOfSpeech: '动', level: 'N2', tone: '①', example: '夢を実現します', exampleMeaning: '实现梦想', frequency: '高' },
+  { word: '完了', reading: 'かんりょう', meaning: '完成', partOfSpeech: '动', level: 'N2', tone: '①', example: '準備が完了しました', exampleMeaning: '准备完成了', frequency: '高' },
+  { word: '把握', reading: 'はあく', meaning: '掌握、抓住', partOfSpeech: '动', level: 'N2', tone: '①', example: '状況を把握します', exampleMeaning: '掌握情况', frequency: '高' },
+  { word: '排除', reading: 'はいじょ', meaning: '排除、清除', partOfSpeech: '动', level: 'N2', tone: '①', example: '障碍を排除します', exampleMeaning: '排除障碍', frequency: '高' },
+  { word: '適用', reading: 'てきよう', meaning: '适用、应用', partOfSpeech: '动', level: 'N2', tone: '①', example: '法律を適用する', exampleMeaning: '适用法律', frequency: '高' },
+  { word: '強調', reading: 'きょうちょう', meaning: '强调', partOfSpeech: '动', level: 'N2', tone: '①', example: '重要性を強調します', exampleMeaning: '强调重要性', frequency: '高' },
+  { word: '提起', reading: 'ていき', meaning: '提出、提起', partOfSpeech: '动', level: 'N2', tone: '①', example: '問題を提起する', exampleMeaning: '提出问题', frequency: '高' },
+  { word: '評価', reading: 'ひょうか', meaning: '评价', partOfSpeech: '动', level: 'N2', tone: '①', example: '高く評価する', exampleMeaning: '高度评价', frequency: '高' },
+  { word: '接触', reading: 'せっしょく', meaning: '接触、联系', partOfSpeech: '动', level: 'N2', tone: '①', example: '互いに接触する', exampleMeaning: '互相接触', frequency: '高' },
+  { word: '直面', reading: 'ちょくめん', meaning: '面临、面对', partOfSpeech: '动', level: 'N2', tone: '①', example: '困難に直面する', exampleMeaning: '面临困难', frequency: '高' },
+  { word: '区別', reading: 'くべつ', meaning: '区别、分辨', partOfSpeech: '动', level: 'N2', tone: '①', example: '区別をつける', exampleMeaning: '加以区别', frequency: '高' },
+  { word: '接触', reading: 'せっしょく', meaning: '接触', partOfSpeech: '动', level: 'N2', frequency: '高' },
+
+  // N2 形容词/形容动词
+  { word: '単なる', reading: 'たんんなる', meaning: '单纯的、仅仅的', partOfSpeech: '形', level: 'N2', tone: '①', example: '単に面白い', exampleMeaning: '仅仅是有趣', frequency: '高' },
+  { word: '新たな', reading: 'あらたな', meaning: '新的', partOfSpeech: '形', level: 'N2', tone: '①', example: '新たな発見', exampleMeaning: '新发现', frequency: '高' },
+  { word: '具体的な', reading: 'ぐたいてきな', meaning: '具体的们', partOfSpeech: '形', level: 'N2', tone: '①', example: '具体的な例', exampleMeaning: '具体的例子', frequency: '高' },
+  { word: '様々な', reading: 'さまざまな', meaning: '各种各样', partOfSpeech: '形', level: 'N2', tone: '④', example: '様々な意見', exampleMeaning: '各种意见', frequency: '高' },
+  { word: '静かな', reading: 'しずかな', meaning: '安静的', partOfSpeech: '形', level: 'N2', tone: '①', frequency: '高' },
+  { word: '可惜な', reading: 'あicana', meaning: '可惜的', partOfSpeech: '形', level: 'N2', tone: '①', example: '可惜な結果', exampleMeaning: '可惜的结果', frequency: '高' },
+  { word: '剧烈な', reading: 'げきれい', meaning: '剧烈的', partOfSpeech: '形', level: 'N2', tone: '①', example: '激しい競争', exampleMeaning: '激烈的竞争', frequency: '高' },
+  { word: '深刻な', reading: 'しんざくな', meaning: '严重的', partOfSpeech: '形', level: 'N2', tone: '①', example: '深刻な問題', exampleMeaning: '严重的问题', frequency: '高' },
+  { word: '明確な', reading: 'めいかくな', meaning: '明确的', partOfSpeech: '形', level: 'N2', tone: '①', example: '明確な目標', exampleMeaning: '明确的目标', frequency: '高' },
+  { word: '純粋な', reading: 'じゅんすいな', meaning: '纯粹的', partOfSpeech: '形', level: 'N2', tone: '①', example: '純粋な気持ち', exampleMeaning: '纯粹的心情', frequency: '高' },
+  { word: '微妙な', reading: 'びみょうな', meaning: '微妙的', partOfSpeech: '形', level: 'N2', tone: '①', example: '微妙な関係', exampleMeaning: '微妙的关系', frequency: '高' },
+  { word: '残酷な', reading: 'ざんこくな', meaning: '残酷的', partOfSpeech: '形', level: 'N2', tone: '①', example: '現実が残酷だ', exampleMeaning: '现实很残酷', frequency: '中' },
+  { word: '空き', reading: 'あき', meaning: '空、闲', partOfSpeech: '形', level: 'N2', tone: '①', example: '空き部屋', exampleMeaning: '空房间', frequency: '中' },
+  { word: '太多的', reading: 'たて', meaning: '太甚、过多', partOfSpeech: '形', level: 'N2', tone: '①', example: '多すぎて選び分からない', exampleMeaning: '太多无法选择', frequency: '中' },
+]
+
+export const VOCABULARY_N1: Omit<VocabularyItem, 'id'>[] = [
+  // N1 词汇
+  { word: '象', reading: 'しょう', meaning: '象征', partOfSpeech: '名', level: 'N1', example: '平和の象', exampleMeaning: '和平的象征', frequency: '高' },
+  { word: '認識', reading: 'にんしき', meaning: '认识', partOfSpeech: '名', level: 'N1', example: '認識が足りない', exampleMeaning: '认识不足', frequency: '高' },
+  { word: '概念', reading: 'がいねん', meaning: '概念', partOfSpeech: '名', level: 'N1', example: '基本概念', exampleMeaning: '基本概念', frequency: '高' },
+  { word: '本質', reading: 'ほんしつ', meaning: '本质', partOfSpeech: '名', level: 'N1', example: '本質を見极める', exampleMeaning: '看透本质', frequency: '高' },
+  { word: '原則', reading: 'げんそく', meaning: '原则', partOfSpeech: '名', level: 'N1', example: ' 원칙に従う', exampleMeaning: '遵守原则', frequency: '高' },
+  { word: '規定', reading: 'きてい', meaning: '规定、规章', partOfSpeech: '名', level: 'N1', example: '規定を守る', exampleMeaning: '遵守规定', frequency: '高' },
+  { word: '基準', reading: 'きじゅん', meaning: '基准、标准', partOfSpeech: '名', level: 'N1', example: '基準を超える', exampleMeaning: '超过基准', frequency: '高' },
+  { word: '論理', reading: 'ろんり', meaning: '逻辑', partOfSpeech: '名', level: 'N1', example: '論理的に考える', exampleMeaning: '逻辑性思考', frequency: '高' },
+  { word: '意識', reading: 'いしき', meaning: '意识', partOfSpeech: '名', level: 'N1', example: '意識が朦朧とする', exampleMeaning: '意识模糊', frequency: '高' },
+  { word: '形而上', reading: 'けいじじょう', meaning: '形而上', partOfSpeech: '名', level: 'N1', example: '形而上学', exampleMeaning: '形而上学', frequency: '中' },
+  { word: '客観', reading: 'きゃつかん', meaning: '客观', partOfSpeech: '名', level: 'N1', example: '客観的に見る', exampleMeaning: '客观地看', frequency: '高' },
+  { word: '主観', reading: 'しゅかん', meaning: '主观', partOfSpeech: '名', level: 'N1', example: '主観的意見', exampleMeaning: '主观意见', frequency: '高' },
+  { word: '具体', reading: 'ぐたい', meaning: '具体', partOfSpeech: '名', level: 'N1', example: '具体例を示す', exampleMeaning: '举例说明', frequency: '高' },
+  { word: '抽象', reading: 'ちゅうしょう', meaning: '抽象', partOfSpeech: '名', level: 'N1', example: '抽象的な話', exampleMeaning: '抽象的话', frequency: '高' },
+  { word: '矛盾', reading: 'むじゅん', meaning: '矛盾', partOfSpeech: '名', level: 'N1', example: '矛盾が生じる', exampleMeaning: '产生矛盾', frequency: '高' },
+  { word: '因果', reading: 'いんが', meaning: '因果', partOfSpeech: '名', level: 'N1', example: '因果関係', exampleMeaning: '因果关系', frequency: '中' },
+  { word: '相互作用', reading: 'そうごさよう', meaning: '相互作用', partOfSpeech: '名', level: 'N1', example: '相互作用し合う', exampleMeaning: '相互影响', frequency: '高' },
+  { word: '根源', reading: 'こんげん', meaning: '根源', partOfSpeech: '名', level: 'N1', example: '問題の根源', exampleMeaning: '问题的根源', frequency: '高' },
+  { word: '真相', reading: 'そうしん', meaning: '真相', partOfSpeech: '名', level: 'N1', example: '真相を查明する', exampleMeaning: '查明真相', frequency: '高' },
+  { word: '実相', reading: 'じっそう', meaning: '实相、真实情况', partOfSpeech: '名', level: 'N1', example: '社会の実相', exampleMeaning: '社会的真实情况', frequency: '中' },
+  { word: '見識', reading: 'けんしき', meaning: '见识、见解', partOfSpeech: '名', level: 'N1', example: '見識が高い', exampleMeaning: '见识高', frequency: '中' },
+  { word: '視座', reading: 'しざ', meaning: '视角、立场', partOfSpeech: '名', level: 'N1', example: '別の視座から見る', exampleMeaning: '从别的角度看', frequency: '中' },
+  { word: '志向', reading: 'しこう', meaning: '志向、意向', partOfSpeech: '名', level: 'N1', example: '将来を志向する', exampleMeaning: '以将来为目标', frequency: '高' },
+  { word: '観点', reading: 'かんてん', meaning: '观点', partOfSpeech: '名', level: 'N1', example: '別の観点から', exampleMeaning: '从别的观点', frequency: '高' },
+  { word: '角度', reading: 'かくど', meaning: '角度', partOfSpeech: '名', level: 'N1', example: '角度を変えて見る', exampleMeaning: '换角度看', frequency: '中' },
+
+  // N1 动词
+  { word: '推奨', reading: 'すいしょう', meaning: '推荐', partOfSpeech: '动', level: 'N1', tone: '①', example: 'お推荐的商品', exampleMeaning: '推荐商品', frequency: '高' },
+  { word: '推薦', reading: 'すいせん', meaning: '推荐、推举', partOfSpeech: '动', level: 'N1', tone: '①', example: '入学を推薦する', exampleMeaning: '推荐入学', frequency: '高' },
+  { word: '唱道', reading: 'せんどう', meaning: '倡导、提倡', partOfSpeech: '动', level: 'N1', tone: '①', example: '平和を唱える', exampleMeaning: '倡导和平', frequency: '高' },
+  { word: '主張', reading: 'しゅちょう', meaning: '主张', partOfSpeech: '动', level: 'N1', tone: '①', example: '自己主張がましい', exampleMeaning: '过于自我主张', frequency: '高' },
+  { word: '断言', reading: 'だんげん', meaning: '断言、肯定', partOfSpeech: '动', level: 'N1', tone: '①', example: '断言できない', exampleMeaning: '无法断言', frequency: '高' },
+  { word: '批判', reading: 'ひihan', meaning: '批判、批评', partOfSpeech: '动', level: 'N1', tone: '①', example: '他者を批判する', exampleMeaning: '批评他人', frequency: '高' },
+  { word: '示唆', reading: 'しさ', meaning: '暗示、启示', partOfSpeech: '动', level: 'N1', tone: '①', example: '示唆に富む', exampleMeaning: '富有启示', frequency: '高' },
+  { word: '象徴', reading: 'しょうちょう', meaning: '象征', partOfSpeech: '动', level: 'N1', tone: '①', example: '平和を象徴する', exampleMeaning: '象征和平', frequency: '高' },
+  { word: '定義', reading: 'ていぎ', meaning: '定义', partOfSpeech: '动', level: 'N1', tone: '①', example: '明確に定義する', exampleMeaning: '明确地定义', frequency: '高' },
+  { word: '解釈', reading: 'かいしゃく', meaning: '解释、理解', partOfSpeech: '动', level: 'N1', tone: '①', example: '別の解釈がある', exampleMeaning: '有另一种解释', frequency: '高' },
+  { word: '洞察', reading: 'どうさつ', meaning: '洞察', partOfSpeech: '动', level: 'N1', tone: '①', example: '先を洞察する', exampleMeaning: '洞察先机', frequency: '高' },
+  { word: '熟慮', reading: 'じゅくりょ', meaning: '熟虑、深思熟虑', partOfSpeech: '动', level: 'N1', tone: '①', example: '熟慮探索', exampleMeaning: '深思熟虑后决定', frequency: '高' },
+  { word: '凝縮', reading: 'ぎょうしゅく', meaning: '凝结、凝聚', partOfSpeech: '动', level: 'N1', tone: '①', example: '努力が凝縮する', exampleMeaning: '努力凝聚', frequency: '中' },
+  { word: '昇華', reading: 'しょうか', meaning: '升华', partOfSpeech: '动', level: 'N1', tone: '①', example: '苦難を昇華する', exampleMeaning: '将苦难升华', frequency: '中' },
+  { word: '統合', reading: 'とうごう', meaning: '统一、整合', partOfSpeech: '动', level: 'N1', tone: '①', example: '情報を統合する', exampleMeaning: '整合信息', frequency: '高' },
+  { word: '帰納', reading: 'きのう', meaning: '归纳', partOfSpeech: '动', level: 'N1', tone: '①', example: '演繹ではなく帰納的に', exampleMeaning: '不是演绎而是归纳地', frequency: '中' },
+  { word: '演繹', reading: 'えんえき', meaning: '演绎', partOfSpeech: '动', level: 'N1', tone: '①', example: '演繹的に考える', exampleMeaning: '演绎地思考', frequency: '中' },
+  { word: '波及', reading: 'はきゅう', meaning: '波及、影响到', partOfSpeech: '动', level: 'N1', tone: '①', example: '影響が波及する', exampleMeaning: '影响波及', frequency: '高' },
+  { word: '投映', reading: 'とうえい', meaning: '投射、映照', partOfSpeech: '动', level: 'N1', tone: '①', example: '影が壁に映る', exampleMeaning: '影子映在墙上', frequency: '中' },
+  { word: '溶場', reading: 'ようかい', meaning: '溶解、融化', partOfSpeech: '动', level: 'N1', tone: '①', example: '塩が水に溶ける', exampleMeaning: '盐溶于水', frequency: '中' },
+
+  // N1 形容词/形容动词
+  { word: '複雑な', reading: 'ふくざつな', meaning: '复杂的', partOfSpeech: '形', level: 'N1', tone: '①', example: '複雑な事情', exampleMeaning: '复杂的情况', frequency: '高' },
+  { word: '重大な', reading: 'じゅうだいな', meaning: '重大的', partOfSpeech: '形', level: 'N1', tone: '①', example: '重大な決断', exampleMeaning: '重大的决断', frequency: '高' },
+  { word: '純粋な', reading: 'じゅんすいな', meaning: '纯粹的', partOfSpeech: '形', level: 'N1', tone: '①', example: '純粋な好意', exampleMeaning: '纯粹的好意', frequency: '高' },
+  { word: '抽象的な', reading: 'ちゅうしょうてきな', meaning: '抽象的', partOfSpeech: '形', level: 'N1', tone: '①', example: '抽象的な概念', exampleMeaning: '抽象的概念', frequency: '高' },
+  { word: '具体的な', reading: 'ぐたいてきな', meaning: '具体的们', partOfSpeech: '形', level: 'N1', tone: '①', example: '具体的に示す', exampleMeaning: '具体地展示', frequency: '高' },
+  { word: '全面的な', reading: 'ぜんめんてきな', meaning: '全方面的', partOfSpeech: '形', level: 'N1', tone: '①', example: '全面的に支持する', exampleMeaning: '全面支持', frequency: '高' },
+  { word: '内面的な', reading: 'ないめんてきな', meaning: '内心的', partOfSpeech: '形', level: 'N1', tone: '①', example: '内面的な成長', exampleMeaning: '内心的成长', frequency: '中' },
+  { word: '外面的な', reading: 'がいめんてきな', meaning: '外表的', partOfSpeech: '形', level: 'N1', tone: '①', example: '外面的な評価', exampleMeaning: '外表的评价', frequency: '中' },
+  { word: '潜在的な', reading: 'せんざいてきな', meaning: '潜在的', partOfSpeech: '形', level: 'N1', tone: '①', example: '潜在的な危険', exampleMeaning: '潜在的危险', frequency: '高' },
+  { word: '致命的な', reading: 'ちめいてきな', meaning: '致命的', partOfSpeech: '形', level: 'N1', tone: '①', example: '致命的な誤り', exampleMeaning: '致命的错误', frequency: '高' },
+  { word: '急速な', reading: 'きゅうそくな', meaning: '快速的', partOfSpeech: '形', level: 'N1', tone: '①', example: '急速に変化する', exampleMeaning: '快速变化', frequency: '高' },
+  { word: '劇的な', reading: 'げきてきな', meaning: '戏剧性的', partOfSpeech: '形', level: 'N1', tone: '①', example: '劇的に改善する', exampleMeaning: '戏剧性地改善', frequency: '中' },
+  { word: '激烈な', reading: 'げきれい', meaning: '激烈的', partOfSpeech: '形', level: 'N1', tone: '①', example: '激烈的議論', exampleMeaning: '激烈的讨论', frequency: '高' },
+  { word: '深刻な', reading: 'しんざくな', meaning: '严重的', partOfSpeech: '形', level: 'N1', tone: '①', example: '深刻な事態', exampleMeaning: '严重的事态', frequency: '高' },
+  { word: '甚大な', reading: 'じんだいな', meaning: '很大的', partOfSpeech: '形', level: 'N1', tone: '①', example: '甚大な被害', exampleMeaning: '很大的损失', frequency: '高' },
+  { word: '広範な', reading: 'こうはん', meaning: '广泛的', partOfSpeech: '形', level: 'N1', tone: '①', example: '広範な影響', exampleMeaning: '广泛的影响', frequency: '高' },
+  { word: '潜在的な', reading: 'せんざいてき', meaning: '潜在的', partOfSpeech: '形', level: 'N1', frequency: '高' },
+]
+
+// 考研核心词汇
+export const VOCABULARY_考研: Omit<VocabularyItem, 'id'>[] = [
+  // 考研高频词汇
+  { word: '政治', reading: 'せいじ', meaning: '政治', partOfSpeech: '名', level: '考研', example: '政治を理解する', exampleMeaning: '理解政治', frequency: '高' },
+  { word: '経済', reading: 'けいざい', meaning: '经济', partOfSpeech: '名', level: '考研', example: '経済を発展させる', exampleMeaning: '发展经济', frequency: '高' },
+  { word: '社会', reading: 'しゃかい', meaning: '社会', partOfSpeech: '名', level: '考研', example: '社会貢献', exampleMeaning: '社会贡献', frequency: '高' },
+  { word: '文化', reading: 'ぶんか', meaning: '文化', partOfSpeech: '名', level: '考研', example: '文化交流', exampleMeaning: '文化交流', frequency: '高' },
+  { word: '歴史', reading: 'れきし', meaning: '历史', partOfSpeech: '名', level: '考研', example: '歴史を学ぶ', exampleMeaning: '学习历史', frequency: '高' },
+  { word: '科学', reading: 'かがく', meaning: '科学', partOfSpeech: '名', level: '考研', example: '科学技術', exampleMeaning: '科学技术', frequency: '高' },
+  { word: '技術', reading: 'ぎじゅつ', meaning: '技术', partOfSpeech: '名', level: '考研', example: '技術が进步する', exampleMeaning: '技术进步', frequency: '高' },
+  { word: '教育', reading: 'きょういく', meaning: '教育', partOfSpeech: '名', level: '考研', example: '教育改革', exampleMeaning: '教育改革', frequency: '高' },
+  { word: '環境', reading: 'かんきょう', meaning: '环境', partOfSpeech: '名', level: '考研', example: '環境を守る', exampleMeaning: '保护环境', frequency: '高' },
+  { word: '資源', reading: 'しげん', meaning: '资源', partOfSpeech: '名', level: '考研', example: '天然資源', exampleMeaning: '天然资源', frequency: '高' },
+  { word: '問題', reading: 'もんだい', meaning: '问题', partOfSpeech: '名', level: '考研', example: '問題を解決する', exampleMeaning: '解决问题', frequency: '高' },
+  { word: '研究', reading: 'けんきゅう', meaning: '研究', partOfSpeech: '名', level: '考研', example: '研究を行う', exampleMeaning: '进行研究', frequency: '高' },
+  { word: '開発', reading: 'かいはつ', meaning: '开发', partOfSpeech: '名', level: '考研', example: '新产品開発', exampleMeaning: '新产品开发', frequency: '高' },
+  { word: '国際', reading: 'こくさい', meaning: '国际', partOfSpeech: '名', level: '考研', example: '国際関係', exampleMeaning: '国际关系', frequency: '高' },
+  { word: '交流', reading: 'こうりゅう', meaning: '交流', partOfSpeech: '名', level: '考研', example: '文化交流', exampleMeaning: '文化交流', frequency: '高' },
+  { word: '影響', reading: 'えいきょう', meaning: '影响', partOfSpeech: '名', level: '考研', example: '影響を受ける', exampleMeaning: '受到影响', frequency: '高' },
+  { word: '関係', reading: 'かんけい', meaning: '关系', partOfSpeech: '名', level: '考研', example: '関係を深める', exampleMeaning: '加深关系', frequency: '高' },
+  { word: '状態', reading: 'じょうたい', meaning: '状态', partOfSpeech: '名', level: '考研', example: '現在の状態', exampleMeaning: '现在的状态', frequency: '高' },
+  { word: '原因', reading: 'げんいん', meaning: '原因', partOfSpeech: '名', level: '考研', example: '原因を調べる', exampleMeaning: '调查原因', frequency: '高' },
+  { word: '結果', reading: 'けっか', meaning: '结果', partOfSpeech: '名', level: '考研', example: '結果を出す', exampleMeaning: '出成果', frequency: '高' },
+  { word: '意味', reading: 'いみ', meaning: '意思、意义', partOfSpeech: '名', level: '考研', example: '意味がない', exampleMeaning: '没有意义', frequency: '高' },
+  { word: '機会', reading: 'きかい', meaning: '机会', partOfSpeech: '名', level: '考研', example: '機会を逃す', exampleMeaning: '错过机会', frequency: '高' },
+  { word: '可能性', reading: 'かのうせい', meaning: '可能性', partOfSpeech: '名', level: '考研', example: '可能性が低い', exampleMeaning: '可能性低', frequency: '高' },
+  { word: '重要', reading: 'じゅうよう', meaning: '重要', partOfSpeech: '形', level: '考研', example: '重要性を認識する', exampleMeaning: '认识到重要性', frequency: '高' },
+  { word: '必要', reading: 'ひつよう', meaning: '必要', partOfSpeech: '形', level: '考研', example: '必要性がある', exampleMeaning: '有必要', frequency: '高' },
+  { word: '発展', reading: 'はってん', meaning: '发展', partOfSpeech: '名', level: '考研', example: '急速に発展する', exampleMeaning: '快速发展', frequency: '高' },
+  { word: '実現', reading: 'じつげん', meaning: '实现', partOfSpeech: '名', level: '考研', example: '目標を実現する', exampleMeaning: '实现目标', frequency: '高' },
+  { word: '改革', reading: 'かいかく', meaning: '改革', partOfSpeech: '名', level: '考研', example: '教育改革', exampleMeaning: '教育改革', frequency: '高' },
+  { word: '進歩', reading: 'しんぽ', meaning: '进步', partOfSpeech: '名', level: '考研', example: '技術が進歩する', exampleMeaning: '技术进步', frequency: '高' },
+  { word: '影響', reading: 'えいきょう', meaning: '影响', partOfSpeech: '名', level: '考研', frequency: '高' },
+  { word: '現代', reading: 'げんだい', meaning: '现代', partOfSpeech: '名', level: '考研', example: '現代社会', exampleMeaning: '现代社会', frequency: '高' },
+  { word: '伝統', reading: 'でんとう', meaning: '传统', partOfSpeech: '名', level: '考研', example: '伝統を守る', exampleMeaning: '守护传统', frequency: '高' },
+  { word: '個人', reading: 'こじん', meaning: '个人', partOfSpeech: '名', level: '考研', example: '個人の自由', exampleMeaning: '个人自由', frequency: '高' },
+  { word: '家族', reading: 'かぞく', meaning: '家庭', partOfSpeech: '名', level: '考研', example: '核家族', exampleMeaning: '核心家庭', frequency: '高' },
+  { word: '人間', reading: 'にんげん', meaning: '人、人类', partOfSpeech: '名', level: '考研', example: '人間関係', exampleMeaning: '人际关系', frequency: '高' },
+  { word: '生命', reading: 'せいめい', meaning: '生命', partOfSpeech: '名', level: '考研', example: '命を尊ぶ', exampleMeaning: '尊重生命', frequency: '高' },
+  { word: '権利', reading: 'けんり', meaning: '权利', partOfSpeech: '名', level: '考研', example: '権利を守る', exampleMeaning: '维护权利', frequency: '高' },
+  { word: '義務', reading: 'ぎむ', meaning: '义务', partOfSpeech: '名', level: '考研', example: '教育的義務', exampleMeaning: '教育的义务', frequency: '高' },
+  { word: '自由', reading: 'じゆう', meaning: '自由', partOfSpeech: '名', level: '考研', example: '言論の自由', exampleMeaning: '言论自由', frequency: '高' },
+  { word: '平等', reading: 'びょうどう', meaning: '平等', partOfSpeech: '名', level: '考研', example: '機会の平等', exampleMeaning: '机会平等', frequency: '高' },
+]
+
+// 生成唯一 ID 的辅助函数
+export function generateVocabularyId(level: Level, index: number): string {
+  return `${level.toLowerCase()}-${String(index).padStart(4, '0')}`
+}
+
+// 获取所有词汇（带 ID）
+export function getAllVocabulary(): VocabularyItem[] {
+  const allVocabulary: VocabularyItem[] = []
+
+  const addVocabulary = (vocabList: Omit<VocabularyItem, 'id'>[], level: Level) => {
+    vocabList.forEach((vocab, index) => {
+      allVocabulary.push({
+        ...vocab,
+        id: generateVocabularyId(level, index + 1),
+        level,
+      })
+    })
+  }
+
+  addVocabulary(VOCABULARY_N5, 'N5')
+  addVocabulary(VOCABULARY_N4, 'N4')
+  addVocabulary(VOCABULARY_N3, 'N3')
+  addVocabulary(VOCABULARY_N2, 'N2')
+  addVocabulary(VOCABULARY_N1, 'N1')
+  addVocabulary(VOCABULARY_考研, '考研')
+
+  return allVocabulary
+}
+
+// 按等级获取词汇
+export function getVocabularyByLevel(level: Level): VocabularyItem[] {
+  const all = getAllVocabulary()
+  return all.filter(v => v.level === level)
+}
+
+// 搜索词汇
+export function searchVocabulary(query: string, level?: Level): VocabularyItem[] {
+  const all = getAllVocabulary()
+  const lowerQuery = query.toLowerCase()
+
+  return all.filter(v => {
+    const matchesLevel = level ? v.level === level : true
+    const matchesQuery =
+      v.word.toLowerCase().includes(lowerQuery) ||
+      v.reading.toLowerCase().includes(lowerQuery) ||
+      v.meaning.toLowerCase().includes(lowerQuery)
+    return matchesLevel && matchesQuery
+  })
+}
+
+// 等级颜色配置
+export const levelColors: Record<Level, { bg: string; text: string; border: string; label: string }> = {
+  N5: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7', label: 'N5' },
+  N4: { bg: '#E3F2FD', text: '#1565C0', border: '#90CAF9', label: 'N4' },
+  N3: { bg: '#FFF3E0', text: '#E65100', border: '#FFCC80', label: 'N3' },
+  N2: { bg: '#F3E5F5', text: '#7B1FA2', border: '#CE93D8', label: 'N2' },
+  N1: { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A', label: 'N1' },
+  '考研': { bg: '#E8F5E9', text: '#1B5E20', border: '#81C784', label: '考研' },
+}
+
+// 获取等级徽章颜色
+export function getLevelBadgeStyle(level: Level) {
+  return levelColors[level] || levelColors.N5
+}
+
+// 词性中文映射
+export const partOfSpeechMap: Record<string, string> = {
+  '名': '名词',
+  '动': '动词',
+  '形': '形容词/形容动词',
+  '副': '副词',
+  '助': '助词',
+  '接': '接续词',
+  '叹': '感叹词',
+  '连体': '连体词',
+  '连语': '连语',
+}
+
+// 获取词性中文
+export function getPartOfSpeechZh(pos: string): string {
+  return partOfSpeechMap[pos] || pos
+}
+
+// 统计信息
 export function getVocabularyStats() {
-  const byLevel = vocabularyLevels.reduce<Record<JLPTLevel, number>>((acc, level) => {
-    acc[level] = allVocabulary.filter((item) => item.level === level).length
-    return acc
-  }, {} as Record<JLPTLevel, number>)
-
   return {
-    total: allVocabulary.length,
-    byLevel,
+    N5: VOCABULARY_N5.length,
+    N4: VOCABULARY_N4.length,
+    N3: VOCABULARY_N3.length,
+    N2: VOCABULARY_N2.length,
+    N1: VOCABULARY_N1.length,
+    '考研': VOCABULARY_考研.length,
+    total: VOCABULARY_N5.length + VOCABULARY_N4.length + VOCABULARY_N3.length + VOCABULARY_N2.length + VOCABULARY_N1.length + VOCABULARY_考研.length,
   }
 }
