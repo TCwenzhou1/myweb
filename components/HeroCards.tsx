@@ -844,7 +844,6 @@ export default function HeroSection() {
                 position: 'absolute',
                 left: '-10px',  // 超出容器边界
                 top: '50%',
-                top: '50%',
                 transform: `translateY(-50%) perspective(1000px) rotateX(${tilt.x * -0.15}deg) rotateY(${tilt.y * -0.15}deg)`,
                 width: '55%',
                 maxWidth: '220px',
