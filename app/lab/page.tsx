@@ -5,10 +5,10 @@ import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
 import VocabularyCard from '@/components/VocabularyCard'
 import GrammarCard from '@/components/GrammarCard'
 import { useLearningProgress } from '@/lib/useLearningProgress'
-import { allVocabulary, vocabularyByLevel, grammarByLevel, type VocabularyItem, type GrammarPoint } from '@/lib/japaneseData'
+import { allVocabulary, vocabularyByLevel, grammarByLevel, vocabularyLevels, type VocabularyItem, type GrammarPoint, type JLPTLevel } from '@/lib/japaneseData'
 
 type StudyMode = 'vocabulary' | 'grammar'
-type LevelFilter = 'all' | 'N5' | 'N4' | 'N3'
+type LevelFilter = JLPTLevel | 'all'
 
 export default function LabContent() {
   const [mode, setMode] = useState<StudyMode>('vocabulary')
@@ -30,14 +30,15 @@ export default function LabContent() {
   const filteredVocabulary = useMemo(() => {
     let result = levelFilter === 'all'
       ? allVocabulary
-      : vocabularyByLevel[levelFilter as keyof typeof vocabularyByLevel]
+      : vocabularyByLevel[levelFilter]
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       result = result.filter(
         (item: VocabularyItem) =>
           item.word.toLowerCase().includes(query) ||
-          item.reading.toLowerCase().includes(query) ||
+          item.kana.toLowerCase().includes(query) ||
+          (item.romaji?.toLowerCase().includes(query) ?? false) ||
           item.meaning.toLowerCase().includes(query)
       )
     }
@@ -48,8 +49,8 @@ export default function LabContent() {
   // 过滤后的语法
   const filteredGrammar = useMemo(() => {
     let result = levelFilter === 'all'
-      ? grammarByLevel.N5.concat(grammarByLevel.N4, grammarByLevel.N3)
-      : grammarByLevel[levelFilter as keyof typeof grammarByLevel]
+      ? [...grammarByLevel.N5, ...grammarByLevel.N4, ...grammarByLevel.N3, ...grammarByLevel.N2, ...grammarByLevel.N1, ...grammarByLevel['考研']]
+      : grammarByLevel[levelFilter]
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
@@ -64,6 +65,20 @@ export default function LabContent() {
   }, [levelFilter, searchQuery])
 
   const currentItems = mode === 'vocabulary' ? filteredVocabulary : filteredGrammar
+
+  // 计算总词汇数
+  const totalVocabulary = allVocabulary.length
+  const totalGrammar = grammarByLevel.N5.length + grammarByLevel.N4.length + grammarByLevel.N3.length + grammarByLevel.N2.length + grammarByLevel.N1.length + grammarByLevel['考研'].length
+
+  // 等级颜色
+  const levelColors: Record<string, string> = {
+    N5: '#2E7D32',
+    N4: '#1565C0',
+    N3: '#E65100',
+    N2: '#7B1FA2',
+    N1: '#C62828',
+    '考研': '#1B5E20',
+  }
 
   return (
     <div
@@ -189,7 +204,7 @@ export default function LabContent() {
                 marginBottom: '20px',
               }}
             >
-              JLPT N5-N3 词汇与语法
+              JLPT N5-N1 · 考研核心词汇与语法
             </p>
 
             {/* 装饰线 */}
@@ -226,11 +241,11 @@ export default function LabContent() {
                 fontWeight: 300,
                 lineHeight: 1.8,
                 color: C.inkDim,
-                maxWidth: '480px',
+                maxWidth: '520px',
                 marginTop: '20px',
               }}
             >
-              备战考研日语203，系统记忆N5至N3核心词汇，掌握考研必备语法句型。
+              备战考研日语203，系统记忆 N5 至 N1 核心词汇，攻克考研必备语法句型。
             </p>
           </div>
         </CinematicSection>
@@ -283,25 +298,25 @@ export default function LabContent() {
               <StatBox
                 label="词汇已学"
                 value={stats.vocabularyLearnedCount}
-                total={allVocabulary.length}
+                total={totalVocabulary}
                 color={C.gold}
               />
               <StatBox
                 label="词汇掌握"
                 value={stats.vocabularyMasteredCount}
-                total={allVocabulary.length}
+                total={totalVocabulary}
                 color={C.goldChamp}
               />
               <StatBox
                 label="语法已学"
                 value={stats.grammarLearnedCount}
-                total={grammarByLevel.N5.length + grammarByLevel.N4.length + grammarByLevel.N3.length}
+                total={totalGrammar}
                 color="#7B809A"
               />
               <StatBox
                 label="语法掌握"
                 value={stats.grammarMasteredCount}
-                total={grammarByLevel.N5.length + grammarByLevel.N4.length + grammarByLevel.N3.length}
+                total={totalGrammar}
                 color={C.goldRich}
               />
             </div>
@@ -351,13 +366,13 @@ export default function LabContent() {
               active={mode === 'vocabulary'}
               onClick={() => setMode('vocabulary')}
             >
-              📖 词汇学习
+              📖 词汇学习 ({totalVocabulary})
             </ModeButton>
             <ModeButton
               active={mode === 'grammar'}
               onClick={() => setMode('grammar')}
             >
-              📝 语法学习
+              📝 语法学习 ({totalGrammar})
             </ModeButton>
           </div>
         </CinematicSection>
@@ -378,27 +393,16 @@ export default function LabContent() {
             >
               全部
             </FilterButton>
-            <FilterButton
-              active={levelFilter === 'N5'}
-              onClick={() => setLevelFilter('N5')}
-              color="#2E7D32"
-            >
-              N5
-            </FilterButton>
-            <FilterButton
-              active={levelFilter === 'N4'}
-              onClick={() => setLevelFilter('N4')}
-              color="#1565C0"
-            >
-              N4
-            </FilterButton>
-            <FilterButton
-              active={levelFilter === 'N3'}
-              onClick={() => setLevelFilter('N3')}
-              color="#E65100"
-            >
-              N3
-            </FilterButton>
+            {vocabularyLevels.map(level => (
+              <FilterButton
+                key={level}
+                active={levelFilter === level}
+                onClick={() => setLevelFilter(level)}
+                color={levelColors[level]}
+              >
+                {level}
+              </FilterButton>
+            ))}
           </div>
         </CinematicSection>
 
@@ -407,7 +411,7 @@ export default function LabContent() {
           <div style={{ position: 'relative', marginBottom: '32px' }}>
             <input
               type="text"
-              placeholder={mode === 'vocabulary' ? '搜索词汇、假名或释义...' : '搜索语法句型或含义...'}
+              placeholder={mode === 'vocabulary' ? '搜索词汇、假名、罗马音或释义...' : '搜索语法句型或含义...'}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               style={{
@@ -457,6 +461,7 @@ export default function LabContent() {
                 marginBottom: '16px',
               }}>
                 共 {currentItems.length} 条结果
+                {levelFilter !== 'all' && ` · ${levelFilter} 等级`}
               </p>
 
               {/* 词汇卡片网格 */}
@@ -464,7 +469,7 @@ export default function LabContent() {
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                     gap: '16px',
                   }}
                 >
@@ -472,7 +477,7 @@ export default function LabContent() {
                     <VocabularyCard
                       key={item.id}
                       item={item}
-                      isLearned={false}
+                      isLearned={stats.vocabularyLearnedCount > 0}
                       isMastered={false}
                       onLearn={learnVocabulary}
                       onMaster={masterVocabulary}

@@ -23,13 +23,16 @@ export default function GrammarCard({
 }: GrammarCardProps) {
   const [showDetail, setShowDetail] = useState(false)
 
-  const levelColors = {
+  const levelColors: Record<string, { bg: string; text: string; border: string }> = {
     N5: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
     N4: { bg: '#E3F2FD', text: '#1565C0', border: '#90CAF9' },
     N3: { bg: '#FFF3E0', text: '#E65100', border: '#FFCC80' },
+    N2: { bg: '#F3E5F5', text: '#7B1FA2', border: '#CE93D8' },
+    N1: { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A' },
+    '考研': { bg: '#E8F5E9', text: '#1B5E20', border: '#81C784' },
   }
 
-  const levelStyle = levelColors[item.level]
+  const levelStyle = levelColors[item.level] || levelColors.N5
 
   return (
     <div

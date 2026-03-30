@@ -23,22 +23,16 @@ export default function VocabularyCard({
 }: VocabularyCardProps) {
   const [showDetail, setShowDetail] = useState(false)
 
-  const levelColors = {
+  const levelColors: Record<string, { bg: string; text: string; border: string }> = {
     N5: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
     N4: { bg: '#E3F2FD', text: '#1565C0', border: '#90CAF9' },
     N3: { bg: '#FFF3E0', text: '#E65100', border: '#FFCC80' },
+    N2: { bg: '#F3E5F5', text: '#7B1FA2', border: '#CE93D8' },
+    N1: { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A' },
+    '考研': { bg: '#E8F5E9', text: '#1B5E20', border: '#81C784' },
   }
 
-  const posLabels = {
-    名: '名词',
-    動: '动词',
-    形: '形容词',
-    副: '副词',
-    助: '助词',
-    連: '连语',
-  }
-
-  const levelStyle = levelColors[item.level]
+  const levelStyle = levelColors[item.level] || levelColors.N5
 
   return (
     <div
@@ -62,34 +56,55 @@ export default function VocabularyCard({
         e.currentTarget.style.boxShadow = 'none'
       }}
     >
-      {/* 顶部：等级 + 词性 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <span
-          style={{
-            fontFamily: FONTS.body,
-            fontSize: '10px',
-            fontWeight: 600,
-            letterSpacing: '0.15em',
-            color: levelStyle.text,
-            background: levelStyle.bg,
-            padding: '3px 8px',
-            borderRadius: '4px',
-            border: `0.5px solid ${levelStyle.border}`,
-          }}
-        >
-          {item.level}
-        </span>
-        <span
-          style={{
-            fontFamily: FONTS.body,
-            fontSize: '10px',
-            fontWeight: 400,
-            letterSpacing: '0.1em',
-            color: C.inkFaint,
-          }}
-        >
-          {posLabels[item.partOfSpeech]}
-        </span>
+      {/* 顶部：等级 + 词性 + 标签 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            style={{
+              fontFamily: FONTS.body,
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
+              color: levelStyle.text,
+              background: levelStyle.bg,
+              padding: '3px 10px',
+              borderRadius: '4px',
+              border: `0.5px solid ${levelStyle.border}`,
+            }}
+          >
+            {item.level}
+          </span>
+          <span
+            style={{
+              fontFamily: FONTS.body,
+              fontSize: '10px',
+              fontWeight: 400,
+              letterSpacing: '0.1em',
+              color: C.inkFaint,
+            }}
+          >
+            {item.partOfSpeech}
+          </span>
+        </div>
+        {item.tags && item.tags.length > 0 && (
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            {item.tags.slice(0, 2).map(tag => (
+              <span
+                key={tag}
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '9px',
+                  color: C.gold,
+                  padding: '2px 6px',
+                  background: `${C.goldChamp}15`,
+                  borderRadius: '3px',
+                }}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 词汇主体 */}
@@ -106,17 +121,30 @@ export default function VocabularyCard({
         >
           {item.word}
         </h3>
-        <p
-          style={{
-            fontFamily: FONTS.body,
-            fontSize: '14px',
-            fontWeight: 300,
-            color: C.inkDim,
-            marginBottom: '2px',
-          }}
-        >
-          {item.reading}
-        </p>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <p
+            style={{
+              fontFamily: FONTS.body,
+              fontSize: '14px',
+              fontWeight: 300,
+              color: C.inkDim,
+            }}
+          >
+            {item.kana}
+          </p>
+          {item.romaji && (
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: '12px',
+                fontWeight: 300,
+                color: C.inkFaint,
+              }}
+            >
+              {item.romaji}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* 释义 */}
@@ -132,7 +160,7 @@ export default function VocabularyCard({
       </p>
 
       {/* 详细面板 */}
-      {showDetail && item.example && (
+      {showDetail && (
         <div
           style={{
             marginTop: '16px',
@@ -140,21 +168,208 @@ export default function VocabularyCard({
             borderTop: `0.5px solid ${C.goldPale}`,
           }}
         >
-          <p style={{
-            fontFamily: FONTS.body,
-            fontSize: '14px',
-            color: C.inkDim,
-            marginBottom: '4px',
-          }}>
-            {item.example}
-          </p>
-          <p style={{
-            fontFamily: FONTS.body,
-            fontSize: '13px',
-            color: C.inkFaint,
-          }}>
-            {item.exampleMeaning}
-          </p>
+          {/* 发音提示 */}
+          {item.pronunciation && (
+            <div style={{ marginBottom: '12px' }}>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '4px',
+              }}>
+                发音
+              </h4>
+              <p style={{
+                fontFamily: FONTS.body,
+                fontSize: '13px',
+                color: C.inkDim,
+                lineHeight: 1.6,
+              }}>
+                {item.pronunciation}
+              </p>
+            </div>
+          )}
+
+          {/* 核心用法 */}
+          {item.usageCore && (
+            <div style={{ marginBottom: '12px' }}>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '4px',
+              }}>
+                核心用法
+              </h4>
+              <p style={{
+                fontFamily: FONTS.body,
+                fontSize: '13px',
+                color: C.inkDim,
+                lineHeight: 1.6,
+              }}>
+                {item.usageCore}
+              </p>
+            </div>
+          )}
+
+          {/* 高频句型 */}
+          {item.usagePatterns && item.usagePatterns.length > 0 && (
+            <div style={{ marginBottom: '12px' }}>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '6px',
+              }}>
+                高频句型
+              </h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {item.usagePatterns.map((pattern, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      fontFamily: FONTS.body,
+                      fontSize: '12px',
+                      color: C.inkMid,
+                      padding: '4px 10px',
+                      background: `${C.goldChamp}10`,
+                      borderRadius: '4px',
+                      border: `0.5px solid ${C.goldPale}40`,
+                    }}
+                  >
+                    {pattern}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 常见搭配 */}
+          {item.collocations && item.collocations.length > 0 && (
+            <div style={{ marginBottom: '12px' }}>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '6px',
+              }}>
+                常见搭配
+              </h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {item.collocations.map((col, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      fontFamily: FONTS.body,
+                      fontSize: '12px',
+                      color: C.inkDim,
+                    }}
+                  >
+                    • {col}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 考试提醒 */}
+          {item.examFocus && (
+            <div style={{
+              marginBottom: '12px',
+              padding: '10px 12px',
+              background: `${C.goldChamp}10`,
+              borderRadius: '8px',
+              border: `0.5px solid ${C.goldPale}40`,
+            }}>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '4px',
+              }}>
+                考试提醒
+              </h4>
+              <p style={{
+                fontFamily: FONTS.body,
+                fontSize: '13px',
+                color: C.inkDim,
+                lineHeight: 1.6,
+              }}>
+                {item.examFocus}
+              </p>
+            </div>
+          )}
+
+          {/* 例句 */}
+          {item.examples && item.examples.length > 0 && (
+            <div>
+              <h4 style={{
+                fontFamily: FONTS.body,
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: C.gold,
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+              }}>
+                例句
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {item.examples.map((ex, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '10px 12px',
+                      background: C.bg,
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <p style={{
+                      fontFamily: FONTS.body,
+                      fontSize: '14px',
+                      color: C.ink,
+                      lineHeight: 1.6,
+                      marginBottom: '2px',
+                    }}>
+                      {ex.jp}
+                    </p>
+                    {ex.kana && (
+                      <p style={{
+                        fontFamily: FONTS.body,
+                        fontSize: '12px',
+                        color: C.inkFaint,
+                        marginBottom: '4px',
+                      }}>
+                        {ex.kana}
+                      </p>
+                    )}
+                    <p style={{
+                      fontFamily: FONTS.body,
+                      fontSize: '13px',
+                      color: C.inkDim,
+                    }}>
+                      {ex.zh}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -165,7 +380,7 @@ export default function VocabularyCard({
           display: 'flex',
           gap: '8px',
           marginTop: '12px',
-          opacity: showDetail ? 1 : 0,
+          opacity: showDetail ? 1 : 0.7,
           transition: `opacity 0.3s ${EASE.focus}`,
         }}
         onClick={e => e.stopPropagation()}
