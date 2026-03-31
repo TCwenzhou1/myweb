@@ -37230,9 +37230,9 @@ export const vocabEntries: VocabEntry[] = [
 ];
 
 export const vocabStats = {
-  total: 3383,
+  total: 4367,
   core2000: 2000,
   n2: 1325,
   n1: 2038,
-  kaoyan: 20
+  kaoyan: 1004
 };
