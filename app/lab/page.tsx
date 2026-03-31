@@ -116,104 +116,180 @@ export default function LabPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-[1.5fr,1fr,1fr,auto]">
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-800">搜索</span>
-              <input
-                value={keyword}
-                onChange={(event) => {
-                  setKeyword(event.target.value);
-                  setPage(1);
-                }}
-                placeholder="输入单词、假名、中文释义、英文释义……"
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500"
-              />
-            </label>
+        {tab === 'grammar' || tab === 'pattern' ? null : (
+          <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
+            <div className="grid gap-4 lg:grid-cols-[1.5fr,1fr,1fr,auto]">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-800">搜索</span>
+                <input
+                  value={keyword}
+                  onChange={(event) => {
+                    setKeyword(event.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="输入单词、假名、中文释义、英文释义……"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500"
+                />
+              </label>
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-800">词库范围</span>
-              <select
-                value={libraryMode}
-                onChange={(event) => {
-                  setLibraryMode(event.target.value as LibraryMode);
-                  setPage(1);
-                }}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
-              >
-                <option value="core2000">Core 2000</option>
-                <option value="n2">N2 全量中文</option>
-                <option value="n1">N1 全量中文</option>
-                <option value="all">全部</option>
-              </select>
-            </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-800">词库范围</span>
+                <select
+                  value={libraryMode}
+                  onChange={(event) => {
+                    setLibraryMode(event.target.value as LibraryMode);
+                    setPage(1);
+                  }}
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
+                >
+                  <option value="core2000">Core 2000</option>
+                  <option value="n2">N2 全量中文</option>
+                  <option value="n1">N1 全量中文</option>
+                  <option value="all">全部</option>
+                </select>
+              </label>
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-800">等级筛选</span>
-              <select
-                value={levelFilter}
-                onChange={(event) => {
-                  setLevelFilter(event.target.value as '全部' | 'N2' | 'N1' | '考研');
-                  setPage(1);
-                }}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
-              >
-                <option value="全部">全部</option>
-                <option value="N2">N2</option>
-                <option value="N1">N1</option>
-                <option value="考研">考研</option>
-              </select>
-            </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-800">等级筛选</span>
+                <select
+                  value={levelFilter}
+                  onChange={(event) => {
+                    setLevelFilter(event.target.value as '全部' | 'N2' | 'N1' | '考研');
+                    setPage(1);
+                  }}
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
+                >
+                  <option value="全部">全部</option>
+                  <option value="N2">N2</option>
+                  <option value="N1">N1</option>
+                  <option value="考研">考研</option>
+                </select>
+              </label>
 
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={resetAll}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-              >
-                重置收藏与复习
-              </button>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={resetAll}
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  重置收藏与复习
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            {[
-              { key: 'library', label: '浏览词库' },
-              { key: 'favorites', label: '收藏本' },
-              { key: 'review', label: '今日复习' },
-              { key: 'grammar', label: '文法', badge: '14类' },
-              { key: 'pattern', label: '句型', badge: '332' }
-            ].map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setTab(item.key as TabKey)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  tab === item.key
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                {item.label}
-                {item.badge && (
-                  <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
-                    tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                { key: 'library', label: '浏览词库' },
+                { key: 'favorites', label: '收藏本' },
+                { key: 'review', label: '今日复习' },
+                { key: 'grammar', label: '文法', badge: '14类' },
+                { key: 'pattern', label: '句型', badge: '332' }
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTab(item.key as TabKey)}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                    tab === item.key
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {item.label}
+                  {item.badge && (
+                    <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                      tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
 
-          <p className="mt-4 text-sm text-slate-500">
-            {tab === 'library' && `当前命中 ${filteredLibrary.length} 条；第 ${page} / ${totalPages} 页。`}
-            {tab === 'favorites' && `收藏中 ${favoriteItems.length} 条。`}
-            {tab === 'review' && `今日待复习 ${reviewItems.length} 条。`}
-            {tab === 'grammar' && '考研日语核心语法 14 大类'}
-            {tab === 'pattern' && '332 个高频惯用表达'}
-          </p>
-        </section>
+            <p className="mt-4 text-sm text-slate-500">
+              {tab === 'library' && `当前命中 ${filteredLibrary.length} 条；第 ${page} / ${totalPages} 页。`}
+              {tab === 'favorites' && `收藏中 ${favoriteItems.length} 条。`}
+              {tab === 'review' && `今日待复习 ${reviewItems.length} 条。`}
+            </p>
+          </section>
+        )}
+
+        {/* 文法 Tab */}
+        {tab === 'grammar' && (
+          <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'library', label: '浏览词库' },
+                  { key: 'favorites', label: '收藏本' },
+                  { key: 'review', label: '今日复习' },
+                  { key: 'grammar', label: '文法', badge: '14类' },
+                  { key: 'pattern', label: '句型', badge: '332' }
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => setTab(item.key as TabKey)}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                      tab === item.key
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {item.label}
+                    {item.badge && (
+                      <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                        tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">考研日语核心语法 14 大类</p>
+          </section>
+        )}
+
+        {/* 句型 Tab */}
+        {tab === 'pattern' && (
+          <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'library', label: '浏览词库' },
+                  { key: 'favorites', label: '收藏本' },
+                  { key: 'review', label: '今日复习' },
+                  { key: 'grammar', label: '文法', badge: '14类' },
+                  { key: 'pattern', label: '句型', badge: '332' }
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => setTab(item.key as TabKey)}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                      tab === item.key
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {item.label}
+                    {item.badge && (
+                      <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                        tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">332 个高频惯用表达</p>
+          </section>
+        )}
 
         {tab === 'grammar' ? (
           <GrammarTab />

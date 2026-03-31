@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { CinematicSection } from '@/components/CinematicUI';
 
 export interface SentencePattern {
   id: string;
@@ -2374,16 +2373,10 @@ function PatternCard({ pattern, index }: PatternCardProps) {
 
 export function PatternTab() {
   return (
-    <CinematicSection>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">332 句型整合</h2>
-        <p className="mt-1 text-sm text-slate-500">高频惯用表达 · 可直接套用</p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {sentencePatterns.map((pattern, index) => (
-          <PatternCard key={pattern.id} pattern={pattern} index={index} />
-        ))}
-      </div>
-    </CinematicSection>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {sentencePatterns.map((pattern, index) => (
+        <PatternCard key={pattern.id} pattern={pattern} index={index} />
+      ))}
+    </div>
   );
 }

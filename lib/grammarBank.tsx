@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { CinematicSection } from '@/components/CinematicUI';
 
 export interface GrammarItem {
   grammar: string;
@@ -491,16 +490,10 @@ function GrammarCard({ category, index }: GrammarCardProps) {
 
 export function GrammarTab() {
   return (
-    <CinematicSection>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">文法总整理</h2>
-        <p className="mt-1 text-sm text-slate-500">考研日语核心语法 14 大类</p>
-      </div>
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {grammarCategories.map((category, index) => (
-          <GrammarCard key={category.id} category={category} index={index} />
-        ))}
-      </div>
-    </CinematicSection>
+    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {grammarCategories.map((category, index) => (
+        <GrammarCard key={category.id} category={category} index={index} />
+      ))}
+    </div>
   );
 }
