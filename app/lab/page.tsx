@@ -7,7 +7,7 @@ import { WordCard } from '@/components/WordCard';
 import { vocabEntries, vocabStats, type VocabEntry } from '@/lib/vocabularyBank';
 import { useSpeech } from '@/lib/useSpeech';
 import { useStudyStore } from '@/lib/useStudyStore';
-import { GrammarTab } from '@/lib/grammarBank';
+import { GrammarTab, grammarCategories } from '@/lib/grammarBank';
 import { PatternTab } from '@/lib/sentencePatterns';
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern';
@@ -116,8 +116,39 @@ export default function LabPage() {
           </div>
         </section>
 
-        {tab === 'grammar' || tab === 'pattern' ? null : (
-          <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
+        {/* Tab 按钮 - 始终可见 */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            { key: 'library', label: '浏览词库' },
+            { key: 'favorites', label: '收藏本' },
+            { key: 'review', label: '今日复习' },
+            { key: 'grammar', label: '文法', badge: '14类' },
+            { key: 'pattern', label: '句型', badge: '332' }
+          ].map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setTab(item.key as TabKey)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                tab === item.key
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              {item.label}
+              {item.badge && (
+                <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                  tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {tab !== 'grammar' && tab !== 'pattern' ? (
+          <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm">
             <div className="grid gap-4 lg:grid-cols-[1.5fr,1fr,1fr,auto]">
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold text-slate-800">搜索</span>
@@ -177,42 +208,16 @@ export default function LabPage() {
               </div>
             </div>
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {[
-                { key: 'library', label: '浏览词库' },
-                { key: 'favorites', label: '收藏本' },
-                { key: 'review', label: '今日复习' },
-                { key: 'grammar', label: '文法', badge: '14类' },
-                { key: 'pattern', label: '句型', badge: '332' }
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setTab(item.key as TabKey)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                    tab === item.key
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {item.label}
-                  {item.badge && (
-                    <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
-                      tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
             <p className="mt-4 text-sm text-slate-500">
               {tab === 'library' && `当前命中 ${filteredLibrary.length} 条；第 ${page} / ${totalPages} 页。`}
               {tab === 'favorites' && `收藏中 ${favoriteItems.length} 条。`}
               {tab === 'review' && `今日待复习 ${reviewItems.length} 条。`}
             </p>
           </section>
+        ) : tab === 'grammar' ? (
+          <p className="mt-4 text-sm text-slate-500">考研日语核心语法 14 大类，共 {grammarCategories.reduce((sum, c) => sum + c.items.length, 0)} 条</p>
+        ) : (
+          <p className="mt-4 text-sm text-slate-500">332 个高频惯用表达</p>
         )}
 
         {tab === 'grammar' ? (

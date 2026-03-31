@@ -445,7 +445,40 @@ export const grammarCategories: GrammarCategory[] = [
     "id": "g-14",
     "number": "14",
     "title": "203 高频易错对比",
-    "items": []
+    "items": [
+      {
+        "grammar": "授受动词 trio",
+        "explanation": "くれる＝别人给我方；あげる＝我方给别人；もらう＝我方得到。注意主语和受益方的对应"
+      },
+      {
+        "grammar": "は vs が",
+        "explanation": "は提示主题、可对比；が强调主语或新信息。存在句用が，恒常状态用が"
+      },
+      {
+        "grammar": "と/ば/たら/なら",
+        "explanation": "と＝自然恒常；ば＝一般条件；たら＝一次性发现；なら＝承接话题"
+      },
+      {
+        "grammar": "こと/の/もの/わけ/はず",
+        "explanation": "こと＝抽象/规则；の＝具体/说明；もの＝本质/感慨；わけ＝合理推论；はず＝按理应"
+      },
+      {
+        "grammar": "使役被动 ～させられる",
+        "explanation": "被迫做某事，带有不情愿语气。例：会議に出席させられた"
+      },
+      {
+        "grammar": "てある/ておく/てしまう/てみる",
+        "explanation": "てある＝人为存续；ておく＝事先准备；てしまう＝遗憾结果；てみる＝试着做"
+      },
+      {
+        "grammar": "～そうだ vs ～ようだ/らしい",
+        "explanation": "そうだ＝样态（眼看就要）；ようだ＝根据判断；らしい＝有根据的典型推测"
+      },
+      {
+        "grammar": "～ほど/～くらい/～ばかり",
+        "explanation": "ほど＝程度/比较；くらい＝最低程度；ばかり＝刚刚/净是，三者意思不同"
+      }
+    ]
   }
 ];
 
@@ -471,15 +504,12 @@ function GrammarCard({ category }: GrammarCardProps) {
         <p className="text-sm text-slate-400 italic">暂无内容</p>
       ) : (
         <div className="space-y-1.5">
-          {category.items.slice(0, 8).map((item, i) => (
+          {category.items.map((item, i) => (
             <div key={i} className="flex gap-2 text-sm leading-relaxed">
               <span className="shrink-0 font-mono text-amber-600">{item.grammar}</span>
               <span className="text-slate-600">{item.explanation}</span>
             </div>
           ))}
-          {category.items.length > 8 && (
-            <p className="text-xs text-slate-400">…还有 {category.items.length - 8} 条</p>
-          )}
         </div>
       )}
     </div>
