@@ -1,4 +1,6 @@
 
+'use client';
+
 export interface SentencePattern {
   id: string;
   number: number;
@@ -2344,28 +2346,26 @@ interface PatternCardProps {
 
 function PatternCard({ pattern }: PatternCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-amber-200 transition-all">
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-medium text-amber-700">
-          {pattern.number}
-        </span>
-        <div className="flex-1">
-          <p className="font-mono text-base font-semibold text-slate-800">{pattern.pattern}</p>
-          <p className="mt-1 text-sm text-slate-500">{pattern.meaning}</p>
-        </div>
+    <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm hover:border-amber-200 hover:shadow-sm transition-all">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-medium text-amber-700">
+        {pattern.number}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="font-mono text-sm font-semibold text-slate-800 leading-snug">{pattern.pattern}</p>
+        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{pattern.meaning}</p>
+        {pattern.example && (
+          <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
+            <span className="text-slate-300 mr-1">例:</span>{pattern.example}
+          </p>
+        )}
       </div>
-      {pattern.example && (
-        <p className="mt-2 rounded-lg bg-slate-50 p-2 text-sm text-slate-600">
-          <span className="text-slate-400">例：</span>{pattern.example}
-        </p>
-      )}
     </div>
   );
 }
 
 export function PatternTab() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {sentencePatterns.map((pattern) => (
         <PatternCard key={pattern.id} pattern={pattern} />
       ))}

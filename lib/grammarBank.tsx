@@ -1,4 +1,6 @@
 
+'use client';
+
 export interface GrammarItem {
   grammar: string;
   explanation: string;
@@ -458,31 +460,35 @@ interface GrammarCardProps {
 
 function GrammarCard({ category }: GrammarCardProps) {
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-5 text-white shadow-lg">
+    <div className="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm">
       <div className="mb-3 flex items-center gap-3">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20 text-sm font-bold text-amber-400">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-700">
           {category.number}
         </span>
-        <h3 className="text-lg font-semibold text-amber-100">{category.title}</h3>
+        <h3 className="text-base font-semibold text-slate-800">{category.title}</h3>
       </div>
-      <div className="space-y-2">
-        {category.items.slice(0, 8).map((item, i) => (
-          <div key={i} className="flex gap-2 text-sm">
-            <span className="font-mono text-amber-400">{item.grammar}</span>
-            <span className="text-slate-300">— {item.explanation}</span>
-          </div>
-        ))}
-        {category.items.length > 8 && (
-          <p className="text-xs text-slate-400">...还有 {category.items.length - 8} 条</p>
-        )}
-      </div>
+      {category.items.length === 0 ? (
+        <p className="text-sm text-slate-400 italic">暂无内容</p>
+      ) : (
+        <div className="space-y-1.5">
+          {category.items.slice(0, 8).map((item, i) => (
+            <div key={i} className="flex gap-2 text-sm leading-relaxed">
+              <span className="shrink-0 font-mono text-amber-600">{item.grammar}</span>
+              <span className="text-slate-600">{item.explanation}</span>
+            </div>
+          ))}
+          {category.items.length > 8 && (
+            <p className="text-xs text-slate-400">…还有 {category.items.length - 8} 条</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 export function GrammarTab() {
   return (
-    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {grammarCategories.map((category) => (
         <GrammarCard key={category.id} category={category} />
       ))}
