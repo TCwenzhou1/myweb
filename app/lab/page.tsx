@@ -7,8 +7,10 @@ import { WordCard } from '@/components/WordCard';
 import { vocabEntries, vocabStats, type VocabEntry } from '@/lib/vocabularyBank';
 import { useSpeech } from '@/lib/useSpeech';
 import { useStudyStore } from '@/lib/useStudyStore';
+import { GrammarTab } from '@/lib/grammarBank';
+import { PatternTab } from '@/lib/sentencePatterns';
 
-type TabKey = 'library' | 'favorites' | 'review';
+type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern';
 type LibraryMode = 'core2000' | 'n2' | 'n1' | 'all';
 const PAGE_SIZE = 24;
 
@@ -21,7 +23,7 @@ export default function LabPage() {
   const [tab, setTab] = useState<TabKey>('library');
   const [keyword, setKeyword] = useState('');
   const [libraryMode, setLibraryMode] = useState<LibraryMode>('core2000');
-  const [levelFilter, setLevelFilter] = useState<'全部' | 'N2' | 'N1'>('全部');
+  const [levelFilter, setLevelFilter] = useState<'全部' | 'N2' | 'N1' | '考研'>('全部');
   const [page, setPage] = useState(1);
 
   const { speak } = useSpeech();
@@ -89,7 +91,7 @@ export default function LabPage() {
           </span>
           <h1 className="mt-4 text-3xl font-bold md:text-4xl">日语学习实验室</h1>
           <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-200 md:text-base">
-            这版专门修正“没有中文释义”和“考研核心词太少”的问题。现在默认给你中文释义，
+            这版专门修正「没有中文释义」和「考研核心词太少」的问题。现在默认给你中文释义，
             并把词库升级为：Core 2000 高频层 + N2 全量中文层 + N1 全量中文层，同时保留
             TTS 发音、收藏本和间隔复习。
           </p>
@@ -151,7 +153,7 @@ export default function LabPage() {
               <select
                 value={levelFilter}
                 onChange={(event) => {
-                  setLevelFilter(event.target.value as '全部' | 'N2' | 'N1');
+                  setLevelFilter(event.target.value as '全部' | 'N2' | 'N1' | '考研');
                   setPage(1);
                 }}
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
@@ -159,6 +161,7 @@ export default function LabPage() {
                 <option value="全部">全部</option>
                 <option value="N2">N2</option>
                 <option value="N1">N1</option>
+                <option value="考研">考研</option>
               </select>
             </label>
 
@@ -177,7 +180,9 @@ export default function LabPage() {
             {[
               { key: 'library', label: '浏览词库' },
               { key: 'favorites', label: '收藏本' },
-              { key: 'review', label: '今日复习' }
+              { key: 'review', label: '今日复习' },
+              { key: 'grammar', label: '文法', badge: '14类' },
+              { key: 'pattern', label: '句型', badge: '332' }
             ].map((item) => (
               <button
                 key={item.key}
@@ -190,6 +195,13 @@ export default function LabPage() {
                 }`}
               >
                 {item.label}
+                {item.badge && (
+                  <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                    tab === item.key ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -198,14 +210,20 @@ export default function LabPage() {
             {tab === 'library' && `当前命中 ${filteredLibrary.length} 条；第 ${page} / ${totalPages} 页。`}
             {tab === 'favorites' && `收藏中 ${favoriteItems.length} 条。`}
             {tab === 'review' && `今日待复习 ${reviewItems.length} 条。`}
+            {tab === 'grammar' && '考研日语核心语法 14 大类'}
+            {tab === 'pattern' && '332 个高频惯用表达'}
           </p>
         </section>
 
-        {tab === 'review' ? (
+        {tab === 'grammar' ? (
+          <GrammarTab />
+        ) : tab === 'pattern' ? (
+          <PatternTab />
+        ) : tab === 'review' ? (
           <section className="mt-8 grid gap-5">
             {reviewItems.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-                今天没有到期的复习词。先在词卡上点“加入复习”。
+                今天没有到期的复习词。先在词卡上点「加入复习」。
               </div>
             ) : (
               reviewItems.map((item) => (
