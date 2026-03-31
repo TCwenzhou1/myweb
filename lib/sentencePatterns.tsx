@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 
 export interface SentencePattern {
   id: string;
@@ -2341,18 +2340,11 @@ export const patternStats = {
 
 interface PatternCardProps {
   pattern: SentencePattern;
-  index: number;
 }
 
-function PatternCard({ pattern, index }: PatternCardProps) {
+function PatternCard({ pattern }: PatternCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{ duration: 0.4, delay: (index % 12) * 0.03, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-amber-200 transition-all"
-    >
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-amber-200 transition-all">
       <div className="mb-2 flex items-start justify-between gap-2">
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-medium text-amber-700">
           {pattern.number}
@@ -2367,15 +2359,15 @@ function PatternCard({ pattern, index }: PatternCardProps) {
           <span className="text-slate-400">例：</span>{pattern.example}
         </p>
       )}
-    </motion.div>
+    </div>
   );
 }
 
 export function PatternTab() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {sentencePatterns.map((pattern, index) => (
-        <PatternCard key={pattern.id} pattern={pattern} index={index} />
+      {sentencePatterns.map((pattern) => (
+        <PatternCard key={pattern.id} pattern={pattern} />
       ))}
     </div>
   );

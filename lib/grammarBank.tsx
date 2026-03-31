@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 
 export interface GrammarItem {
   grammar: string;
@@ -455,18 +454,11 @@ export const grammarStats = {
 
 interface GrammarCardProps {
   category: GrammarCategory;
-  index: number;
 }
 
-function GrammarCard({ category, index }: GrammarCardProps) {
+function GrammarCard({ category }: GrammarCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-5 text-white shadow-lg"
-    >
+    <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-5 text-white shadow-lg">
       <div className="mb-3 flex items-center gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20 text-sm font-bold text-amber-400">
           {category.number}
@@ -484,15 +476,15 @@ function GrammarCard({ category, index }: GrammarCardProps) {
           <p className="text-xs text-slate-400">...还有 {category.items.length - 8} 条</p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export function GrammarTab() {
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {grammarCategories.map((category, index) => (
-        <GrammarCard key={category.id} category={category} index={index} />
+      {grammarCategories.map((category) => (
+        <GrammarCard key={category.id} category={category} />
       ))}
     </div>
   );
