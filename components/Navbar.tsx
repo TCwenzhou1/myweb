@@ -305,12 +305,7 @@ const Navbar = () => {
           }
         }
 
-        /* Mobile menu is shown via React state, no media query needed */
-        @media (max-width: 1023px) {
-          .navbar-mobile-menu {
-            display: block !important;
-          }
-        }
+        /* Mobile menu visibility is controlled by React isOpen state — no CSS needed */
       `}</style>
     </nav>
   )

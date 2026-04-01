@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { GrammarPoint } from '@/lib/japaneseData'
-import { C, FONTS, EASE } from '@/components/CinematicUI'
+import { C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 interface GrammarCardProps {
   item: GrammarPoint
@@ -208,7 +208,7 @@ export default function GrammarCard({
               fontWeight: 500,
               letterSpacing: '0.1em',
               color: isMastered ? C.gold : C.bg,
-              background: isMastered ? `${C.goldChamp}20` : C.gold,
+              background: isMastered ? `${alpha(C.goldChamp, 0.13)}` : C.gold,
               border: `0.5px solid ${isMastered ? C.goldChamp : 'transparent'}`,
               borderRadius: '6px',
               cursor: 'pointer',

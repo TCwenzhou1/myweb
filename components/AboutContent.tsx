@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
+import Link from 'next/link'
+import { CinematicSection, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 export default function AboutContent() {
   return (
@@ -258,7 +259,7 @@ export default function AboutContent() {
 
             {/* 导航 */}
             <div className="about-nav" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <a
+              <Link
                 href="/contact"
                 style={{
                   fontFamily: FONTS.body,
@@ -285,7 +286,7 @@ export default function AboutContent() {
               >
                 Contact
                 <span style={{ fontSize: '14px', opacity: 0.6 }}>→</span>
-              </a>
+              </Link>
             </div>
 
             <span
@@ -387,7 +388,7 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
           lineHeight: 1.9,
           color: C.inkDim,
           paddingLeft: '20px',
-          borderLeft: `0.5px solid ${C.goldPale}40`,
+          borderLeft: `0.5px solid ${alpha(C.goldPale, 0.25)}`,
         }}
       >
         {children}

@@ -147,7 +147,7 @@ export function useStudyStore() {
     return Object.entries(state.reviewMap)
       .filter(([, item]) => isDue(item.dueAt))
       .map(([id]) => id);
-  }, [state.reviewMap]);
+  }, [state]);
 
   return {
     favorites: state.favorites,

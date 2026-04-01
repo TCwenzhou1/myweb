@@ -1,6 +1,7 @@
 'use client'
 
-import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
+import Link from 'next/link'
+import { CinematicSection, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 export default function LabContent() {
   return (
@@ -213,7 +214,7 @@ export default function LabContent() {
 
             {/* 导航 */}
             <div className="lab-nav" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-              <a
+              <Link
                 href="/projects"
                 style={{
                   fontFamily: FONTS.body,
@@ -239,8 +240,8 @@ export default function LabContent() {
                 }}
               >
                 ← Projects
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/games"
                 style={{
                   fontFamily: FONTS.body,
@@ -266,7 +267,7 @@ export default function LabContent() {
                 }}
               >
                 Games →
-              </a>
+              </Link>
             </div>
 
             <span
@@ -436,8 +437,8 @@ function PlaceholderDemo({ title, description, status }: { title: string; descri
           color: C.gold,
           padding: '5px 14px',
           borderRadius: '4px',
-          border: `0.5px solid ${C.goldChamp}50`,
-          background: `${C.goldChamp}10`,
+          border: `0.5px solid ${alpha(C.goldChamp, 0.31)}`,
+          background: `${alpha(C.goldChamp, 0.06)}`,
         }}
       >
         {status}

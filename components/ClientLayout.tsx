@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { alpha } from '@/components/CinematicUI'
 
 // 统一配色
 const C = {
@@ -30,6 +31,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const prevPathnameRef = useRef(pathname)
   const isFirstRender = useRef(true)
   const contentRef = useRef<HTMLDivElement>(null)
+  const enterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -59,24 +61,28 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     // 400ms 后淡入新内容（电影级慢淡）
     const exitTimeout = setTimeout(() => {
       setDisplayChildren(children)
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+      window.scrollTo({ top: 0, behavior: 'auto' as ScrollBehavior })
       setTransitionState('entering')
 
       // 淡入完成
-      const enterTimeout = setTimeout(() => {
+      enterTimeoutRef.current = setTimeout(() => {
         setTransitionState('idle')
       }, 450)
-
-      return () => clearTimeout(enterTimeout)
     }, 400)
 
-    return () => clearTimeout(exitTimeout)
+    return () => {
+      clearTimeout(exitTimeout)
+      if (enterTimeoutRef.current !== null) {
+        clearTimeout(enterTimeoutRef.current)
+        enterTimeoutRef.current = null
+      }
+    }
   }, [pathname, children, mounted])
 
   if (!mounted) return null
 
   // 计算内容透明度 - 用于rack focus效果
-  const contentOpacity = transitionState === 'idle' ? 1 : 0
+  const contentOpacity = transitionState === 'exiting' ? 0 : 1
   const contentTransform = transitionState === 'exiting'
     ? 'scale(1.01) translateY(8px)' // 轻微后退感
     : transitionState === 'entering'
@@ -94,7 +100,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           left: 0,
           right: 0,
           height: '1px',
-          background: `linear-gradient(to right, transparent 5%, ${C.goldChamp}30 30%, ${C.goldChamp}50 50%, ${C.goldChamp}30 70%, transparent 95%)`,
+          background: `linear-gradient(to right, transparent 5%, ${alpha(C.goldChamp, 0.19)} 30%, ${alpha(C.goldChamp, 0.31)} 50%, ${alpha(C.goldChamp, 0.19)} 70%, transparent 95%)`,
           zIndex: 100,
           pointerEvents: 'none',
         }}
@@ -143,7 +149,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             style={{
               width: '40px',
               height: '0.5px',
-              background: `linear-gradient(to right, transparent, ${C.goldChamp}60, transparent)`,
+              background: `linear-gradient(to right, transparent, ${alpha(C.goldChamp, 0.38)}, transparent)`,
             }}
           />
         </div>
@@ -161,7 +167,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           `,
         }}
       >
-        {!isHome && <Navbar />}
+        <Navbar />
         <main className={isHome ? '' : 'pt-16'}>
           {displayChildren}
         </main>

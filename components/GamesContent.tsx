@@ -1,6 +1,7 @@
 'use client'
 
-import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
+import Link from 'next/link'
+import { CinematicSection, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 export default function GamesContent() {
   return (
@@ -223,7 +224,7 @@ export default function GamesContent() {
 
             {/* 导航 */}
             <div className="games-nav" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-              <a
+              <Link
                 href="/lab"
                 style={{
                   fontFamily: FONTS.body,
@@ -249,8 +250,8 @@ export default function GamesContent() {
                 }}
               >
                 ← Lab
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/about"
                 style={{
                   fontFamily: FONTS.body,
@@ -276,7 +277,7 @@ export default function GamesContent() {
                 }}
               >
                 About →
-              </a>
+              </Link>
             </div>
 
             <span
@@ -443,8 +444,8 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
           color: C.gold,
           padding: '5px 14px',
           borderRadius: '4px',
-          border: `0.5px solid ${C.goldChamp}50`,
-          background: `${C.goldChamp}10`,
+          border: `0.5px solid ${alpha(C.goldChamp, 0.31)}`,
+          background: `${alpha(C.goldChamp, 0.06)}`,
         }}
       >
         {status}

@@ -49725,12 +49725,23 @@ function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
 
 export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries, jlpt10kEntries);
 
+// 从合并词库动态计算各级别真实数量
+const levelCounts = vocabAllEntries.reduce<Record<string, number>>((acc, entry) => {
+  if (entry.level) {
+    acc[entry.level] = (acc[entry.level] || 0) + 1;
+  }
+  return acc;
+}, {});
+
 export const vocabStats = {
   total: vocabAllEntries.length,
-  core2000: 2000,
-  n2: 1325,
-  n1: 2038,
-  kaoyan: 1004,
+  core2000: vocabEntries.length,
+  n5: levelCounts['N5'] || 0,
+  n4: levelCounts['N4'] || 0,
+  n3: levelCounts['N3'] || 0,
+  n2: levelCounts['N2'] || 0,
+  n1: levelCounts['N1'] || 0,
+  kaoyan: levelCounts['考研'] || 0,
   kaoyan3500: kaoyan3500Stats.total,
   jlpt10k: jlpt10kStats.total,
 };

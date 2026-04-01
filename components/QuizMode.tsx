@@ -1,13 +1,12 @@
-// @ts-nocheck
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { VocabEntry } from '@/lib/vocabularyBank';
 import type { ReviewRating } from '@/lib/useStudyStore';
 
 interface QuizConfig {
-  items: VocabEntry[];
-  sourceLabel: string;
+  reviewItems: VocabEntry[];
+  favoriteItems: VocabEntry[];
   onRate: (id: string, rating: ReviewRating) => void;
   onSpeak: (text: string) => void;
 }
@@ -26,17 +25,23 @@ const ratingActions: Array<{ key: ReviewRating; label: string; emoji: string; hi
   { key: 'easy', label: '简单', emoji: '😎', hint: '轻松回忆起来' }
 ];
 
-export function QuizMode({ items, sourceLabel, onRate, onSpeak }: QuizConfig) {
+export function QuizMode({ reviewItems, favoriteItems, onRate, onSpeak }: QuizConfig) {
   const [phase, setPhase] = useState<QuizPhase>('config');
   const [quizItems, setQuizItems] = useState<QuizItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [quizCount, setQuizCount] = useState(10);
+  const [quizSource, setQuizSource] = useState<'review' | 'favorites'>(
+    reviewItems.length > 0 ? 'review' : 'favorites'
+  );
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const currentSourceItems = quizSource === 'review' ? reviewItems : favoriteItems;
+  const sourceLabel = quizSource === 'review' ? '今日复习' : '收藏本';
+
   const shuffled = useMemo(() => {
-    return [...items].sort(() => Math.random() - 0.5);
-  }, [items]);
+    return [...currentSourceItems].sort(() => Math.random() - 0.5);
+  }, [currentSourceItems]);
 
   const startQuiz = useCallback(() => {
     const count = Math.min(quizCount, shuffled.length);
@@ -68,7 +73,7 @@ export function QuizMode({ items, sourceLabel, onRate, onSpeak }: QuizConfig) {
     } else {
       setPhase('result');
     }
-  }, [current, currentIndex, quizItems.length, onRate]);
+  }, [current, currentIndex, quizItems, onRate]);
 
   const handleReveal = useCallback(() => {
     setRevealed(true);
@@ -103,6 +108,30 @@ export function QuizMode({ items, sourceLabel, onRate, onSpeak }: QuizConfig) {
 
             <div className="mt-5">
               <label className="block text-sm font-semibold text-slate-700 mb-2">
+                选择词库来源
+              </label>
+              <div className="flex flex-wrap gap-3 mb-4">
+                {[
+                  { key: 'review', label: '今日复习', count: reviewItems.length },
+                  { key: 'favorites', label: '收藏本', count: favoriteItems.length },
+                ].map((src) => (
+                  <button
+                    key={src.key}
+                    type="button"
+                    onClick={() => setQuizSource(src.key as 'review' | 'favorites')}
+                    disabled={src.count === 0}
+                    className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                      quizSource === src.key
+                        ? 'bg-indigo-600 text-white'
+                        : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {src.label}（{src.count}条）
+                  </button>
+                ))}
+              </div>
+
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
                 本轮测试数量
               </label>
               <div className="flex flex-wrap gap-3">
@@ -122,22 +151,22 @@ export function QuizMode({ items, sourceLabel, onRate, onSpeak }: QuizConfig) {
                 ))}
               </div>
               <p className="mt-2 text-xs text-slate-400">
-                {sourceLabel} 共有 {items.length} 条，题目随机打乱
+                {sourceLabel} 共有 {currentSourceItems.length} 条，题目随机打乱
               </p>
             </div>
 
             <button
               type="button"
               onClick={startQuiz}
-              disabled={items.length === 0}
+              disabled={currentSourceItems.length === 0}
               className="mt-5 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {items.length === 0 ? '暂无可测试词汇' : `开始测试（${Math.min(quizCount, items.length)}题）`}
+              {currentSourceItems.length === 0 ? '暂无可测试词汇' : `开始测试（${Math.min(quizCount, currentSourceItems.length)}题）`}
             </button>
           </div>
         </div>
 
-        {items.length === 0 && (
+        {reviewItems.length === 0 && favoriteItems.length === 0 && (
           <p className="mt-4 text-sm text-slate-400">
             请先在词库中点击 ♥ 收藏单词，或在复习中加入复习队列。
           </p>

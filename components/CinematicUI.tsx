@@ -21,6 +21,22 @@ const C = {
   cardShadow:   '#D8D0C0',
 }
 
+// ─── HEX → RGBA 转换工具（避免 8位 HEX 兼容性问题）────────────────────────────
+// 用法：alpha(C.goldChamp, 0.25) → 'rgba(212,188,138,0.25)'
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace('#', '')
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ]
+}
+
+function alpha(hex: string, a: number): string {
+  const [r, g, b] = hexToRgb(hex)
+  return `rgba(${r},${g},${b},${a})`
+}
+
 // ─── 统一字体 ─────────────────────────────────────────────────────────────────
 const FONTS = {
   display: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
@@ -343,7 +359,7 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
           ? `translateY(${hovered ? '-3px' : '0'})`
           : 'translateY(24px)',
         boxShadow: hovered
-          ? `0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), 0 0 0 0.5px ${C.goldPale}40`
+          ? `0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), 0 0 0 0.5px ${alpha(C.goldPale, 0.25)}`
           : `0 2px 8px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)`,
         transition: `
           opacity 0.9s ${EASE.standard} ${delay}ms,
@@ -387,4 +403,4 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
 }
 
 // ─── 导出统一配色和字体 ─────────────────────────────────────────────────────────────────
-export { C, FONTS, EASE }
+export { C, FONTS, EASE, alpha }

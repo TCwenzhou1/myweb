@@ -211,7 +211,7 @@ export default function LabPage() {
                 <select
                   value={levelFilter}
                   onChange={(event) => {
-                    setLevelFilter(event.target.value as '全部' | 'N2' | 'N1' | '考研');
+                    setLevelFilter(event.target.value as '全部' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研');
                     setPage(1);
                   }}
                   className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
@@ -259,8 +259,8 @@ export default function LabPage() {
           <PatternTab />
         ) : tab === 'quiz' ? (
           <QuizMode
-            items={reviewItems.length > 0 ? reviewItems : favoriteItems}
-            sourceLabel={reviewItems.length > 0 ? '今日复习' : '收藏本'}
+            reviewItems={reviewItems}
+            favoriteItems={favoriteItems}
             onRate={reviewCard}
             onSpeak={speak}
           />
@@ -304,18 +304,90 @@ export default function LabPage() {
             <button
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              className="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-white"
+              disabled={page <= 1}
+              className="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
             >
               上一页
             </button>
-            <span className="px-3 text-sm text-slate-500">{page} / {totalPages}</span>
+            {/* 页码跳转 — 快速导航到任意页 */}
+            <div className="flex items-center gap-1">
+              {/* 首页 + 末页始终显示 */}
+              <button
+                type="button"
+                onClick={() => setPage(1)}
+                className={`min-w-[32px] rounded-lg px-2 py-1 text-sm ${page === 1 ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                1
+              </button>
+              {totalPages > 7 && page > 3 && <span className="px-1 text-slate-400">...</span>}
+              {/* 当前页附近页码 */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  if (totalPages <= 7) return true;
+                  // 显示当前页±2范围
+                  return Math.abs(p - page) <= 2;
+                })
+                .filter((p) => p !== 1 && p !== totalPages)
+                .map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPage(p)}
+                    className={`min-w-[32px] rounded-lg px-2 py-1 text-sm ${page === p ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              {totalPages > 7 && page < totalPages - 2 && <span className="px-1 text-slate-400">...</span>}
+              {totalPages > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setPage(totalPages)}
+                  className={`min-w-[32px] rounded-lg px-2 py-1 text-sm ${page === totalPages ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                >
+                  {totalPages}
+                </button>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              className="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-white"
+              disabled={page >= totalPages}
+              className="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
             >
               下一页
             </button>
+            {/* 跳页输入框 */}
+            {totalPages > 10 && (
+              <div className="flex items-center gap-1 ml-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  placeholder="页码"
+                  className="w-16 rounded-lg border border-slate-300 px-2 py-1.5 text-sm text-center outline-none focus:border-slate-500"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const val = parseInt((e.target as HTMLInputElement).value, 10);
+                      if (val >= 1 && val <= totalPages) setPage(val);
+                      (e.target as HTMLInputElement).value = '';
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                    const val = parseInt(input?.value, 10);
+                    if (val >= 1 && val <= totalPages) setPage(val);
+                    if (input) input.value = '';
+                  }}
+                  className="rounded-lg bg-slate-200 px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-300"
+                >
+                  跳转
+                </button>
+              </div>
+            )}
           </section>
         )}
       </div>

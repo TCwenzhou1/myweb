@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
 
 // ─── 配色 ───────────────────────────────────────────────────────────────────
 const C = {
@@ -38,7 +39,7 @@ function Sparkles() {
   }>>([])
 
   useEffect(() => {
-    const generated = Array.from({ length: 20 }, (_, i) => ({
+    const generated = Array.from({ length: 12 }, (_, i) => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 2 + 0.8,
@@ -786,8 +787,9 @@ export default function HeroSection() {
               { label: 'Games',    href: '/games'    },
               { label: 'Lab',      href: '/lab'      },
               { label: 'About',    href: '/about'    },
+              { label: 'Contact',  href: '/contact'  },
             ].map(item => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 style={{
@@ -805,7 +807,7 @@ export default function HeroSection() {
                 onMouseLeave={e => (e.currentTarget.style.color = C.inkFaint)}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -994,34 +996,34 @@ export default function HeroSection() {
                 flexDirection: 'column',
                 gap: '16px',
               }}>
-                {[
+                {[ 
                   { label: '查看项目', href: '/projects', primary: true },
                   { label: '进入实验室', href: '/lab', primary: false },
                 ].map((item) => (
-                  <a
+                  <Link
                     key={item.href}
                     href={item.href}
                     style={{
                       fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                      fontSize: '12px',           // 13px → 12px（更精致）
+                      fontSize: '12px',
                       fontWeight: 400,
-                      letterSpacing: '0.18em',     // 0.16 → 0.18
+                      letterSpacing: '0.18em',
                       color: item.primary ? C.ink : C.inkFaint,
                       textDecoration: 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '18px',                // 16px → 18px
+                      gap: '18px',
                       transition: 'all 0.35s ease',
-                      paddingTop: '8px',           // 新增，让按钮更修长
-                      paddingBottom: '10px',       // 6px → 10px
+                      paddingTop: '8px',
+                      paddingBottom: '10px',
                       borderBottom: item.primary
-                        ? `0.4px solid ${C.gold}`   // 0.5px → 0.4px（更精细）
+                        ? `0.4px solid ${C.gold}`
                         : `0.4px solid rgba(90,85,90,0.22)`,
                     }}
                     onMouseEnter={e => {
                       e.currentTarget.style.color = item.primary ? C.goldRich : C.inkMid
                       e.currentTarget.style.borderBottomColor = item.primary ? C.goldRich : C.inkDim
-                      e.currentTarget.style.transform = 'translateY(-1px)'  // 微抬升
+                      e.currentTarget.style.transform = 'translateY(-1px)'
                       const line = e.currentTarget.querySelector('.line') as HTMLElement
                       if (line) {
                         line.style.width = item.primary ? '34px' : '26px'
@@ -1043,14 +1045,14 @@ export default function HeroSection() {
                       className="line"
                       style={{
                         width: '24px',
-                        height: '0.4px',          // 0.5px → 0.4px
+                        height: '0.4px',
                         background: item.primary ? C.gold : C.inkFaint,
                         flexShrink: 0,
                         transition: 'width 0.35s ease, background 0.35s ease',
                       }}
                     />
                     {item.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -1268,6 +1270,9 @@ export default function HeroSection() {
       <style>{`
         /* ── Tablet (768px - 1199px) ── */
         @media (max-width: 1199px) and (min-width: 768px) {
+          .hero-nav {
+            display: none !important;
+          }
           .hero-main-grid {
             grid-template-columns: 1fr !important;
             gap: 48px !important;

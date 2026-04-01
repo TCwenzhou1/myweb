@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Github, Mail } from 'lucide-react'
-import { CinematicSection, C, FONTS, EASE } from '@/components/CinematicUI'
+import Link from 'next/link'
+import { CinematicSection, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 export default function ContactContent() {
   return (
@@ -319,7 +320,7 @@ export default function ContactContent() {
                 justifyContent: 'center',
               }}
             >
-              <a
+              <Link
                 href="/"
                 style={{
                   fontFamily: FONTS.body,
@@ -335,7 +336,7 @@ export default function ContactContent() {
                   alignItems: 'center',
                   gap: '10px',
                   padding: '12px 24px',
-                  border: `0.5px solid ${C.goldPale}50`,
+                  border: `0.5px solid rgba(232,220,196,0.31)`,
                   borderRadius: '6px',
                 }}
                 onMouseEnter={e => {
@@ -346,12 +347,12 @@ export default function ContactContent() {
                 onMouseLeave={e => {
                   e.currentTarget.style.color = C.inkDim
                   e.currentTarget.style.opacity = '0.7'
-                  e.currentTarget.style.borderColor = `${C.goldPale}50`
+                  e.currentTarget.style.borderColor = 'rgba(232,220,196,0.31)'
                 }}
               >
                 <span style={{ fontSize: '16px' }}>←</span>
                 回到开场
-              </a>
+              </Link>
             </div>
           </div>
         </CinematicSection>
@@ -442,7 +443,7 @@ function ContactCard({
           width: '44px',
           height: '44px',
           borderRadius: '10px',
-          background: `${C.bgDeep}80`,
+          background: `${alpha(C.bgDeep, 0.50)}`,
           border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.4)'}`,
           display: 'flex',
           alignItems: 'center',

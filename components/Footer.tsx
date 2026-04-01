@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Github, Mail } from 'lucide-react'
+import { alpha } from '@/components/CinematicUI'
 
 const navLinks = [
   { label: 'Projects', href: '/projects' },
@@ -49,7 +50,7 @@ const Footer = () => {
           left: 'clamp(24px, 5vw, 80px)',
           right: 'clamp(24px, 5vw, 80px)',
           height: '0.5px',
-          background: `linear-gradient(to right, transparent, ${C.goldChamp}40, ${C.goldChamp}60, ${C.goldChamp}40, transparent)`,
+          background: `linear-gradient(to right, transparent, ${alpha(C.goldChamp, 0.25)}, ${alpha(C.goldChamp, 0.38)}, ${alpha(C.goldChamp, 0.25)}, transparent)`,
         }}
       />
 

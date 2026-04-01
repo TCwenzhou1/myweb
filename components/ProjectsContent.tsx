@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { ExternalLink, Github } from 'lucide-react'
-import { CinematicSection, PageHeader, C, FONTS, EASE } from '@/components/CinematicUI'
+import Link from 'next/link'
+import { CinematicSection, PageHeader, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
 
 interface Project {
   title: string
@@ -245,7 +246,7 @@ export default function ProjectsContent() {
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a
+    <Link
       href={href}
       style={{
         fontFamily: FONTS.body,
@@ -272,7 +273,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
     >
       {label}
       <span style={{ fontSize: '14px', opacity: 0.6 }}>→</span>
-    </a>
+    </Link>
   )
 }
 
@@ -502,7 +503,7 @@ function ProjectCard({
                 color: C.inkDim,
                 padding: isFeatured ? '6px 14px' : '5px 12px',
                 borderRadius: '4px',
-                background: `${C.bgDeep}90`,
+                background: `${alpha(C.bgDeep, 0.56)}`,
                 border: `0.5px solid rgba(200,190,168,0.4)`,
               }}
             >
