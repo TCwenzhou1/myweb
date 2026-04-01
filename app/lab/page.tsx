@@ -9,8 +9,9 @@ import { useSpeech } from '@/lib/useSpeech';
 import { useStudyStore } from '@/lib/useStudyStore';
 import { GrammarTab, grammarCategories } from '@/lib/grammarBank';
 import { PatternTab } from '@/lib/sentencePatterns';
+import { QuizMode } from '@/components/QuizMode';
 
-type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern';
+type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz';
 type LibraryMode = 'core2000' | 'n2' | 'n1' | 'all';
 const PAGE_SIZE = 24;
 
@@ -122,6 +123,7 @@ export default function LabPage() {
             { key: 'library', label: '浏览词库' },
             { key: 'favorites', label: '收藏本' },
             { key: 'review', label: '今日复习' },
+            { key: 'quiz', label: '自测', badge: 'NEW' },
             { key: 'grammar', label: '文法', badge: '14类' },
             { key: 'pattern', label: '句型', badge: '332' }
           ].map((item) => (
@@ -147,7 +149,7 @@ export default function LabPage() {
           ))}
         </div>
 
-        {tab !== 'grammar' && tab !== 'pattern' ? (
+        {tab !== 'grammar' && tab !== 'pattern' && tab !== 'quiz' ? (
           <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm">
             <div className="grid gap-4 lg:grid-cols-[1.5fr,1fr,1fr,auto]">
               <label className="block">
@@ -216,6 +218,11 @@ export default function LabPage() {
           </section>
         ) : tab === 'grammar' ? (
           <p className="mt-4 text-sm text-slate-500">考研日语核心语法 14 大类，共 {grammarCategories.reduce((sum, c) => sum + c.items.length, 0)} 条</p>
+        ) : tab === 'quiz' ? (
+          <p className="mt-4 text-sm text-slate-500">
+            看日语想中文，检验真实掌握程度
+            {reviewItems.length > 0 ? `（今日复习 ${reviewItems.length} 条）` : favoriteItems.length > 0 ? `（收藏本 ${favoriteItems.length} 条）` : '（请先收藏或加入复习）'}
+          </p>
         ) : (
           <p className="mt-4 text-sm text-slate-500">332 个高频惯用表达</p>
         )}
@@ -224,6 +231,13 @@ export default function LabPage() {
           <GrammarTab />
         ) : tab === 'pattern' ? (
           <PatternTab />
+        ) : tab === 'quiz' ? (
+          <QuizMode
+            items={reviewItems.length > 0 ? reviewItems : favoriteItems}
+            sourceLabel={reviewItems.length > 0 ? '今日复习' : '收藏本'}
+            onRate={reviewCard}
+            onSpeak={speak}
+          />
         ) : tab === 'review' ? (
           <section className="mt-8 grid gap-5">
             {reviewItems.length === 0 ? (
