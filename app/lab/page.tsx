@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 import { ReviewCard } from '@/components/ReviewCard';
 import { WordCard } from '@/components/WordCard';
-import { vocabEntries, vocabStats, type VocabEntry } from '@/lib/vocabularyBank';
+import { vocabEntries, vocabStats, vocabAllEntries, type VocabEntry } from '@/lib/vocabularyBank';
 import { useSpeech } from '@/lib/useSpeech';
 import { useStudyStore } from '@/lib/useStudyStore';
 import { GrammarTab, grammarCategories } from '@/lib/grammarBank';
@@ -12,7 +12,7 @@ import { PatternTab } from '@/lib/sentencePatterns';
 import { QuizMode } from '@/components/QuizMode';
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz';
-type LibraryMode = 'core2000' | 'n2' | 'n1' | 'all';
+type LibraryMode = 'core2000' | 'n2' | 'n1' | 'kaoyan3500' | 'all';
 const PAGE_SIZE = 24;
 
 function paginate<T>(items: T[], page: number) {
@@ -43,7 +43,8 @@ export default function LabPage() {
   const reviewSet = useMemo(() => new Set(Object.keys(reviewMap)), [reviewMap]);
 
   const filteredLibrary = useMemo(() => {
-    const next = vocabEntries.filter((item) => {
+    const dataSource = vocabAllEntries;
+    const next = dataSource.filter((item) => {
       const matchesKeyword =
         keyword.trim() === '' ||
         [item.word, item.kana, item.meaningZh, item.meaningEn, item.detailZh]
@@ -58,6 +59,8 @@ export default function LabPage() {
             ? item.level === 'N2'
             : libraryMode === 'n1'
               ? item.level === 'N1'
+            : libraryMode === 'kaoyan3500'
+              ? item.track === 'kaoyan3500'
               : true;
 
       const matchesLevel = levelFilter === '全部' ? true : item.level === levelFilter;
@@ -69,11 +72,11 @@ export default function LabPage() {
   }, [keyword, libraryMode, levelFilter]);
 
   const favoriteItems = useMemo(() => {
-    return vocabEntries.filter((item) => favoriteSet.has(item.id));
+    return vocabAllEntries.filter((item) => favoriteSet.has(item.id));
   }, [favoriteSet]);
 
   const reviewItems = useMemo(() => {
-    const dueOnly = vocabEntries.filter((item) => dueSet.has(item.id));
+    const dueOnly = vocabAllEntries.filter((item) => dueSet.has(item.id));
     return dueOnly;
   }, [dueSet]);
 
@@ -93,11 +96,11 @@ export default function LabPage() {
           <h1 className="mt-4 text-3xl font-bold md:text-4xl">日语学习实验室</h1>
           <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-200 md:text-base">
             这版专门修正「没有中文释义」和「考研核心词太少」的问题。现在默认给你中文释义，
-            并把词库升级为：Core 2000 高频层 + N2 全量中文层 + N1 全量中文层，同时保留
-            TTS 发音、收藏本和间隔复习。
+            并把词库升级为：Core 2000 高频层 + N2 全量中文层 + N1 全量中文层 + 考研3500词（带例句+真题），
+            同时保留 TTS 发音、收藏本和间隔复习。
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-4">
+          <div className="mt-6 grid gap-4 md:grid-cols-5">
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-sm text-slate-200">总词条</p>
               <p className="mt-2 text-2xl font-bold">{vocabStats.total}</p>
@@ -107,12 +110,16 @@ export default function LabPage() {
               <p className="mt-2 text-2xl font-bold">{vocabStats.core2000}</p>
             </div>
             <div className="rounded-2xl bg-white/10 p-4">
-              <p className="text-sm text-slate-200">收藏数</p>
-              <p className="mt-2 text-2xl font-bold">{favorites.length}</p>
+              <p className="text-sm text-slate-200">N2 + N1</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.n2 + vocabStats.n1}</p>
             </div>
             <div className="rounded-2xl bg-white/10 p-4">
-              <p className="text-sm text-slate-200">今日复习</p>
-              <p className="mt-2 text-2xl font-bold">{dueTodayIds.length}</p>
+              <p className="text-sm text-slate-200">考研3500</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.kaoyan3500}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-sm text-slate-200">收藏数</p>
+              <p className="mt-2 text-2xl font-bold">{favorites.length}</p>
             </div>
           </div>
         </section>
@@ -178,6 +185,7 @@ export default function LabPage() {
                   <option value="core2000">Core 2000</option>
                   <option value="n2">N2 全量中文</option>
                   <option value="n1">N1 全量中文</option>
+                  <option value="kaoyan3500">考研3500词</option>
                   <option value="all">全部</option>
                 </select>
               </label>

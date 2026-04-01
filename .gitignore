@@ -35,3 +35,10 @@ DEPLOYMENT-FIX-SUMMARY.md
 FIX-SUMMARY.md
 VERCEL-FIX-NOTES.md
 preview.html
+
+# Anki deck source files (large binary)
+*.apkg
+
+# Intermediate extraction data
+scripts/_extract_*.json
+scripts/*_tmp/

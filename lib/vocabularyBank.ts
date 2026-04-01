@@ -1,5 +1,5 @@
 // @ts-nocheck
-export type VocabLevel = 'N2' | 'N1' | '考研';
+export type VocabLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研';
 
 export interface VocabEntry {
   id: string;
@@ -10,7 +10,7 @@ export interface VocabEntry {
   meaningEn: string;
   detailZh: string;
   source: string;
-  track: 'core2000' | 'full';
+  track: 'core2000' | 'full' | 'kaoyan' | 'kaoyan3500';
 }
 
 export const vocabEntries: VocabEntry[] = [
@@ -49703,10 +49703,30 @@ export const vocabEntries: VocabEntry[] = [
   }
 ];
 
+// 导入考研3500词库（Anki提取）
+import { kaoyan3500Entries, kaoyan3500Stats } from './kaoyan3500Bank';
+
+// 合并所有词库，去重（以 word+kana 为 key，后面的覆盖前面的）
+function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
+  const map = new Map<string, VocabEntry>();
+  for (const list of lists) {
+    for (const entry of list) {
+      const key = `${entry.word}__${entry.kana}`;
+      if (!map.has(key)) {
+        map.set(key, entry);
+      }
+    }
+  }
+  return Array.from(map.values());
+}
+
+export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries);
+
 export const vocabStats = {
-  total: 4367,
+  total: vocabAllEntries.length,
   core2000: 2000,
   n2: 1325,
   n1: 2038,
-  kaoyan: 1004
+  kaoyan: 1004,
+  kaoyan3500: kaoyan3500Stats.total,
 };
