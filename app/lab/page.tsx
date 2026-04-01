@@ -12,7 +12,7 @@ import { PatternTab } from '@/lib/sentencePatterns';
 import { QuizMode } from '@/components/QuizMode';
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz';
-type LibraryMode = 'core2000' | 'n2' | 'n1' | 'kaoyan3500' | 'all';
+type LibraryMode = 'core2000' | 'n2' | 'n1' | 'n3' | 'n4' | 'kaoyan3500' | 'jlpt10k' | 'all';
 const PAGE_SIZE = 24;
 
 function paginate<T>(items: T[], page: number) {
@@ -24,7 +24,7 @@ export default function LabPage() {
   const [tab, setTab] = useState<TabKey>('library');
   const [keyword, setKeyword] = useState('');
   const [libraryMode, setLibraryMode] = useState<LibraryMode>('core2000');
-  const [levelFilter, setLevelFilter] = useState<'全部' | 'N2' | 'N1' | '考研'>('全部');
+  const [levelFilter, setLevelFilter] = useState<'全部' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'>('全部');
   const [page, setPage] = useState(1);
 
   const { speak } = useSpeech();
@@ -59,8 +59,14 @@ export default function LabPage() {
             ? item.level === 'N2'
             : libraryMode === 'n1'
               ? item.level === 'N1'
+            : libraryMode === 'n3'
+              ? item.level === 'N3'
+            : libraryMode === 'n4'
+              ? item.level === 'N4'
             : libraryMode === 'kaoyan3500'
               ? item.track === 'kaoyan3500'
+            : libraryMode === 'jlpt10k'
+              ? item.track === 'jlpt10k'
               : true;
 
       const matchesLevel = levelFilter === '全部' ? true : item.level === levelFilter;
@@ -95,12 +101,11 @@ export default function LabPage() {
           </span>
           <h1 className="mt-4 text-3xl font-bold md:text-4xl">日语学习实验室</h1>
           <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-200 md:text-base">
-            这版专门修正「没有中文释义」和「考研核心词太少」的问题。现在默认给你中文释义，
-            并把词库升级为：Core 2000 高频层 + N2 全量中文层 + N1 全量中文层 + 考研3500词（带例句+真题），
-            同时保留 TTS 发音、收藏本和间隔复习。
+            词库全面升级：Core 2000 高频 + N2/N1/N3/N4 全量中文 + 考研3500词（带例句+真题）+ JLPT 10k 完整词库。
+            支持 TTS 发音、收藏本和间隔复习。
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-5">
+          <div className="mt-6 grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-sm text-slate-200">总词条</p>
               <p className="mt-2 text-2xl font-bold">{vocabStats.total}</p>
@@ -110,16 +115,24 @@ export default function LabPage() {
               <p className="mt-2 text-2xl font-bold">{vocabStats.core2000}</p>
             </div>
             <div className="rounded-2xl bg-white/10 p-4">
-              <p className="text-sm text-slate-200">N2 + N1</p>
-              <p className="mt-2 text-2xl font-bold">{vocabStats.n2 + vocabStats.n1}</p>
+              <p className="text-sm text-slate-200">N4</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.n4 || 0}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-sm text-slate-200">N3</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.n3 || 0}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-sm text-slate-200">N2</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.n2}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-sm text-slate-200">N1</p>
+              <p className="mt-2 text-2xl font-bold">{vocabStats.n1}</p>
             </div>
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-sm text-slate-200">考研3500</p>
               <p className="mt-2 text-2xl font-bold">{vocabStats.kaoyan3500}</p>
-            </div>
-            <div className="rounded-2xl bg-white/10 p-4">
-              <p className="text-sm text-slate-200">收藏数</p>
-              <p className="mt-2 text-2xl font-bold">{favorites.length}</p>
             </div>
           </div>
         </section>
@@ -183,9 +196,12 @@ export default function LabPage() {
                   className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
                 >
                   <option value="core2000">Core 2000</option>
-                  <option value="n2">N2 全量中文</option>
-                  <option value="n1">N1 全量中文</option>
+                  <option value="n4">N4</option>
+                  <option value="n3">N3</option>
+                  <option value="n2">N2</option>
+                  <option value="n1">N1</option>
                   <option value="kaoyan3500">考研3500词</option>
+                  <option value="jlpt10k">JLPT 10k 全量</option>
                   <option value="all">全部</option>
                 </select>
               </label>
@@ -201,6 +217,8 @@ export default function LabPage() {
                   className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none"
                 >
                   <option value="全部">全部</option>
+                  <option value="N4">N4</option>
+                  <option value="N3">N3</option>
                   <option value="N2">N2</option>
                   <option value="N1">N1</option>
                   <option value="考研">考研</option>

@@ -19,11 +19,14 @@ def extract_apkg(apkg_path, output_json):
     with zipfile.ZipFile(apkg_path, 'r') as z:
         z.extractall(tmp_dir)
     
-    # 找到 SQLite 数据库
+    # 找到 SQLite 数据库（优先 .anki21，然后 .anki2）
     db_path = None
-    for f in os.listdir(tmp_dir):
-        if f.endswith('.anki2') or f.endswith('.anki21'):
-            db_path = os.path.join(tmp_dir, f)
+    for suffix in ['.anki21', '.anki2', '.anki21b']:
+        for f in os.listdir(tmp_dir):
+            if f.endswith(suffix):
+                db_path = os.path.join(tmp_dir, f)
+                break
+        if db_path:
             break
     
     if not db_path:

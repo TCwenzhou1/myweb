@@ -49706,6 +49706,9 @@ export const vocabEntries: VocabEntry[] = [
 // 导入考研3500词库（Anki提取）
 import { kaoyan3500Entries, kaoyan3500Stats } from './kaoyan3500Bank';
 
+// 导入 JLPT N1~N4 全量词库（egg_rolls JLPT 10k v3）
+import { jlpt10kEntries, jlpt10kStats } from './jlpt10kBank';
+
 // 合并所有词库，去重（以 word+kana 为 key，后面的覆盖前面的）
 function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
   const map = new Map<string, VocabEntry>();
@@ -49720,7 +49723,7 @@ function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
   return Array.from(map.values());
 }
 
-export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries);
+export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries, jlpt10kEntries);
 
 export const vocabStats = {
   total: vocabAllEntries.length,
@@ -49729,4 +49732,5 @@ export const vocabStats = {
   n1: 2038,
   kaoyan: 1004,
   kaoyan3500: kaoyan3500Stats.total,
+  jlpt10k: jlpt10kStats.total,
 };
