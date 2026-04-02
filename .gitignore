@@ -42,3 +42,10 @@ preview.html
 # Intermediate extraction data
 scripts/_extract_*.json
 scripts/*_tmp/
+
+# JMDict cache data (large, regenerable)
+scripts/_jmdict_cache/
+
+# Backup files
+*_backup.ts
+*_backup.tsx

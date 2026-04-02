@@ -10,7 +10,7 @@ export interface VocabEntry {
   meaningEn: string;
   detailZh: string;
   source: string;
-  track: 'core2000' | 'full' | 'kaoyan' | 'kaoyan3500';
+  track: 'core2000' | 'full' | 'kaoyan' | 'kaoyan3500' | 'jlpt10k' | 'jmdict';
 }
 
 export const vocabEntries: VocabEntry[] = [
@@ -49709,6 +49709,9 @@ import { kaoyan3500Entries, kaoyan3500Stats } from './kaoyan3500Bank';
 // 导入 JLPT N1~N4 全量词库（egg_rolls JLPT 10k v3）
 import { jlpt10kEntries, jlpt10kStats } from './jlpt10kBank';
 
+// 导入 JLPT API 补充词库（N1~N5 新增词汇）
+import { jmdictEntries, jmdictStats } from './jmdictBank';
+
 // 合并所有词库，去重（以 word+kana 为 key，后面的覆盖前面的）
 function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
   const map = new Map<string, VocabEntry>();
@@ -49723,7 +49726,7 @@ function mergeVocab(...lists: VocabEntry[][]): VocabEntry[] {
   return Array.from(map.values());
 }
 
-export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries, jlpt10kEntries);
+export const vocabAllEntries: VocabEntry[] = mergeVocab(vocabEntries, kaoyan3500Entries, jlpt10kEntries, jmdictEntries);
 
 // 从合并词库动态计算各级别真实数量
 const levelCounts = vocabAllEntries.reduce<Record<string, number>>((acc, entry) => {
@@ -49744,4 +49747,5 @@ export const vocabStats = {
   kaoyan: levelCounts['考研'] || 0,
   kaoyan3500: kaoyan3500Stats.total,
   jlpt10k: jlpt10kStats.total,
+  jmdict: jmdictStats?.n1 + jmdictStats?.n2 + jmdictStats?.n3 + jmdictStats?.n4 + jmdictStats?.n5 || 0,
 };
