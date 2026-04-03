@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Bodoni_Moda, Jost, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
@@ -21,17 +21,34 @@ const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
 })
 
+const siteUrl = 'https://www.tcwenzhou.site'
+
+export const viewport: Viewport = {
+  themeColor: '#F8F5EE',
+  colorScheme: 'light',
+}
+
 export const metadata: Metadata = {
-  title: 'TCwenzhou | 个人主页',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'TCwenzhou | 个人主页',
+    template: '%s | TCwenzhou',
+  },
   description: '计算机工程学生，AI 项目学习者，游戏开发探索者。这里是项目、实验和长期成长的记录。',
-  keywords: ['计算机工程', 'AI项目', '游戏开发', '个人主页', '工程实践', '强化学习'],
-  authors: [{ name: 'TCwenzhou', url: 'https://www.tcwenzhou.site' }],
+  applicationName: 'TCwenzhou',
+  keywords: ['TCwenzhou', '计算机工程', 'AI 项目', '游戏开发', '个人主页', '工程实践', '强化学习', 'Next.js portfolio'],
+  authors: [{ name: 'TCwenzhou', url: siteUrl }],
   creator: 'TCwenzhou',
-  metadataBase: new URL('https://www.tcwenzhou.site'),
+  alternates: {
+    canonical: '/',
+  },
+  category: 'technology',
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: 'TCwenzhou | 个人主页',
     description: '计算机工程学生，AI 项目学习者，游戏开发探索者。',
-    url: 'https://www.tcwenzhou.site',
+    url: siteUrl,
+    siteName: 'TCwenzhou',
     type: 'website',
     locale: 'zh_CN',
   },
@@ -39,11 +56,22 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'TCwenzhou | 个人主页',
     description: '计算机工程学生，AI 项目学习者，游戏开发探索者。',
-    creator: '@tcwenzhou',
+  },
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
 }
 

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import ContactContent from '@/components/ContactContent'
 
 export const metadata: Metadata = {
-  title: 'Contact | TCwenzhou',
-  description: '片尾字幕 · 档案封存',
+  title: '联系',
+  description: '联系 TCwenzhou，发起合作、交流或项目讨论。',
 }
 
 export default function ContactPage() {

@@ -7,8 +7,8 @@ import { usePathname } from 'next/navigation'
 const navItems = [
   { label: 'Home', href: '/', chapter: '00' },
   { label: 'Projects', href: '/projects', chapter: '02' },
-  { label: 'Games', href: '/games', chapter: '04' },
   { label: 'Lab', href: '/lab', chapter: '03' },
+  { label: 'Games', href: '/games', chapter: '04' },
   { label: 'About', href: '/about', chapter: '05' },
   { label: 'Contact', href: '/contact', chapter: '06' },
 ]
@@ -35,6 +35,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const pathname = usePathname()
+  const mobileMenuId = 'site-mobile-menu'
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -47,6 +48,27 @@ const Navbar = () => {
     const t = setTimeout(() => setIsVisible(true), 300)
     return () => clearTimeout(t)
   }, [pathname])
+
+  useEffect(() => {
+    if (!isOpen) {
+      document.body.style.overflow = ''
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen])
 
   return (
     <nav
@@ -128,6 +150,7 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? 'page' : undefined}
                 style={{
                   textDecoration: 'none',
                   display: 'flex',
@@ -182,6 +205,8 @@ const Navbar = () => {
           }}
           className="navbar-mobile-menu-btn"
           aria-label="Toggle menu"
+          aria-expanded={isOpen}
+          aria-controls={mobileMenuId}
         >
           <div style={{
             width: '18px',
@@ -219,10 +244,31 @@ const Navbar = () => {
         </button>
       </div>
 
+      {isOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setIsOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: '64px 0 0',
+            background: 'rgba(15,14,16,0.08)',
+            border: 'none',
+            padding: 0,
+            margin: 0,
+            cursor: 'pointer',
+          }}
+        />
+      )}
+
       {/* Mobile Menu */}
       {isOpen && (
         <div
+          id={mobileMenuId}
           className="navbar-mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
           style={{
             position: 'absolute',
             top: '100%',
@@ -246,6 +292,7 @@ const Navbar = () => {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
                   style={{
                     textDecoration: 'none',
                     display: 'flex',
@@ -289,9 +336,6 @@ const Navbar = () => {
           display: flex;
         }
         .navbar-mobile-menu-btn {
-          display: none;
-        }
-        .navbar-mobile-menu {
           display: none;
         }
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { CinematicSection, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
+import { gameRoadmap } from '@/lib/siteContent'
 
 export default function GamesContent() {
   return (
@@ -177,22 +178,90 @@ export default function GamesContent() {
           </div>
         </CinematicSection>
 
-        {/* 游戏卡片区 */}
         <div
+          className="games-grid"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            gap: '20px',
           }}
         >
-          <CinematicSection delay={100}>
-            <PlaceholderGame
-              title="即将到来"
-              description="正在开发中，暂无可展示内容。"
-              status="空位预留中"
-            />
-          </CinematicSection>
+          {gameRoadmap.map((item, index) => (
+            <CinematicSection key={item.title} delay={100 + index * 80}>
+              <RoadmapCard {...item} />
+            </CinematicSection>
+          ))}
         </div>
+
+        <CinematicSection delay={340}>
+          <div
+            className="games-note"
+            style={{
+              marginTop: '24px',
+              border: `0.5px solid ${alpha(C.goldChamp, 0.35)}`,
+              borderRadius: '16px',
+              background: alpha(C.cardIvory, 0.92),
+              padding: '24px',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.24em',
+                textTransform: 'uppercase',
+                color: C.gold,
+              }}
+            >
+              Development Note
+            </p>
+            <p
+              style={{
+                marginTop: '14px',
+                fontFamily: FONTS.body,
+                fontSize: '15px',
+                lineHeight: 1.85,
+                color: C.inkDim,
+                maxWidth: '720px',
+              }}
+            >
+              这一页暂时不再只是空占位，而是明确告诉访客我正在推进哪些方向。等到第一个可玩原型上线后，这里会优先放试玩入口和开发日志。
+            </p>
+            <div style={{ marginTop: '18px', display: 'flex', flexWrap: 'wrap', gap: '18px' }}>
+              <Link
+                href="/projects"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: C.inkMid,
+                  textDecoration: 'none',
+                }}
+              >
+                查看相关项目
+              </Link>
+              <a
+                href="https://github.com/TCwenzhou1"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: C.gold,
+                  textDecoration: 'none',
+                }}
+              >
+                关注 GitHub 更新
+              </a>
+            </div>
+          </div>
+        </CinematicSection>
 
         {/* 底部场景编号与导航 */}
         <CinematicSection delay={300}>
@@ -300,6 +369,9 @@ export default function GamesContent() {
       <style>{`
         /* ── Mobile (< 768px) ── */
         @media (max-width: 767px) {
+          .games-grid {
+            grid-template-columns: 1fr !important;
+          }
           .games-desc {
             font-size: 15px !important;
             line-height: 1.7 !important;
@@ -322,6 +394,9 @@ export default function GamesContent() {
 
         /* ── Tablet (768px - 1199px) ── */
         @media (max-width: 1199px) and (min-width: 768px) {
+          .games-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
           .games-footer {
             justify-content: center !important;
             text-align: center;
@@ -332,7 +407,7 @@ export default function GamesContent() {
   )
 }
 
-function PlaceholderGame({ title, description, status }: { title: string; description: string; status: string }) {
+function RoadmapCard({ title, description, status }: { title: string; description: string; status: string }) {
   return (
     <div
       className="games-placeholder"
@@ -377,7 +452,7 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
         }}
       />
 
-      {/* 空位图标 */}
+      {/* 状态图标 */}
       <div
         style={{
           width: '48px',
@@ -394,12 +469,12 @@ function PlaceholderGame({ title, description, status }: { title: string; descri
         <span
           style={{
             fontFamily: '"Bodoni Moda", serif',
-            fontSize: '24px',
+            fontSize: '22px',
             color: C.gold,
             opacity: 0.4,
           }}
         >
-          +
+          ♠
         </span>
       </div>
 

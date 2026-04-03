@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { ExternalLink, Github } from 'lucide-react'
 import Link from 'next/link'
 import { CinematicSection, PageHeader, C, FONTS, EASE, alpha } from '@/components/CinematicUI'
+import { portfolioProjects } from '@/lib/siteContent'
 
 interface Project {
   title: string
@@ -16,37 +17,7 @@ interface Project {
   featured?: boolean
 }
 
-const projects: Project[] = [
-  {
-    title: '三国杀 AI 系统',
-    description:
-      '用强化学习 + MCTS 搜索树做的卡牌游戏 AI。主要在解决不完全信息下的决策问题，包括特征工程、自玩训练和多智能体对战框架。还在持续迭代中。',
-    tags: ['Python', 'PyTorch', 'RL', 'MCTS'],
-    status: 'wip',
-    github: 'https://github.com/TCwenzhou1/sgs-ai',
-    year: '2024',
-    featured: true,
-  },
-  {
-    title: 'AI 自动化邮件回复系统',
-    description:
-      '把 LLM 接入邮件流程里，做自动分类和回复草稿生成。目的是把重复性的邮件处理从手工操作变成半自动化。目前在做原型验证阶段。',
-    tags: ['Next.js', 'TypeScript', 'LangChain', 'PostgreSQL'],
-    status: 'wip',
-    github: 'https://github.com/TCwenzhou1/ai-mail-system',
-    year: '2024',
-  },
-  {
-    title: '个人网站 / 实验主页',
-    description:
-      '就是这个站。用 Next.js + Tailwind 做的，主要用来展示项目和实验，同时也是前端实践的场所。会持续迭代。',
-    tags: ['Next.js', 'TypeScript', 'Tailwind', 'Vercel'],
-    status: 'active',
-    github: 'https://github.com/TCwenzhou1/myweb',
-    demo: 'https://www.tcwenzhou.site',
-    year: '2024',
-  },
-]
+const projects: Project[] = portfolioProjects
 
 const statusMap = {
   active: { label: '运行中', color: '#7D9970' },
@@ -317,7 +288,7 @@ function ProjectCard({
           : `0 2px 8px rgba(0,0,0,0.04)`,
         transition: `all 0.5s ${EASE.standard}`,
         overflow: 'hidden',
-        cursor: 'pointer',
+        cursor: 'default',
       }}
     >
       {/* 聚光效果 - 随鼠标移动 */}
@@ -390,6 +361,20 @@ function ProjectCard({
             >
               {project.title}
             </h2>
+            {project.year && (
+              <span
+                style={{
+                  fontFamily: FONTS.body,
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: C.inkFaint,
+                }}
+              >
+                {project.year}
+              </span>
+            )}
             <span
               className="project-status"
               style={{
@@ -436,7 +421,7 @@ function ProjectCard({
                   e.currentTarget.style.borderColor = C.goldPale
                   e.currentTarget.style.color = C.inkDim
                 }}
-                aria-label="GitHub"
+                aria-label={`${project.title} 的 GitHub 仓库`}
               >
                 <Github size={isFeatured ? 16 : 14} />
               </a>
@@ -466,7 +451,7 @@ function ProjectCard({
                   e.currentTarget.style.borderColor = C.goldPale
                   e.currentTarget.style.color = C.inkDim
                 }}
-                aria-label="Demo"
+                aria-label={`${project.title} 的在线演示`}
               >
                 <ExternalLink size={isFeatured ? 16 : 14} />
               </a>
@@ -510,6 +495,52 @@ function ProjectCard({
               {tag}
             </span>
           ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: '18px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '18px',
+          }}
+        >
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: C.gold,
+                textDecoration: 'none',
+              }}
+            >
+              打开 GitHub
+            </a>
+          )}
+          {project.demo && (
+            <a
+              href={project.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: FONTS.body,
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: C.gold,
+                textDecoration: 'none',
+              }}
+            >
+              在线访问
+            </a>
+          )}
         </div>
       </div>
 

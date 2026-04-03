@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import AboutContent from '@/components/AboutContent'
 
 export const metadata: Metadata = {
-  title: 'About | TCwenzhou',
-  description: '作者特写 · 角色揭示',
+  title: '关于',
+  description: 'TCwenzhou 的方向、做事方式和当前关注点。',
 }
 
 export default function AboutPage() {
