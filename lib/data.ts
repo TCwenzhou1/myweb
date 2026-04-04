@@ -2,7 +2,7 @@
 export const socialLinks = [
   { icon: 'Github', href: 'https://github.com/TCwenzhou1', label: 'GitHub' },
   { icon: 'Linkedin', href: 'https://linkedin.com/in/tcwenzhou', label: 'LinkedIn' },
-  { icon: 'Mail', href: 'mailto:hello@tcwenzhou.site', label: 'Email' },
+  { icon: 'Mail', href: 'mailto:3240468691@qq.com', label: 'Email' },
 ]
 
 // 联系信息
@@ -10,7 +10,7 @@ export const contactInfo = [
   {
     icon: 'Mail',
     title: '邮箱',
-    value: 'hello@tcwenzhou.site',
+    value: '3240468691@qq.com',
     color: 'from-blue-500 to-cyan-500',
   },
   {

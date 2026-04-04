@@ -194,7 +194,7 @@ const Footer = () => {
                 </span>
               </a>
               <a
-                href="mailto:hello@tcwenzhou.site"
+                href="mailto:3240468691@qq.com"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -215,7 +215,7 @@ const Footer = () => {
                     color: C.inkDim,
                   }}
                 >
-                  hello@tcwenzhou.site
+                  3240468691@qq.com
                 </span>
               </a>
             </div>

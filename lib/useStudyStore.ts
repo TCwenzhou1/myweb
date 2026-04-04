@@ -15,9 +15,16 @@ interface ReviewItem {
 interface StudyState {
   favorites: string[];
   reviewMap: Record<string, ReviewItem>;
+  recentViewed: string[];
 }
 
-const STORAGE_KEY = 'jp-lab-study-store-v3';
+const STORAGE_KEY = 'jp-lab-study-store-v4';
+const LEGACY_STORAGE_KEY = 'jp-lab-study-store-v3';
+const DEFAULT_STATE: StudyState = {
+  favorites: [],
+  reviewMap: {},
+  recentViewed: [],
+};
 
 function addDays(days: number) {
   const next = new Date();
@@ -29,20 +36,32 @@ function isDue(dueAt: string) {
   return new Date(dueAt).getTime() <= Date.now();
 }
 
+function getLocalDayKey(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
+
+function normalizeState(input?: Partial<StudyState>): StudyState {
+  return {
+    favorites: Array.isArray(input?.favorites) ? input!.favorites : [],
+    reviewMap: input?.reviewMap ?? {},
+    recentViewed: Array.isArray(input?.recentViewed) ? input!.recentViewed.slice(0, 12) : [],
+  };
+}
+
 export function useStudyStore() {
-  const [state, setState] = useState<StudyState>({
-    favorites: [],
-    reviewMap: {}
-  });
+  const [state, setState] = useState<StudyState>(DEFAULT_STATE);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return;
 
     try {
-      const parsed = JSON.parse(raw) as StudyState;
-      setState(parsed);
+      const parsed = JSON.parse(raw) as Partial<StudyState>;
+      setState(normalizeState(parsed));
     } catch (error) {
       console.error('Failed to parse study store:', error);
     }
@@ -63,6 +82,13 @@ export function useStudyStore() {
           : [...prev.favorites, id]
       };
     });
+  }, []);
+
+  const markViewed = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      recentViewed: [id, ...prev.recentViewed.filter((item) => item !== id)].slice(0, 12),
+    }));
   }, []);
 
   const toggleReviewQueue = useCallback((id: string) => {
@@ -140,7 +166,7 @@ export function useStudyStore() {
   }, []);
 
   const resetAll = useCallback(() => {
-    setState({ favorites: [], reviewMap: {} });
+    setState(DEFAULT_STATE);
   }, []);
 
   const dueTodayIds = useMemo(() => {
@@ -149,11 +175,24 @@ export function useStudyStore() {
       .map(([id]) => id);
   }, [state]);
 
+  const completedTodayCount = useMemo(() => {
+    const todayKey = getLocalDayKey(new Date().toISOString());
+    return Object.values(state.reviewMap).filter((item) => getLocalDayKey(item.lastReviewedAt) === todayKey).length;
+  }, [state.reviewMap]);
+
+  const scheduledCount = useMemo(() => {
+    return Object.keys(state.reviewMap).length;
+  }, [state.reviewMap]);
+
   return {
     favorites: state.favorites,
     reviewMap: state.reviewMap,
+    recentViewedIds: state.recentViewed,
     dueTodayIds,
+    completedTodayCount,
+    scheduledCount,
     toggleFavorite,
+    markViewed,
     toggleReviewQueue,
     reviewCard,
     resetAll

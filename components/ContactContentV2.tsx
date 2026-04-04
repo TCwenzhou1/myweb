@@ -76,7 +76,7 @@ export default function ContactContentV2() {
                 <p style={eyebrowStyle}>Direct Contact</p>
                 <h3 style={cardTitleStyle}>Reach me directly</h3>
                 <div style={{ marginTop: '18px', display: 'grid', gap: '14px' }}>
-                  <ContactMethod icon={<Mail size={18} />} label="Email" value="hello@tcwenzhou.site" href="mailto:hello@tcwenzhou.site" />
+                  <ContactMethod icon={<Mail size={18} />} label="Email" value="3240468691@qq.com" href="mailto:3240468691@qq.com" />
                   <ContactMethod icon={<Github size={18} />} label="GitHub" value="github.com/TCwenzhou1" href="https://github.com/TCwenzhou1" />
                 </div>
               </ArchiveCard>

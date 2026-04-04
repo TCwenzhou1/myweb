@@ -1071,7 +1071,7 @@ export default function HeroSection() {
             color: C.inkMid,               // inkDim → inkMid
             opacity: 0.9,                  // 0.85 → 0.9
           }}>
-            hello@tcwenzhou.site
+            3240468691@qq.com
           </p>
         </div>
       </div>

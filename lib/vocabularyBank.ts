@@ -10,7 +10,11 @@ export interface VocabEntry {
   meaningEn: string;
   detailZh: string;
   source: string;
-  track: 'core2000' | 'full' | 'kaoyan' | 'kaoyan3500' | 'jlpt10k' | 'jmdict';
+  track: 'core2000' | 'full' | 'kaoyan' | 'kaoyan3500' | 'jlpt10k' | 'jmdict' | 'featured';
+  partOfSpeech?: string;
+  exampleJa?: string;
+  exampleZh?: string;
+  notes?: string[];
 }
 
 export const vocabEntries: VocabEntry[] = [

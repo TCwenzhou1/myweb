@@ -8,7 +8,7 @@ const structuredData = {
       '@type': 'Person',
       name: 'TCwenzhou',
       url: 'https://www.tcwenzhou.site',
-      email: 'mailto:hello@tcwenzhou.site',
+      email: 'mailto:3240468691@qq.com',
       sameAs: ['https://github.com/TCwenzhou1'],
       knowsAbout: ['AI Engineering', 'Reinforcement Learning', 'Learning Product Design', 'Game Prototyping'],
       jobTitle: 'Computer Engineering Student',

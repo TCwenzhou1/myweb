@@ -2,18 +2,20 @@
 
 import dynamic from 'next/dynamic'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { ReviewCard } from '@/components/ReviewCard'
-import { WordCard } from '@/components/WordCard'
+import { ReviewCardV2 as ReviewCard } from '@/components/ReviewCardV2'
+import { WordCardV2 as WordCard } from '@/components/WordCardV2'
+import { featuredLabEntries, labFallbackCatalog, labQuickPresets } from '@/lib/labFeaturedDeck'
 import type { VocabEntry } from '@/lib/vocabularyBank'
 import { useSpeech } from '@/lib/useSpeech'
 import { useStudyStore } from '@/lib/useStudyStore'
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz'
-type SourceMode = 'all' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1'
+type SourceMode = 'all' | 'featured' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1'
 type LevelFilter = 'ALL' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
 
 interface LabStats {
   total: number
+  featured: number
   core2000: number
   n5: number
   n4: number
@@ -29,6 +31,7 @@ interface LabStats {
 const PAGE_SIZE = 14
 const EMPTY_STATS: LabStats = {
   total: 0,
+  featured: featuredLabEntries.length,
   core2000: 0,
   n5: 0,
   n4: 0,
@@ -52,7 +55,8 @@ const TAB_ITEMS: Array<{ key: TabKey; label: string; badge?: string }> = [
 
 const SOURCE_OPTIONS: Array<{ value: SourceMode; label: string }> = [
   { value: 'all', label: '全词汇' },
-  { value: 'core2000', label: 'Core 2000' },
+  { value: 'featured', label: '高质量词卡' },
+  { value: 'core2000', label: '基础整合库' },
   { value: 'jlpt10k', label: 'JLPT 10K' },
   { value: 'jmdict', label: 'JMDict 补充' },
   { value: 'kaoyan3500', label: '考研 3500' },
@@ -95,21 +99,41 @@ function getPrimaryMeaning(item: VocabEntry) {
 }
 
 function getTrackLabel(track: VocabEntry['track']) {
+  if (track === 'featured') return '精选词卡'
   if (track === 'core2000') return 'Core 2000'
+  if (track === 'full') return '整合词库'
   if (track === 'jlpt10k') return 'JLPT 10K'
   if (track === 'jmdict') return 'JMDict'
   if (track === 'kaoyan3500' || track === 'kaoyan') return '考研'
   return '全词库'
 }
 
+function mergePreviewWithLive(items: VocabEntry[]) {
+  const map = new Map<string, VocabEntry>()
+
+  for (const entry of featuredLabEntries) {
+    map.set(`${entry.word}__${entry.kana}`, entry)
+  }
+
+  for (const entry of items) {
+    const key = `${entry.word}__${entry.kana}`
+    if (!map.has(key)) {
+      map.set(key, entry)
+    }
+  }
+
+  return Array.from(map.values())
+}
+
 function matchesKeyword(item: VocabEntry, keyword: string) {
   if (!keyword) return true
-  return [item.word, item.kana, item.meaningZh, item.meaningEn, item.detailZh].join(' ').toLowerCase().includes(keyword)
+  return [item.word, item.kana, item.meaningZh, item.meaningEn, item.detailZh, item.partOfSpeech ?? '', ...(item.notes ?? [])].join(' ').toLowerCase().includes(keyword)
 }
 
 function matchesSourceMode(item: VocabEntry, mode: SourceMode) {
   if (mode === 'all') return true
-  if (mode === 'core2000') return item.track === 'core2000'
+  if (mode === 'featured') return item.track === 'featured'
+  if (mode === 'core2000') return item.track === 'core2000' || item.track === 'full' || item.track === 'kaoyan'
   if (mode === 'jlpt10k') return item.track === 'jlpt10k'
   if (mode === 'jmdict') return item.track === 'jmdict'
   if (mode === 'kaoyan3500') return item.track === 'kaoyan3500'
@@ -126,6 +150,7 @@ function matchesLevel(item: VocabEntry, level: LevelFilter) {
 
 function getSourceCount(stats: LabStats, mode: SourceMode) {
   if (mode === 'all') return stats.total
+  if (mode === 'featured') return stats.featured
   if (mode === 'core2000') return stats.core2000
   if (mode === 'jlpt10k') return stats.jlpt10k
   if (mode === 'jmdict') return stats.jmdict
@@ -143,7 +168,7 @@ export default function LabPageClient() {
   const [sourceMode, setSourceMode] = useState<SourceMode>('all')
   const [levelFilter, setLevelFilter] = useState<LevelFilter>('ALL')
   const [page, setPage] = useState(1)
-  const [selectedWordId, setSelectedWordId] = useState<string | null>(null)
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(featuredLabEntries[0]?.id ?? null)
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
   const [vocabAllEntries, setVocabAllEntries] = useState<VocabEntry[]>([])
   const [vocabStats, setVocabStats] = useState<LabStats | null>(null)
@@ -151,8 +176,12 @@ export default function LabPageClient() {
   const [loadError, setLoadError] = useState<string | null>(null)
 
   const deferredKeyword = useDeferredValue(keyword)
-  const { speak } = useSpeech()
-  const { favorites, reviewMap, dueTodayIds, toggleFavorite, toggleReviewQueue, reviewCard, resetAll } = useStudyStore()
+  const { speak, voicesReady, isSupported, voiceStatusLabel } = useSpeech()
+  const { favorites, reviewMap, recentViewedIds, dueTodayIds, completedTodayCount, scheduledCount, toggleFavorite, markViewed, toggleReviewQueue, reviewCard, resetAll } = useStudyStore()
+
+  const speakText = useCallback((text: string) => {
+    void speak({ text })
+  }, [speak])
 
   const loadVocabulary = useCallback(async () => {
     setIsLoadingLibrary(true)
@@ -160,11 +189,14 @@ export default function LabPageClient() {
 
     try {
       const mod = await import('@/lib/vocabularyBank')
-      setVocabAllEntries(mod.vocabAllEntries)
-      setVocabStats(mod.vocabStats as LabStats)
+      setVocabAllEntries(mergePreviewWithLive(mod.vocabAllEntries))
+      setVocabStats({
+        ...(mod.vocabStats as Omit<LabStats, 'featured'>),
+        featured: featuredLabEntries.length,
+      })
     } catch (error) {
       console.error('Failed to load vocabulary bank:', error)
-      setLoadError('词库加载失败，请重试。')
+      setLoadError('全词库加载失败，当前先展示高质量示例词卡。你仍然可以收藏、复习和发音。')
     } finally {
       setIsLoadingLibrary(false)
     }
@@ -211,19 +243,19 @@ export default function LabPageClient() {
   const reviewSet = useMemo(() => new Set(Object.keys(reviewMap)), [reviewMap])
   const normalizedKeyword = deferredKeyword.trim().toLowerCase()
   const stats = vocabStats ?? EMPTY_STATS
+  const libraryEntries = vocabAllEntries.length > 0 ? vocabAllEntries : featuredLabEntries
   const sourceLabel = SOURCE_OPTIONS.find((option) => option.value === sourceMode)?.label ?? '全词汇'
   const levelLabel = LEVEL_OPTIONS.find((option) => option.value === levelFilter)?.label ?? '全部等级'
-  const needsVocabulary = tab === 'library' || tab === 'favorites' || tab === 'review' || tab === 'quiz'
 
   const filteredLibrary = useMemo(() => {
-    return vocabAllEntries.filter((item) => {
+    return libraryEntries.filter((item) => {
       return matchesKeyword(item, normalizedKeyword) && matchesSourceMode(item, sourceMode) && matchesLevel(item, levelFilter)
     })
-  }, [vocabAllEntries, normalizedKeyword, sourceMode, levelFilter])
+  }, [libraryEntries, normalizedKeyword, sourceMode, levelFilter])
 
   const favoriteItemsAll = useMemo(() => {
-    return vocabAllEntries.filter((item) => favoriteSet.has(item.id))
-  }, [vocabAllEntries, favoriteSet])
+    return libraryEntries.filter((item) => favoriteSet.has(item.id))
+  }, [libraryEntries, favoriteSet])
 
   const filteredFavorites = useMemo(() => {
     return favoriteItemsAll.filter((item) => {
@@ -232,14 +264,14 @@ export default function LabPageClient() {
   }, [favoriteItemsAll, normalizedKeyword, sourceMode, levelFilter])
 
   const reviewQueueItemsAll = useMemo(() => {
-    return vocabAllEntries
+    return libraryEntries
       .filter((item) => reviewSet.has(item.id))
       .sort((left, right) => {
         const leftDue = new Date(reviewMap[left.id]?.dueAt ?? 0).getTime()
         const rightDue = new Date(reviewMap[right.id]?.dueAt ?? 0).getTime()
         return leftDue - rightDue
       })
-  }, [vocabAllEntries, reviewSet, reviewMap])
+  }, [libraryEntries, reviewSet, reviewMap])
 
   const dueItemsAll = useMemo(() => {
     return reviewQueueItemsAll.filter((item) => dueSet.has(item.id))
@@ -258,6 +290,11 @@ export default function LabPageClient() {
   const selectedWord = pagedWordItems.find((item) => item.id === selectedWordId) ?? pagedWordItems[0] ?? null
   const selectedReview = filteredReviewItems.find((item) => item.id === selectedReviewId) ?? filteredReviewItems[0] ?? null
   const activeCollectionCount = tab === 'library' ? filteredLibrary.length : tab === 'favorites' ? filteredFavorites.length : filteredReviewItems.length
+  const recentViewedItems = useMemo(() => {
+    return recentViewedIds
+      .map((id) => libraryEntries.find((item) => item.id === id))
+      .filter((item): item is VocabEntry => Boolean(item))
+  }, [libraryEntries, recentViewedIds])
 
   useEffect(() => {
     if (page > totalPages) {
@@ -286,6 +323,12 @@ export default function LabPageClient() {
     }
   }, [filteredReviewItems, selectedReviewId])
 
+  useEffect(() => {
+    if ((tab === 'library' || tab === 'favorites') && selectedWord) {
+      markViewed(selectedWord.id)
+    }
+  }, [markViewed, selectedWord, tab])
+
   return (
     <main className="min-h-screen bg-[#f7f2e9] px-4 py-6 md:px-6 md:py-8">
       <div className="mx-auto max-w-7xl space-y-6" style={{ fontFamily: 'var(--font-jost)' }}>
@@ -296,13 +339,13 @@ export default function LabPageClient() {
           <div className="relative grid gap-6 xl:grid-cols-[1.35fr,0.95fr] xl:items-end">
             <div>
               <span className="inline-flex rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#a77a37]">
-                Japanese Lab · Dictionary Workflow
+                Japanese Lab · Search to Review
               </span>
               <h1 className="mt-5 text-4xl font-semibold text-[#1f1710] md:text-5xl" style={{ fontFamily: 'var(--font-cormorant)' }}>
                 日语学习实验室
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[#5f4b36] md:text-base">
-                这版把词汇入口扩成了全词汇词典，也把学习界面改成更像词典 App 的工作台：先搜索，再选词，再决定收藏、复习还是自测。
+                现在会先展示能直接拿来学的完整词卡，再在后台接入更大的多源词库。你可以从搜索开始，也可以直接继续收藏、复习和发音。
               </p>
 
               <div className="mt-6 rounded-[28px] border border-white/70 bg-white/75 p-4 shadow-[0_12px_32px_rgba(134,100,50,0.08)] backdrop-blur">
@@ -315,32 +358,119 @@ export default function LabPageClient() {
                         setKeyword(event.target.value)
                         setPage(1)
                       }}
-                      disabled={isLoadingLibrary || Boolean(loadError)}
-                      placeholder="输入日语、假名、中文释义或 English gloss"
-                      className="w-full rounded-[22px] border border-[#e4d2b8] bg-[#fffdf9] px-4 py-3 text-sm text-[#2f2419] outline-none transition placeholder:text-[#a38e73] focus:border-[#caa46e] disabled:cursor-not-allowed disabled:bg-[#f5f1ea]"
+                      placeholder="输入日语、假名、中文释义、词性或 English gloss"
+                      className="w-full rounded-[22px] border border-[#e4d2b8] bg-[#fffdf9] px-4 py-3 text-sm text-[#2f2419] outline-none transition placeholder:text-[#a38e73] focus:border-[#caa46e]"
                     />
                     <button
                       type="button"
                       onClick={() => void loadVocabulary()}
                       className="shrink-0 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
                     >
-                      {isLoadingLibrary ? '加载中...' : '刷新词库'}
+                      {isLoadingLibrary ? '接入全词库中...' : '刷新词库'}
                     </button>
                   </div>
                 </label>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <StatusBadge tone="warm" label={`范围 ${sourceLabel}`} />
+                  <StatusBadge tone="dark" label={`等级 ${levelLabel}`} />
+                  <StatusBadge tone="warm" label={voiceStatusLabel} />
+                  {isLoadingLibrary && <StatusBadge tone="warm" label="更大词库正在后台接入" />}
+                </div>
                 <p className="mt-3 text-sm leading-6 text-[#79624b]">
-                  当前使用「{sourceLabel} · {levelLabel}」视角。
-                  {isLoadingLibrary ? ' 词库正在后台准备中。' : ` 已接入 ${stats.total.toLocaleString()} 条可检索词条。`}
+                  {vocabStats ? `当前已接入 ${stats.total.toLocaleString()} 条可检索词条。` : labFallbackCatalog.totalDescription}
                 </p>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {labQuickPresets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      setTab('library')
+                      setKeyword(preset.keyword)
+                      setSourceMode(preset.sourceMode as SourceMode)
+                      setLevelFilter(preset.levelFilter as LevelFilter)
+                      setPage(1)
+                    }}
+                    className="rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-[#6a543d] transition hover:bg-[#fff8ef]"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <HeroMetric label="全词条" value={vocabStats ? stats.total.toLocaleString() : '...'} description="聚合 Core、JLPT、考研与补充词库" />
+              <HeroMetric label="全词库" value={vocabStats ? stats.total.toLocaleString() : labFallbackCatalog.totalLabel} description={labFallbackCatalog.totalDescription} />
               <HeroMetric label="今日复习" value={dueItemsAll.length.toString()} description="今天到期、应该优先处理的卡片" />
-              <HeroMetric label="收藏本" value={favoriteItemsAll.length.toString()} description="你主动留下来的生词与重点词" />
-              <HeroMetric label="当前范围" value={vocabStats ? getSourceCount(stats, sourceMode).toLocaleString() : '...'} description={`${sourceLabel} 下的总量`} />
+              <HeroMetric label="今日完成" value={completedTodayCount.toString()} description="今天已经完成反馈的复习张数" />
+              <HeroMetric label="当前范围" value={vocabStats ? getSourceCount(stats, sourceMode).toLocaleString() : sourceMode === 'featured' ? featuredLabEntries.length.toString() : labFallbackCatalog.totalLabel} description={`${sourceLabel} 视角下的可见规模`} />
             </div>
+          </div>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] backdrop-blur md:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Quick Loop</p>
+            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              最小可用学习闭环
+            </h2>
+            <div className="mt-5 grid gap-3 md:grid-cols-4">
+              {['搜索词', '查看词卡', '收藏 / 加入复习', '进入今日复习'].map((item, index) => (
+                <div key={item} className="rounded-[22px] bg-[#fbf7ef] px-4 py-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#af8a50]">0{index + 1}</p>
+                  <p className="mt-3 text-sm font-medium text-[#332719]">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] backdrop-blur md:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Continue</p>
+            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              继续今天的学习
+            </h2>
+            {recentViewedItems[0] ? (
+              <div className="mt-5 rounded-[24px] bg-[#fbf7ef] p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[30px] font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                      {recentViewedItems[0].word}
+                    </p>
+                    <p className="mt-1 text-sm text-[#7a6145]">{recentViewedItems[0].kana || recentViewedItems[0].word}</p>
+                    <p className="mt-3 text-sm leading-7 text-[#4b3b2d]">{getPrimaryMeaning(recentViewedItems[0])}</p>
+                  </div>
+                  <StatusBadge tone="warm" label={getTrackLabel(recentViewedItems[0].track)} />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('library')
+                      setSelectedWordId(recentViewedItems[0].id)
+                    }}
+                    className="rounded-full bg-[#201911] px-4 py-2 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
+                  >
+                    打开词卡
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('review')
+                      setSelectedReviewId(dueItemsAll[0]?.id ?? null)
+                    }}
+                    className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm font-medium text-[#6c5338] transition hover:bg-[#fff8ef]"
+                  >
+                    进入今日复习
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-4 text-sm leading-7 text-[#6c5945]">
+                先打开一张词卡，系统就会开始记录你的最近学习轨迹。
+              </p>
+            )}
           </div>
         </section>
 
@@ -402,7 +532,7 @@ export default function LabPageClient() {
                       key={option.value}
                       active={sourceMode === option.value}
                       label={option.label}
-                      count={vocabStats ? getSourceCount(stats, option.value).toLocaleString() : '...'}
+                      count={vocabStats ? getSourceCount(stats, option.value).toLocaleString() : option.value === 'featured' ? featuredLabEntries.length.toString() : option.value === 'all' ? labFallbackCatalog.totalLabel : '...'}
                       onClick={() => {
                         setSourceMode(option.value)
                         setPage(1)
@@ -428,10 +558,10 @@ export default function LabPageClient() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <MiniMetric label="当前命中" value={isLoadingLibrary ? '...' : activeCollectionCount.toLocaleString()} description={tab === 'review' ? '本轮待处理的到期复习词' : '当前筛选条件下的可见词条'} />
-                <MiniMetric label="复习队列" value={reviewQueueItemsAll.length.toString()} description="已加入间隔复习系统的全部词" />
+                <MiniMetric label="当前命中" value={activeCollectionCount.toString()} description={tab === 'review' ? '本轮待处理的到期复习词' : '当前筛选条件下的可见词条'} />
+                <MiniMetric label="复习队列" value={scheduledCount.toString()} description="已加入间隔复习系统的全部词" />
                 <MiniMetric label="收藏词汇" value={favoriteItemsAll.length.toString()} description="你主动标记过的词" />
-                <MiniMetric label="范围总量" value={vocabStats ? getSourceCount(stats, sourceMode).toLocaleString() : '...'} description={`${sourceLabel} 视角下的馆藏规模`} />
+                <MiniMetric label="最近查看" value={recentViewedItems.length.toString()} description="本地记录的最近学习轨迹" />
               </div>
             </div>
           </section>
@@ -451,11 +581,11 @@ export default function LabPageClient() {
           </section>
         )}
 
-        {needsVocabulary && isLoadingLibrary ? (
-          <LibraryLoadingState />
-        ) : loadError && needsVocabulary ? (
-          <PanelMessage title="词库没有成功加载" description={loadError} actionLabel="重新加载" onAction={() => void loadVocabulary()} />
-        ) : tab === 'library' || tab === 'favorites' ? (
+        {loadError && (
+          <PanelMessage title="全词库暂时没有完整接入" description={loadError} compact actionLabel="重新加载" onAction={() => void loadVocabulary()} />
+        )}
+
+        {tab === 'library' || tab === 'favorites' ? (
           <DictionaryWorkbench
             items={pagedWordItems}
             totalCount={activeWordCount}
@@ -468,7 +598,7 @@ export default function LabPageClient() {
             favoriteSet={favoriteSet}
             reviewSet={reviewSet}
             dueSet={dueSet}
-            onSpeak={speak}
+            onSpeak={speakText}
             onToggleFavorite={toggleFavorite}
             onToggleReview={toggleReviewQueue}
             emptyTitle={tab === 'library' ? '没有匹配的词条' : '收藏本里没有命中内容'}
@@ -477,15 +607,15 @@ export default function LabPageClient() {
         ) : tab === 'review' ? (
           <ReviewWorkbench
             items={filteredReviewItems}
-            queueCount={reviewQueueItemsAll.length}
+            queueCount={scheduledCount}
             selectedId={selectedReviewId}
             selectedItem={selectedReview}
             onSelect={setSelectedReviewId}
-            onSpeak={speak}
+            onSpeak={speakText}
             onReview={reviewCard}
           />
         ) : tab === 'quiz' ? (
-          <QuizMode reviewItems={dueItemsAll} favoriteItems={favoriteItemsAll} onRate={reviewCard} onSpeak={speak} />
+          <QuizMode reviewItems={dueItemsAll} favoriteItems={favoriteItemsAll} onRate={reviewCard} onSpeak={speakText} />
         ) : tab === 'grammar' ? (
           <GrammarTab />
         ) : (

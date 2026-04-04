@@ -1,8 +1,8 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '实验室',
-  description: '日语学习实验室，包含全词汇词典、收藏本、今日复习、自测、语法与句型学习。',
+  title: '日语学习实验室 | TCwenzhou',
+  description: '支持全词库检索、收藏、复习、自测与浏览器发音的日语学习实验室。',
 }
 
 export default function LabLayout({ children }: { children: React.ReactNode }) {

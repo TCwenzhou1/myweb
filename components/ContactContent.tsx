@@ -198,8 +198,8 @@ export default function ContactContent() {
             <ContactCard
               icon={<Mail size={18} />}
               label="邮箱"
-              value="hello@tcwenzhou.site"
-              href="mailto:hello@tcwenzhou.site"
+              value="3240468691@qq.com"
+              href="mailto:3240468691@qq.com"
             />
           </CinematicSection>
 
