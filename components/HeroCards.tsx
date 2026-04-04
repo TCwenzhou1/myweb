@@ -754,64 +754,6 @@ export default function HeroSection() {
         zIndex: 3,
       }}>
 
-        {/* ── 顶部：导航（Desktop 显示，Mobile 隐藏）─ */}
-        <div className="hero-nav" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          opacity: phase >= 2 ? 1 : 0,
-          transform: phase >= 2 ? 'translateY(0)' : 'translateY(-12px)',
-          transition: 'opacity 1.0s ease, transform 1.0s ease',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{
-              width: '5px',
-              height: '5px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${C.goldChamp}, ${C.gold})`,
-              boxShadow: `0 0 6px 1px rgba(196,162,101,0.4)`,
-            }} />
-            <span style={{
-              fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-              fontSize: '11px',
-              fontWeight: 500,
-              letterSpacing: '0.28em',
-              color: C.inkMid,
-              textTransform: 'uppercase',
-            }}>TCwenzhou</span>
-          </div>
-
-          <nav className="desktop-nav" style={{ display: 'flex', gap: '36px' }}>
-            {[
-              { label: 'Projects', href: '/projects' },
-              { label: 'Games',    href: '/games'    },
-              { label: 'Lab',      href: '/lab'      },
-              { label: 'About',    href: '/about'    },
-              { label: 'Contact',  href: '/contact'  },
-            ].map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  fontFamily: '"Jost", "Inter", system-ui, sans-serif',
-                  fontSize: '11px',
-                  fontWeight: 400,
-                  letterSpacing: '0.12em',
-                  color: C.inkFaint,
-                  textDecoration: 'none',
-                  position: 'relative',
-                  paddingBottom: '2px',
-                  transition: 'color 0.3s ease',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = C.inkMid)}
-                onMouseLeave={e => (e.currentTarget.style.color = C.inkFaint)}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-
         {/* ══════════════════════════════════════════════════
             中部：主内容区 - 三端响应式布局
             戏剧张力型：标题成为绝对主角，卡牌作为精致辅助
@@ -1270,9 +1212,6 @@ export default function HeroSection() {
       <style>{`
         /* ── Tablet (768px - 1199px) ── */
         @media (max-width: 1199px) and (min-width: 768px) {
-          .hero-nav {
-            display: none !important;
-          }
           .hero-main-grid {
             grid-template-columns: 1fr !important;
             gap: 48px !important;
@@ -1314,9 +1253,6 @@ export default function HeroSection() {
           .hero-page-num, .hero-royal {
             display: none;
           }
-          .desktop-nav {
-            gap: 24px !important;
-          }
         }
 
         /* ── Mobile (< 768px) ── */
@@ -1333,9 +1269,6 @@ export default function HeroSection() {
             gap: 40px !important;
             padding-top: 40px !important;
             padding-bottom: 40px !important;
-          }
-          .hero-nav {
-            justify-content: center !important;
           }
           .hero-card {
             order: 2 !important;
@@ -1388,9 +1321,6 @@ export default function HeroSection() {
             font-size: 11px !important;
           }
           .hero-page-num, .hero-royal, .hero-corner-tl, .hero-corner-tr {
-            display: none !important;
-          }
-          .desktop-nav {
             display: none !important;
           }
         }

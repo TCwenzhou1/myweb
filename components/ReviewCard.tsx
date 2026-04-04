@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { VocabEntry } from '@/lib/vocabularyBank';
 import type { ReviewRating } from '@/lib/useStudyStore';
 
@@ -10,51 +11,110 @@ interface ReviewCardProps {
 }
 
 const actions: Array<{ key: ReviewRating; label: string }> = [
-  { key: 'again', label: '不会' },
-  { key: 'hard', label: '困难' },
-  { key: 'good', label: '一般' },
-  { key: 'easy', label: '简单' }
+  { key: 'again', label: '再来一次' },
+  { key: 'hard', label: '有点困难' },
+  { key: 'good', label: '基本记住' },
+  { key: 'easy', label: '已经很稳' }
 ];
 
 export function ReviewCard({ item, onSpeak, onReview }: ReviewCardProps) {
+  const [revealed, setRevealed] = useState(false);
+  const primaryMeaning = item.meaningZh.trim() || item.meaningEn.trim() || item.detailZh.trim() || '暂未整理释义';
+  const englishMeaning = item.meaningEn.trim();
+
+  useEffect(() => {
+    setRevealed(false);
+  }, [item.id]);
+
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+    <article className="overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white shadow-[0_18px_50px_rgba(125,93,48,0.08)]">
+      <div className="border-b border-[#f1e6d5] bg-[linear-gradient(135deg,#fffaf2_0%,#fff1de_100%)] p-5 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-3xl font-bold text-slate-900">{item.word}</h3>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+            <span className="rounded-full bg-[#201911] px-3 py-1 text-xs font-semibold text-[#fff1da]">
+              今日复习
+            </span>
+            <span className="rounded-full bg-[#f4efe6] px-3 py-1 text-xs font-semibold text-[#6e5a40]">
               {item.level}
             </span>
           </div>
-          <p className="mt-2 text-sm text-slate-500">假名：{item.kana}</p>
-          <p className="mt-4 text-lg font-semibold text-slate-900">{item.meaningZh}</p>
+          <button
+            type="button"
+            onClick={() => onSpeak(item.kana || item.word)}
+            className="rounded-full border border-[#dfcfb7] bg-white px-4 py-2 text-sm font-medium text-[#5b4630] transition hover:border-[#c9af84] hover:bg-[#fff7eb]"
+          >
+            发音
+          </button>
+        </div>
+      </div>
+
+      <div className="p-5 md:p-6">
+        <div className="rounded-[30px] bg-[linear-gradient(180deg,#fffaf2_0%,#fff5e6_100%)] p-6 text-center md:p-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#af8a50]">
+            Review Card
+          </p>
+          <h2
+            className="mt-4 text-5xl font-semibold text-[#201911] md:text-6xl"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            {item.word}
+          </h2>
+          <p className="mt-3 text-lg text-[#7a6145]">{item.kana || item.word}</p>
+
+          <div className="mt-6">
+            {revealed ? (
+              <div className="rounded-[24px] bg-white px-5 py-6 text-left shadow-[inset_0_0_0_1px_rgba(226,208,180,0.65)]">
+                <p className="text-lg font-semibold leading-8 text-[#2e241a]">{primaryMeaning}</p>
+                {item.meaningZh.trim() && englishMeaning && (
+                  <p className="mt-2 text-sm leading-6 text-[#7a6a58]">EN: {englishMeaning}</p>
+                )}
+                <p className="mt-4 text-sm leading-7 text-[#544230]">{item.detailZh}</p>
+              </div>
+            ) : (
+              <div className="rounded-[24px] border border-dashed border-[#dcc9ad] bg-white/70 px-5 py-6 text-sm leading-7 text-[#7a6145]">
+                先在脑中回忆释义，再点“显示答案”。这样会比直接看解释更接近真实记忆过程。
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setRevealed((prev) => !prev)}
+            className="mt-5 rounded-full bg-[#201911] px-5 py-2.5 text-sm font-medium text-[#fff1da] transition hover:bg-[#382b1b]"
+          >
+            {revealed ? '隐藏答案' : '显示答案'}
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => onSpeak(item.word)}
-          className="rounded-full border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-        >
-          播放发音
-        </button>
-      </div>
-
-      <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-        <p className="text-sm text-slate-700">{item.detailZh}</p>
-      </div>
-
-      <div className="mt-4 grid gap-2 sm:grid-cols-4">
-        {actions.map((action) => (
-          <button
-            key={action.key}
-            type="button"
-            onClick={() => onReview(item.id, action.key)}
-            className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            {action.label}
-          </button>
-        ))}
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {actions.map((action) => (
+            <button
+              key={action.key}
+              type="button"
+              disabled={!revealed}
+              onClick={() => {
+                onReview(item.id, action.key);
+                setRevealed(false);
+              }}
+              className={`rounded-[24px] px-4 py-4 text-left text-sm font-medium transition ${
+                revealed
+                  ? 'border border-[#dfcfb7] bg-white text-[#2f2419] hover:border-[#c8a978] hover:bg-[#fff8ef]'
+                  : 'cursor-not-allowed border border-[#ede4d5] bg-[#f8f4ee] text-[#b09e86]'
+              }`}
+            >
+              <span className="block text-base font-semibold">{action.label}</span>
+              <span className="mt-1 block text-xs leading-5 text-inherit">
+                {action.key === 'again'
+                  ? '需要尽快再次见到'
+                  : action.key === 'hard'
+                    ? '记得不牢，还要加深'
+                    : action.key === 'good'
+                      ? '可以按正常节奏复习'
+                      : '可以把间隔拉长一些'}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </article>
   );
