@@ -1,8 +1,8 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '项目',
-  description: '正在做和已经做过的项目：三国杀 AI 系统、AI 自动化邮件回复、个人实验站。',
+  title: 'AI Projects and Case Studies',
+  description: 'A case archive for AI systems, automation workflows, and personal product experiments.',
 }
 
 export default function ProjectsLayout({

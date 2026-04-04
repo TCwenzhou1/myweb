@@ -1,6 +1,5 @@
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import { Bodoni_Moda, Jost, Cormorant_Garamond } from 'next/font/google'
+﻿import type { Metadata, Viewport } from 'next'
+import { Inter, Bodoni_Moda, Jost, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import ClientLayout from '@/components/ClientLayout'
 
@@ -31,12 +30,13 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'TCwenzhou | 个人主页',
+    default: 'TCwenzhou | AI 项目、实验室与原型',
     template: '%s | TCwenzhou',
   },
-  description: '计算机工程学生，AI 项目学习者，游戏开发探索者。这里是项目、实验和长期成长的记录。',
+  description:
+    '计算机工程学生，持续做 AI 系统、学习产品实验和游戏原型。这里展示项目案例、日语学习实验室与公开工作流。',
   applicationName: 'TCwenzhou',
-  keywords: ['TCwenzhou', '计算机工程', 'AI 项目', '游戏开发', '个人主页', '工程实践', '强化学习', 'Next.js portfolio'],
+  keywords: ['TCwenzhou', 'AI 项目', '工程案例', '日语学习实验室', '游戏原型', '个人网站', 'Next.js'],
   authors: [{ name: 'TCwenzhou', url: siteUrl }],
   creator: 'TCwenzhou',
   alternates: {
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   category: 'technology',
   manifest: '/manifest.webmanifest',
   openGraph: {
-    title: 'TCwenzhou | 个人主页',
-    description: '计算机工程学生，AI 项目学习者，游戏开发探索者。',
+    title: 'TCwenzhou | AI 项目、实验室与原型',
+    description: '项目案例、日语学习实验室、游戏原型与持续公开的个人工作流。',
     url: siteUrl,
     siteName: 'TCwenzhou',
     type: 'website',
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TCwenzhou | 个人主页',
-    description: '计算机工程学生，AI 项目学习者，游戏开发探索者。',
+    title: 'TCwenzhou | AI 项目、实验室与原型',
+    description: '项目案例、日语学习实验室、游戏原型与持续公开的个人工作流。',
   },
   icons: {
     icon: '/icon.svg',

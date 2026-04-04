@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import ProjectsContent from '@/components/ProjectsContent'
+﻿import type { Metadata } from 'next'
+import ProjectsContentV2 from '@/components/ProjectsContentV2'
 
 export const metadata: Metadata = {
-  title: '项目',
-  description: 'TCwenzhou 正在做和已经做过的核心项目档案。',
+  title: 'AI Projects and Case Studies',
+  description: 'TCwenzhou project cases focused on AI systems, automation workflows, and product experiments.',
 }
 
 export default function ProjectsPage() {
-  return <ProjectsContent />
+  return <ProjectsContentV2 />
 }

@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import GamesContent from '@/components/GamesContent'
+﻿import type { Metadata } from 'next'
+import GamesContentV2 from '@/components/GamesContentV2'
 
 export const metadata: Metadata = {
-  title: '游戏',
-  description: 'TCwenzhou 的游戏方向、原型计划和开发路线。',
+  title: 'Game Prototypes and Dev Logs',
+  description: 'TCwenzhou game direction page with prototype notes, AI opponent experiments, and development evidence.',
 }
 
 export default function GamesPage() {
-  return <GamesContent />
+  return <GamesContentV2 />
 }

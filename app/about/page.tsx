@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import AboutContent from '@/components/AboutContent'
+﻿import type { Metadata } from 'next'
+import AboutContentV2 from '@/components/AboutContentV2'
 
 export const metadata: Metadata = {
-  title: '关于',
-  description: 'TCwenzhou 的方向、做事方式和当前关注点。',
+  title: 'About TCwenzhou',
+  description: 'What TCwenzhou builds, what problems he likes to solve, and what he is focused on right now.',
 }
 
 export default function AboutPage() {
-  return <AboutContent />
+  return <AboutContentV2 />
 }
