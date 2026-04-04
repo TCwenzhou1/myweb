@@ -176,7 +176,7 @@ export default function LabPageClient() {
   const [loadError, setLoadError] = useState<string | null>(null)
 
   const deferredKeyword = useDeferredValue(keyword)
-  const { speak, voicesReady, isSupported, voiceStatusLabel } = useSpeech()
+  const { speak, voiceStatusLabel } = useSpeech()
   const { favorites, reviewMap, recentViewedIds, dueTodayIds, completedTodayCount, scheduledCount, toggleFavorite, markViewed, toggleReviewQueue, reviewCard, resetAll } = useStudyStore()
 
   const speakText = useCallback((text: string) => {
@@ -204,37 +204,15 @@ export default function LabPageClient() {
 
   useEffect(() => {
     let cancelled = false
-    let timeoutId: ReturnType<typeof setTimeout> | null = null
-    let idleId: number | null = null
 
-    const loadWhenIdle = async () => {
+    const timeoutId = setTimeout(() => {
       if (cancelled) return
-      await loadVocabulary()
-    }
-
-    const idleWindow = window as Window & {
-      requestIdleCallback?: (callback: () => void) => number
-      cancelIdleCallback?: (handle: number) => void
-    }
-
-    if (idleWindow.requestIdleCallback) {
-      idleId = idleWindow.requestIdleCallback(() => {
-        void loadWhenIdle()
-      })
-    } else {
-      timeoutId = setTimeout(() => {
-        void loadWhenIdle()
-      }, 0)
-    }
+      void loadVocabulary()
+    }, 120)
 
     return () => {
       cancelled = true
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-      }
-      if (idleId !== null && idleWindow.cancelIdleCallback) {
-        idleWindow.cancelIdleCallback(idleId)
-      }
+      clearTimeout(timeoutId)
     }
   }, [loadVocabulary])
 
@@ -296,6 +274,16 @@ export default function LabPageClient() {
       .filter((item): item is VocabEntry => Boolean(item))
   }, [libraryEntries, recentViewedIds])
 
+  const openLibraryWord = useCallback((id: string) => {
+    const index = libraryEntries.findIndex((item) => item.id === id)
+    setTab('library')
+    setKeyword('')
+    setSourceMode('all')
+    setLevelFilter('ALL')
+    setPage(index >= 0 ? Math.floor(index / PAGE_SIZE) + 1 : 1)
+    setSelectedWordId(id)
+  }, [libraryEntries])
+
   useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages)
@@ -345,7 +333,7 @@ export default function LabPageClient() {
                 日语学习实验室
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[#5f4b36] md:text-base">
-                现在会先展示能直接拿来学的完整词卡，再在后台接入更大的多源词库。你可以从搜索开始，也可以直接继续收藏、复习和发音。
+                现在会先展示能直接拿来学的完整词卡，然后尽快把更大的多源词库接进来。你可以从搜索开始，也可以直接继续收藏、复习和发音。
               </p>
 
               <div className="mt-6 rounded-[28px] border border-white/70 bg-white/75 p-4 shadow-[0_12px_32px_rgba(134,100,50,0.08)] backdrop-blur">
@@ -447,8 +435,7 @@ export default function LabPageClient() {
                   <button
                     type="button"
                     onClick={() => {
-                      setTab('library')
-                      setSelectedWordId(recentViewedItems[0].id)
+                      openLibraryWord(recentViewedItems[0].id)
                     }}
                     className="rounded-full bg-[#201911] px-4 py-2 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
                   >
@@ -601,6 +588,7 @@ export default function LabPageClient() {
             onSpeak={speakText}
             onToggleFavorite={toggleFavorite}
             onToggleReview={toggleReviewQueue}
+            notice={isLoadingLibrary && !vocabStats ? `完整词库正在接入中，当前先展示 ${featuredLabEntries.length} 张高质量词卡。词库完成后，这里的结果会自动扩展到 ${labFallbackCatalog.totalLabel}。` : undefined}
             emptyTitle={tab === 'library' ? '没有匹配的词条' : '收藏本里没有命中内容'}
             emptyDescription={tab === 'library' ? '换一个关键词、词库范围或等级试试看。' : '可以先在词典里点“收藏”，或者调整当前筛选条件。'}
           />
@@ -680,6 +668,7 @@ function DictionaryWorkbench({
   onSpeak,
   onToggleFavorite,
   onToggleReview,
+  notice,
   emptyTitle,
   emptyDescription,
 }: {
@@ -697,6 +686,7 @@ function DictionaryWorkbench({
   onSpeak: (text: string) => void
   onToggleFavorite: (id: string) => void
   onToggleReview: (id: string) => void
+  notice?: string
   emptyTitle: string
   emptyDescription: string
 }) {
@@ -710,6 +700,11 @@ function DictionaryWorkbench({
               {totalCount.toLocaleString()} 条结果
             </h3>
             <p className="mt-2 text-sm leading-6 text-[#6c5945]">第 {page} / {totalPages} 页，每页 {PAGE_SIZE} 条。左侧快速切词，右侧查看完整词卡。</p>
+            {notice && (
+              <p className="mt-3 rounded-[18px] bg-[#fbf5e8] px-3 py-2 text-sm leading-6 text-[#7c6243]">
+                {notice}
+              </p>
+            )}
           </div>
 
           {items.length === 0 ? (

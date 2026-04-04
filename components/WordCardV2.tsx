@@ -22,8 +22,44 @@ const trackMeta: Record<string, { label: string; badgeClass: string }> = {
   kaoyan: { label: '考研整合', badgeClass: 'bg-[#eefbf3] text-[#1f7a46]' },
 }
 
+const partOfSpeechMap: Record<string, string> = {
+  名: '名词',
+  副: '副词',
+  形: '形容词',
+  形動: '形容动词',
+  連体: '连体词',
+  代: '代词',
+  接: '接续词',
+  感: '感叹词',
+  助: '助词',
+  自五: '五段自动词',
+  他五: '五段他动词',
+  自一: '一段自动词',
+  他一: '一段他动词',
+  自サ: 'サ变自动词',
+  他サ: 'サ变他动词',
+  サ変: 'サ变动词',
+  サ変名詞: 'サ变名词',
+  サ変名: 'サ变名词',
+  自カ: 'カ变自动词',
+  他カ: 'カ变他动词',
+}
+
 function getPrimaryMeaning(item: VocabEntry) {
   return item.meaningZh.trim() || item.meaningEn.trim() || item.detailZh.trim() || '暂未整理释义'
+}
+
+function getPartOfSpeech(item: VocabEntry) {
+  if (item.partOfSpeech?.trim()) return item.partOfSpeech.trim()
+
+  const match = item.detailZh.match(/【([^】]+)】/)
+  if (!match) return null
+
+  return match[1]
+    .split(/[・/]/)
+    .map((part) => partOfSpeechMap[part.trim()] ?? part.trim())
+    .filter(Boolean)
+    .join(' / ') || null
 }
 
 function getExample(item: VocabEntry) {
@@ -40,9 +76,11 @@ function getExample(item: VocabEntry) {
   }
 }
 
-function getNotes(item: VocabEntry, inReview: boolean) {
+function getNotes(item: VocabEntry, isFavorite: boolean, inReview: boolean, dueToday: boolean) {
   if (item.notes && item.notes.length > 0) return item.notes
+  if (dueToday) return ['这张词卡今天已经到期，建议先听一遍发音，再做一轮完整复习反馈。']
   if (inReview) return ['这张词卡已经进入复习队列，建议今天处理完一轮反馈。']
+  if (isFavorite) return ['你已经把它放进收藏本了，下一步建议加入复习队列，形成真正的记忆闭环。']
   return ['先收藏，再加入复习队列，会比只看一遍更容易形成记忆。']
 }
 
@@ -58,8 +96,9 @@ export function WordCardV2({
   const primaryMeaning = getPrimaryMeaning(item)
   const englishMeaning = item.meaningEn.trim()
   const detailText = item.detailZh.trim() || primaryMeaning
+  const displayPartOfSpeech = getPartOfSpeech(item)
   const example = getExample(item)
-  const notes = getNotes(item, inReview)
+  const notes = getNotes(item, isFavorite, inReview, dueToday)
   const meta = trackMeta[item.track] ?? {
     label: item.track,
     badgeClass: 'bg-slate-100 text-slate-700',
@@ -72,8 +111,8 @@ export function WordCardV2({
           <div className="flex flex-wrap items-center gap-2">
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${meta.badgeClass}`}>{meta.label}</span>
             <span className="rounded-full bg-[#f4efe6] px-3 py-1 text-xs font-semibold text-[#6e5a40]">{item.level}</span>
-            {item.partOfSpeech && (
-              <span className="rounded-full bg-[#f4efe6] px-3 py-1 text-xs font-semibold text-[#6e5a40]">{item.partOfSpeech}</span>
+            {displayPartOfSpeech && (
+              <span className="rounded-full bg-[#f4efe6] px-3 py-1 text-xs font-semibold text-[#6e5a40]">{displayPartOfSpeech}</span>
             )}
             {dueToday && <span className="rounded-full bg-[#fff0f0] px-3 py-1 text-xs font-semibold text-[#b34242]">今日待复习</span>}
           </div>
@@ -148,7 +187,7 @@ export function WordCardV2({
             <dl className="mt-4 space-y-3 text-sm text-[#5a4937]">
               <div className="flex items-start justify-between gap-4">
                 <dt className="text-[#9b866b]">词性</dt>
-                <dd className="text-right font-medium text-[#2e241a]">{item.partOfSpeech || '待补充'}</dd>
+                <dd className="text-right font-medium text-[#2e241a]">{displayPartOfSpeech || '待补充'}</dd>
               </div>
               <div className="flex items-start justify-between gap-4">
                 <dt className="text-[#9b866b]">来源</dt>

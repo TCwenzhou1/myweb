@@ -17,8 +17,44 @@ const actions: Array<{ key: ReviewRating; label: string; hint: string }> = [
   { key: 'easy', label: '已经很稳', hint: '可以把间隔拉长一些' },
 ]
 
+const partOfSpeechMap: Record<string, string> = {
+  名: '名词',
+  副: '副词',
+  形: '形容词',
+  形動: '形容动词',
+  連体: '连体词',
+  代: '代词',
+  接: '接续词',
+  感: '感叹词',
+  助: '助词',
+  自五: '五段自动词',
+  他五: '五段他动词',
+  自一: '一段自动词',
+  他一: '一段他动词',
+  自サ: 'サ变自动词',
+  他サ: 'サ变他动词',
+  サ変: 'サ变动词',
+  サ変名詞: 'サ变名词',
+  サ変名: 'サ变名词',
+  自カ: 'カ变自动词',
+  他カ: 'カ变他动词',
+}
+
 function getPrimaryMeaning(item: VocabEntry) {
   return item.meaningZh.trim() || item.meaningEn.trim() || item.detailZh.trim() || '暂未整理释义'
+}
+
+function getPartOfSpeech(item: VocabEntry) {
+  if (item.partOfSpeech?.trim()) return item.partOfSpeech.trim()
+
+  const match = item.detailZh.match(/【([^】]+)】/)
+  if (!match) return null
+
+  return match[1]
+    .split(/[・/]/)
+    .map((part) => partOfSpeechMap[part.trim()] ?? part.trim())
+    .filter(Boolean)
+    .join(' / ') || null
 }
 
 function getExample(item: VocabEntry) {
@@ -39,6 +75,7 @@ export function ReviewCardV2({ item, onSpeak, onReview }: ReviewCardProps) {
   const [revealed, setRevealed] = useState(false)
   const primaryMeaning = getPrimaryMeaning(item)
   const englishMeaning = item.meaningEn.trim()
+  const displayPartOfSpeech = getPartOfSpeech(item)
   const example = getExample(item)
 
   useEffect(() => {
@@ -79,6 +116,10 @@ export function ReviewCardV2({ item, onSpeak, onReview }: ReviewCardProps) {
             {item.word}
           </h2>
           <p className="mt-3 text-lg text-[#7a6145]">{item.kana || item.word}</p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#6e5a40]">{item.level}</span>
+            {displayPartOfSpeech && <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#6e5a40]">{displayPartOfSpeech}</span>}
+          </div>
 
           <div className="mt-6">
             {revealed ? (
