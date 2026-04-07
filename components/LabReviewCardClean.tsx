@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import type { VocabEntry } from '@/lib/labTypes'
@@ -22,7 +22,7 @@ function getPrimaryMeaning(item: VocabEntry) {
 }
 
 function getDisplayLevel(level: VocabEntry['level']) {
-  return level === '鑰冪爺' ? '考研' : level
+  return level
 }
 
 function getExample(item: VocabEntry) {

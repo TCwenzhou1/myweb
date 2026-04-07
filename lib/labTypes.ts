@@ -1,4 +1,4 @@
-export type VocabLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '\u8003\u7814' | '\u9470\u51AA\u723A'
+export type VocabLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
 
 export type VocabTrack =
   | 'core2000'
@@ -8,6 +8,19 @@ export type VocabTrack =
   | 'jlpt10k'
   | 'jmdict'
   | 'featured'
+
+export type LabSourceMode = 'all' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500'
+export type LabLevelFilter = 'ALL' | VocabLevel
+
+export interface LabMeaningGroup {
+  zh: string[]
+  en: string[]
+}
+
+export interface LabExampleSentence {
+  ja: string
+  zh: string
+}
 
 export interface VocabEntry {
   id: string
@@ -23,6 +36,15 @@ export interface VocabEntry {
   exampleJa?: string
   exampleZh?: string
   notes?: string[]
+  meanings?: LabMeaningGroup
+  aliases?: string[]
+  variants?: string[]
+  exampleSentences?: LabExampleSentence[]
+  levels?: VocabLevel[]
+  tracks?: VocabTrack[]
+  sources?: string[]
+  tags?: string[]
+  searchText?: string
 }
 
 export interface LabLibraryStats {
@@ -37,6 +59,38 @@ export interface LabLibraryStats {
   kaoyan3500: number
   jlpt10k: number
   jmdict: number
+}
+
+export interface LabSourceSummary {
+  key: Exclude<LabSourceMode, 'all'>
+  label: string
+  description: string
+  count: number
+}
+
+export interface LabSearchParams {
+  keyword?: string
+  source?: LabSourceMode
+  level?: LabLevelFilter
+  page?: number
+  pageSize?: number
+}
+
+export interface LabSearchResponse {
+  items: VocabEntry[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  keyword: string
+  source: LabSourceMode
+  level: LabLevelFilter
+  stats: LabLibraryStats
+  sources: LabSourceSummary[]
+}
+
+export interface LabLookupResponse {
+  items: VocabEntry[]
 }
 
 export interface LabVocabularyPayload {
