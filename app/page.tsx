@@ -1,4 +1,4 @@
-﻿import HeroSection from '@/components/HeroCards'
+import HomeHeroClean from '@/components/HomeHeroClean'
 import HomeOverviewV2 from '@/components/HomeOverviewV2'
 
 const structuredData = {
@@ -29,7 +29,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HeroSection />
+      <HomeHeroClean />
       <HomeOverviewV2 />
     </>
   )

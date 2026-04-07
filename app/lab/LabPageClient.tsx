@@ -2,10 +2,10 @@
 
 import dynamic from 'next/dynamic'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { ReviewCardV2 as ReviewCard } from '@/components/ReviewCardV2'
-import { WordCardV2 as WordCard } from '@/components/WordCardV2'
-import { featuredLabEntries, labFallbackCatalog, labQuickPresets } from '@/lib/labFeaturedDeck'
-import type { VocabEntry } from '@/lib/vocabularyBank'
+import { LabReviewCardClean as ReviewCard } from '@/components/LabReviewCardClean'
+import { LabWordCardClean as WordCard } from '@/components/LabWordCardClean'
+import { featuredLabEntries, labFallbackCatalog, labQuickPresets } from '@/lib/labFeaturedDeckStable'
+import type { LabLibraryStats, LabVocabularyPayload, VocabEntry } from '@/lib/labTypes'
 import { useSpeech } from '@/lib/useSpeech'
 import { useStudyStore } from '@/lib/useStudyStore'
 
@@ -13,22 +13,13 @@ type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz
 type SourceMode = 'all' | 'featured' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1'
 type LevelFilter = 'ALL' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
 
-interface LabStats {
-  total: number
+type LabStats = LabLibraryStats & {
   featured: number
-  core2000: number
-  n5: number
-  n4: number
-  n3: number
-  n2: number
-  n1: number
-  kaoyan: number
-  kaoyan3500: number
-  jlpt10k: number
-  jmdict: number
 }
 
 const PAGE_SIZE = 14
+let cachedLabPayload: LabVocabularyPayload | null = null
+
 const EMPTY_STATS: LabStats = {
   total: 0,
   featured: featuredLabEntries.length,
@@ -85,7 +76,7 @@ const PatternTab = dynamic(() => import('@/lib/sentencePatterns').then((mod) => 
   loading: () => <PanelMessage title="句型内容加载中" description="正在按需加载句型模块。" />,
 })
 
-const QuizMode = dynamic(() => import('@/components/QuizMode').then((mod) => mod.QuizMode), {
+const QuizMode = dynamic(() => import('@/components/LabQuizModeClean').then((mod) => mod.QuizMode), {
   loading: () => <PanelMessage title="自测模块加载中" description="正在准备测试题。" />,
 })
 
@@ -106,6 +97,10 @@ function getTrackLabel(track: VocabEntry['track']) {
   if (track === 'jmdict') return 'JMDict'
   if (track === 'kaoyan3500' || track === 'kaoyan') return '考研'
   return '全词库'
+}
+
+function getDisplayLevel(level: VocabEntry['level']) {
+  return level === '鑰冪爺' ? '考研' : level
 }
 
 function mergePreviewWithLive(items: VocabEntry[]) {
@@ -145,7 +140,9 @@ function matchesSourceMode(item: VocabEntry, mode: SourceMode) {
 }
 
 function matchesLevel(item: VocabEntry, level: LevelFilter) {
-  return level === 'ALL' ? true : item.level === level
+  if (level === 'ALL') return true
+  if (level === '考研') return item.level === '考研' || item.level === '鑰冪爺'
+  return item.level === level
 }
 
 function getSourceCount(stats: LabStats, mode: SourceMode) {
@@ -183,15 +180,26 @@ export default function LabPageClient() {
     void speak({ text })
   }, [speak])
 
-  const loadVocabulary = useCallback(async () => {
+  const loadVocabulary = useCallback(async (forceRefresh = false) => {
     setIsLoadingLibrary(true)
     setLoadError(null)
 
     try {
-      const mod = await import('@/lib/vocabularyBank')
-      setVocabAllEntries(mergePreviewWithLive(mod.vocabAllEntries))
+      let payload = cachedLabPayload
+
+      if (!payload || forceRefresh) {
+        const response = await fetch('/api/lab/vocabulary')
+        if (!response.ok) {
+          throw new Error(`Failed to load vocabulary bank (${response.status})`)
+        }
+
+        payload = (await response.json()) as LabVocabularyPayload
+        cachedLabPayload = payload
+      }
+
+      setVocabAllEntries(mergePreviewWithLive(payload.entries))
       setVocabStats({
-        ...(mod.vocabStats as Omit<LabStats, 'featured'>),
+        ...payload.stats,
         featured: featuredLabEntries.length,
       })
     } catch (error) {
@@ -351,7 +359,7 @@ export default function LabPageClient() {
                     />
                     <button
                       type="button"
-                      onClick={() => void loadVocabulary()}
+                      onClick={() => void loadVocabulary(true)}
                       className="shrink-0 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
                     >
                       {isLoadingLibrary ? '接入全词库中...' : '刷新词库'}
@@ -359,7 +367,7 @@ export default function LabPageClient() {
                   </div>
                 </label>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <StatusBadge tone="warm" label={`范围 ${sourceLabel}`} />
+          <StatusBadge tone="warm" label={`范围 ${sourceLabel}`} />
                   <StatusBadge tone="dark" label={`等级 ${levelLabel}`} />
                   <StatusBadge tone="warm" label={voiceStatusLabel} />
                   {isLoadingLibrary && <StatusBadge tone="warm" label="更大词库正在后台接入" />}
@@ -569,7 +577,7 @@ export default function LabPageClient() {
         )}
 
         {loadError && (
-          <PanelMessage title="全词库暂时没有完整接入" description={loadError} compact actionLabel="重新加载" onAction={() => void loadVocabulary()} />
+          <PanelMessage title="全词库暂时没有完整接入" description={loadError} compact actionLabel="重新加载" onAction={() => void loadVocabulary(true)} />
         )}
 
         {tab === 'library' || tab === 'favorites' ? (
@@ -850,7 +858,7 @@ function WordListItem({
             <span className="text-[30px] font-semibold leading-none text-[#201911]" style={{ fontFamily: 'var(--font-cormorant)' }}>
               {item.word}
             </span>
-            <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{item.level}</span>
+            <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{getDisplayLevel(item.level)}</span>
             <span className="rounded-full bg-[#fff4dd] px-2.5 py-1 text-[11px] font-semibold text-[#9b6d1f]">{getTrackLabel(item.track)}</span>
           </div>
           <p className="mt-2 text-sm text-[#7a6145]">{item.kana || item.word}</p>
@@ -884,7 +892,7 @@ function ReviewQueueItem({ item, selected, onSelect }: { item: VocabEntry; selec
             <span className="text-[28px] font-semibold leading-none text-[#201911]" style={{ fontFamily: 'var(--font-cormorant)' }}>
               {item.word}
             </span>
-            <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{item.level}</span>
+            <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{getDisplayLevel(item.level)}</span>
           </div>
           <p className="mt-2 text-sm text-[#7a6145]">{item.kana || item.word}</p>
           <p className="mt-3 text-sm leading-6 text-[#544230]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>

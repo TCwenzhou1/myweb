@@ -1,5 +1,8 @@
 import { ImageResponse } from 'next/og'
 
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
 export const size = {
   width: 1200,
   height: 630,
@@ -51,7 +54,7 @@ export default function OpenGraphImage() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 28, color: '#5C585E' }}>
             <span>tcwenzhou.site</span>
-            <span>Projects · Lab · Games</span>
+            <span>Projects / Lab / Games</span>
           </div>
         </div>
       </div>
@@ -59,3 +62,4 @@ export default function OpenGraphImage() {
     size
   )
 }
+
