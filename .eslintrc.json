@@ -1,6 +1,9 @@
 {
-  "ignorePatterns": ["components/HeroCards.tsx", "lib/labFeaturedDeck.ts"],
   "extends": ["next/core-web-vitals"],
+  "ignorePatterns": [
+    "**/*_backup.ts",
+    "**/*_backup.tsx"
+  ],
   "rules": {
     "@next/next/no-img-element": "off"
   }
