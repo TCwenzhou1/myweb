@@ -8,6 +8,7 @@ const bodoni = Bodoni_Moda({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-bodoni',
+  adjustFontFallback: false,
 })
 const jost = Jost({
   subsets: ['latin'],

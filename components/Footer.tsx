@@ -12,7 +12,7 @@ const navLinks = [
   { label: 'Contact', href: '/contact' },
 ]
 
-// 统一配色
+// Footer palette
 const C = {
   bg:           '#F8F5EE',
   bgDeep:       '#E8E2D6',
@@ -25,7 +25,6 @@ const C = {
   goldPale:     '#E8DCC4',
 }
 
-// 电影级缓动
 const EASE = {
   focus: 'cubic-bezier(0.33, 1, 0.68, 1)',
 }
@@ -41,7 +40,7 @@ const Footer = () => {
         overflow: 'hidden',
       }}
     >
-      {/* 顶部金色细线 */}
+      {/* Decorative top border */}
       <div
         aria-hidden
         style={{
@@ -61,7 +60,7 @@ const Footer = () => {
           padding: 'clamp(48px, 6vh, 72px) clamp(24px, 5vw, 80px) clamp(32px, 4vh, 48px)',
         }}
       >
-        {/* 主内容区 */}
+        {/* Main footer grid */}
         <div
           className="footer-grid"
           style={{
@@ -71,7 +70,7 @@ const Footer = () => {
             marginBottom: 'clamp(40px, 5vh, 56px)',
           }}
         >
-          {/* 品牌区 */}
+          {/* Brand block */}
           <div className="footer-brand">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div
@@ -112,7 +111,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* 导航链接 */}
+          {/* Navigation block */}
           <div className="footer-nav">
             <p
               style={{
@@ -150,7 +149,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* 联系 */}
+          {/* Contact block */}
           <div className="footer-contact">
             <p
               style={{
@@ -222,7 +221,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* 底部字幕区 */}
+        {/* Footer meta row */}
         <div
           className="footer-bottom"
           style={{
@@ -235,7 +234,7 @@ const Footer = () => {
             gap: '16px',
           }}
         >
-          {/* 左：档案编号 */}
+          {/* Copyright and edition label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <span
               style={{
@@ -263,7 +262,7 @@ const Footer = () => {
             </span>
           </div>
 
-          {/* 右：技术标注 */}
+          {/* Tech stack summary */}
           <span
             className="footer-tech"
             style={{
@@ -282,7 +281,7 @@ const Footer = () => {
 
       {/* Responsive Styles */}
       <style>{`
-        /* ── Tablet (768px - 1023px) ── */
+        /* Tablet (768px - 1023px) */
         @media (max-width: 1023px) and (min-width: 768px) {
           .footer-grid {
             grid-template-columns: repeat(2, 1fr) !important;
@@ -296,7 +295,7 @@ const Footer = () => {
           }
         }
 
-        /* ── Mobile (< 768px) ── */
+        /* Mobile (< 768px) */
         @media (max-width: 767px) {
           .footer-grid {
             grid-template-columns: 1fr !important;
