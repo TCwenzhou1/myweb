@@ -25,6 +25,8 @@ node_modules
 # Development tools
 .vscode/settings.json
 .workbuddy/
+.codex/
+.codex-main-sync/
 skill-helper.js
 **/skills-quick-reference.md
 
@@ -49,3 +51,8 @@ scripts/_jmdict_cache/
 # Backup files
 *_backup.ts
 *_backup.tsx
+
+# Local logs and build caches
+*.log
+build-output.txt
+tsconfig.tsbuildinfo
