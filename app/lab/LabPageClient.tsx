@@ -1,64 +1,34 @@
 ﻿'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { LabReviewCardClean as ReviewCard } from '@/components/LabReviewCardClean'
 import { LabWordCardClean as WordCard } from '@/components/LabWordCardClean'
-import { featuredLabEntries, labFallbackCatalog, labQuickPresets } from '@/lib/labFeaturedDeckStable'
-import type { LabLibraryStats, LabVocabularyPayload, VocabEntry } from '@/lib/labTypes'
+import type { LabLevelFilter, LabLookupResponse, LabSearchResponse, LabSourceMode, LabSourceSummary, VocabEntry } from '@/lib/labTypes'
 import { useSpeech } from '@/lib/useSpeech'
 import { useStudyStore } from '@/lib/useStudyStore'
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz'
-type SourceMode = 'all' | 'featured' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1'
-type LevelFilter = 'ALL' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
-
-type LabStats = LabLibraryStats & {
-  featured: number
-}
 
 const PAGE_SIZE = 14
-let cachedLabPayload: LabVocabularyPayload | null = null
-
-const EMPTY_STATS: LabStats = {
-  total: 0,
-  featured: featuredLabEntries.length,
-  core2000: 0,
-  n5: 0,
-  n4: 0,
-  n3: 0,
-  n2: 0,
-  n1: 0,
-  kaoyan: 0,
-  kaoyan3500: 0,
-  jlpt10k: 0,
-  jmdict: 0,
-}
-
-const TAB_ITEMS: Array<{ key: TabKey; label: string; badge?: string }> = [
-  { key: 'library', label: '全词汇词典' },
+const LOOKUP_CHUNK_SIZE = 80
+const BASE_TRACKS = new Set(['core2000', 'full', 'kaoyan'])
+const TAB_ITEMS: Array<{ key: TabKey; label: string }> = [
+  { key: 'library', label: '全词库检索' },
   { key: 'favorites', label: '收藏本' },
   { key: 'review', label: '今日复习' },
   { key: 'quiz', label: '自测' },
-  { key: 'grammar', label: '文法', badge: '14 类' },
-  { key: 'pattern', label: '句型', badge: '332' },
+  { key: 'grammar', label: '文法' },
+  { key: 'pattern', label: '句型' },
 ]
-
-const SOURCE_OPTIONS: Array<{ value: SourceMode; label: string }> = [
-  { value: 'all', label: '全词汇' },
-  { value: 'featured', label: '高质量词卡' },
+const SOURCE_OPTIONS: Array<{ value: LabSourceMode; label: string }> = [
+  { value: 'all', label: '全部来源' },
   { value: 'core2000', label: '基础整合库' },
   { value: 'jlpt10k', label: 'JLPT 10K' },
   { value: 'jmdict', label: 'JMDict 补充' },
   { value: 'kaoyan3500', label: '考研 3500' },
-  { value: 'n5', label: 'N5' },
-  { value: 'n4', label: 'N4' },
-  { value: 'n3', label: 'N3' },
-  { value: 'n2', label: 'N2' },
-  { value: 'n1', label: 'N1' },
 ]
-
-const LEVEL_OPTIONS: Array<{ value: LevelFilter; label: string }> = [
+const LEVEL_OPTIONS: Array<{ value: LabLevelFilter; label: string }> = [
   { value: 'ALL', label: '全部等级' },
   { value: 'N5', label: 'N5' },
   { value: 'N4', label: 'N4' },
@@ -69,549 +39,475 @@ const LEVEL_OPTIONS: Array<{ value: LevelFilter; label: string }> = [
 ]
 
 const GrammarTab = dynamic(() => import('@/lib/grammarBank').then((mod) => mod.GrammarTab), {
-  loading: () => <PanelMessage title="文法内容加载中" description="正在按需加载语法模块。" />,
+  loading: () => <EmptyState title="文法内容加载中" description="正在按需加载语法模块。" />,
 })
-
 const PatternTab = dynamic(() => import('@/lib/sentencePatterns').then((mod) => mod.PatternTab), {
-  loading: () => <PanelMessage title="句型内容加载中" description="正在按需加载句型模块。" />,
+  loading: () => <EmptyState title="句型内容加载中" description="正在按需加载句型模块。" />,
 })
-
 const QuizMode = dynamic(() => import('@/components/LabQuizModeClean').then((mod) => mod.QuizMode), {
-  loading: () => <PanelMessage title="自测模块加载中" description="正在准备测试题。" />,
+  loading: () => <EmptyState title="自测模块加载中" description="正在准备测试题。" />,
 })
 
-function paginate<T>(items: T[], page: number) {
-  const start = (page - 1) * PAGE_SIZE
-  return items.slice(start, start + PAGE_SIZE)
+function normalizeKeyword(value: string) {
+  return value.trim().toLowerCase()
+}
+
+function buildEntryMap(entries: VocabEntry[]) {
+  return entries.reduce<Record<string, VocabEntry>>((acc, entry) => {
+    acc[entry.id] = entry
+    return acc
+  }, {})
+}
+
+function mergeEntryMap(previous: Record<string, VocabEntry>, entries: VocabEntry[]) {
+  const next = { ...previous }
+  for (const entry of entries) next[entry.id] = entry
+  return next
 }
 
 function getPrimaryMeaning(item: VocabEntry) {
   return item.meaningZh.trim() || item.meaningEn.trim() || item.detailZh.trim() || '暂未整理释义'
 }
 
+function getDisplayLevel(level: VocabEntry['level']) {
+  return level
+}
+
 function getTrackLabel(track: VocabEntry['track']) {
-  if (track === 'featured') return '精选词卡'
-  if (track === 'core2000') return 'Core 2000'
-  if (track === 'full') return '整合词库'
+  if (track === 'core2000') return '基础整合库'
   if (track === 'jlpt10k') return 'JLPT 10K'
   if (track === 'jmdict') return 'JMDict'
   if (track === 'kaoyan3500' || track === 'kaoyan') return '考研'
-  return '全词库'
-}
-
-function getDisplayLevel(level: VocabEntry['level']) {
-  return level === '鑰冪爺' ? '考研' : level
-}
-
-function mergePreviewWithLive(items: VocabEntry[]) {
-  const map = new Map<string, VocabEntry>()
-
-  for (const entry of featuredLabEntries) {
-    map.set(`${entry.word}__${entry.kana}`, entry)
-  }
-
-  for (const entry of items) {
-    const key = `${entry.word}__${entry.kana}`
-    if (!map.has(key)) {
-      map.set(key, entry)
-    }
-  }
-
-  return Array.from(map.values())
+  if (track === 'featured') return '精选词卡'
+  return '整合词库'
 }
 
 function matchesKeyword(item: VocabEntry, keyword: string) {
   if (!keyword) return true
-  return [item.word, item.kana, item.meaningZh, item.meaningEn, item.detailZh, item.partOfSpeech ?? '', ...(item.notes ?? [])].join(' ').toLowerCase().includes(keyword)
+  return (item.searchText ?? [item.word, item.kana, item.meaningZh, item.meaningEn, item.detailZh, ...(item.notes ?? [])].join(' ').toLowerCase()).includes(keyword)
 }
 
-function matchesSourceMode(item: VocabEntry, mode: SourceMode) {
-  if (mode === 'all') return true
-  if (mode === 'featured') return item.track === 'featured'
-  if (mode === 'core2000') return item.track === 'core2000' || item.track === 'full' || item.track === 'kaoyan'
-  if (mode === 'jlpt10k') return item.track === 'jlpt10k'
-  if (mode === 'jmdict') return item.track === 'jmdict'
-  if (mode === 'kaoyan3500') return item.track === 'kaoyan3500'
-  if (mode === 'n5') return item.level === 'N5'
-  if (mode === 'n4') return item.level === 'N4'
-  if (mode === 'n3') return item.level === 'N3'
-  if (mode === 'n2') return item.level === 'N2'
-  return item.level === 'N1'
+function matchesSource(item: VocabEntry, source: LabSourceMode) {
+  if (source === 'all') return true
+  const tracks = item.tracks ?? [item.track]
+  if (source === 'core2000') return tracks.some((track) => BASE_TRACKS.has(track))
+  if (source === 'jlpt10k') return tracks.includes('jlpt10k')
+  if (source === 'jmdict') return tracks.includes('jmdict')
+  return tracks.includes('kaoyan3500')
 }
 
-function matchesLevel(item: VocabEntry, level: LevelFilter) {
+function matchesLevel(item: VocabEntry, level: LabLevelFilter) {
   if (level === 'ALL') return true
-  if (level === '考研') return item.level === '考研' || item.level === '鑰冪爺'
-  return item.level === level
+  return (item.levels ?? [item.level]).includes(level)
 }
 
-function getSourceCount(stats: LabStats, mode: SourceMode) {
-  if (mode === 'all') return stats.total
-  if (mode === 'featured') return stats.featured
-  if (mode === 'core2000') return stats.core2000
-  if (mode === 'jlpt10k') return stats.jlpt10k
-  if (mode === 'jmdict') return stats.jmdict
-  if (mode === 'kaoyan3500') return stats.kaoyan3500
-  if (mode === 'n5') return stats.n5
-  if (mode === 'n4') return stats.n4
-  if (mode === 'n3') return stats.n3
-  if (mode === 'n2') return stats.n2
-  return stats.n1
+function getSourceCount(response: LabSearchResponse, source: LabSourceMode) {
+  if (source === 'all') return response.stats.total
+  if (source === 'core2000') return response.stats.core2000
+  if (source === 'jlpt10k') return response.stats.jlpt10k
+  if (source === 'jmdict') return response.stats.jmdict
+  return response.stats.kaoyan3500
 }
 
-export default function LabPageClient() {
+function getLevelCount(response: LabSearchResponse, level: LabLevelFilter) {
+  if (level === 'ALL') return response.stats.total
+  if (level === 'N5') return response.stats.n5
+  if (level === 'N4') return response.stats.n4
+  if (level === 'N3') return response.stats.n3
+  if (level === 'N2') return response.stats.n2
+  if (level === 'N1') return response.stats.n1
+  return response.stats.kaoyan
+}
+
+async function requestLibrary(params: { keyword: string; source: LabSourceMode; level: LabLevelFilter; page: number }) {
+  const searchParams = new URLSearchParams({
+    source: params.source,
+    level: params.level,
+    page: String(params.page),
+    pageSize: String(PAGE_SIZE),
+  })
+
+  if (params.keyword.trim()) searchParams.set('q', params.keyword.trim())
+
+  const response = await fetch(`/api/lab/vocabulary?${searchParams.toString()}`)
+  if (!response.ok) throw new Error(`Failed to search vocabulary (${response.status})`)
+  return (await response.json()) as LabSearchResponse
+}
+
+async function requestEntriesByIds(ids: string[]) {
+  const chunks: string[][] = []
+  for (let index = 0; index < ids.length; index += LOOKUP_CHUNK_SIZE) {
+    chunks.push(ids.slice(index, index + LOOKUP_CHUNK_SIZE))
+  }
+
+  const responses = await Promise.all(
+    chunks.map(async (chunk) => {
+      const searchParams = new URLSearchParams({ ids: chunk.join(',') })
+      const response = await fetch(`/api/lab/vocabulary?${searchParams.toString()}`)
+      if (!response.ok) throw new Error(`Failed to load vocabulary entries (${response.status})`)
+      return (await response.json()) as LabLookupResponse
+    }),
+  )
+
+  return {
+    items: responses.flatMap((payload) => payload.items),
+  } satisfies LabLookupResponse
+}
+
+export default function LabPageClient({ initialLibrary }: { initialLibrary: LabSearchResponse }) {
   const [tab, setTab] = useState<TabKey>('library')
-  const [keyword, setKeyword] = useState('')
-  const [sourceMode, setSourceMode] = useState<SourceMode>('all')
-  const [levelFilter, setLevelFilter] = useState<LevelFilter>('ALL')
-  const [page, setPage] = useState(1)
-  const [selectedWordId, setSelectedWordId] = useState<string | null>(featuredLabEntries[0]?.id ?? null)
+  const [keyword, setKeyword] = useState(initialLibrary.keyword)
+  const [sourceMode, setSourceMode] = useState<LabSourceMode>(initialLibrary.source)
+  const [levelFilter, setLevelFilter] = useState<LabLevelFilter>(initialLibrary.level)
+  const [page, setPage] = useState(initialLibrary.page)
+  const [libraryResponse, setLibraryResponse] = useState(initialLibrary)
+  const [entryMap, setEntryMap] = useState<Record<string, VocabEntry>>(() => buildEntryMap(initialLibrary.items))
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(initialLibrary.items[0]?.id ?? null)
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
-  const [vocabAllEntries, setVocabAllEntries] = useState<VocabEntry[]>([])
-  const [vocabStats, setVocabStats] = useState<LabStats | null>(null)
-  const [isLoadingLibrary, setIsLoadingLibrary] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
-
+  const [isLoadingLibrary, setIsLoadingLibrary] = useState(false)
+  const [isLoadingLinkedEntries, setIsLoadingLinkedEntries] = useState(false)
   const deferredKeyword = useDeferredValue(keyword)
+  const initialQueryRef = useRef<{ keyword: string; source: LabSourceMode; level: LabLevelFilter; page: number } | null>({ keyword: initialLibrary.keyword, source: initialLibrary.source, level: initialLibrary.level, page: initialLibrary.page })
+  const pendingSelectionIdRef = useRef<string | null>(null)
+
   const { speak, voiceStatusLabel } = useSpeech()
-  const { favorites, reviewMap, recentViewedIds, dueTodayIds, completedTodayCount, scheduledCount, toggleFavorite, markViewed, toggleReviewQueue, reviewCard, resetAll } = useStudyStore()
+  const {
+    favorites,
+    reviewMap,
+    recentViewedIds,
+    dueTodayIds,
+    completedTodayCount,
+    scheduledCount,
+    toggleFavorite,
+    markViewed,
+    toggleReviewQueue,
+    reviewCard,
+  } = useStudyStore()
+
+  const mergeCachedEntries = useCallback((items: VocabEntry[]) => {
+    setEntryMap((previous) => mergeEntryMap(previous, items))
+  }, [])
+
+  const runLibrarySearch = useCallback(async (params: { keyword: string; source: LabSourceMode; level: LabLevelFilter; page: number }) => {
+    setIsLoadingLibrary(true)
+    setLoadError(null)
+    try {
+      const payload = await requestLibrary(params)
+      setLibraryResponse(payload)
+      mergeCachedEntries(payload.items)
+      if (payload.page !== params.page) setPage(payload.page)
+    } catch (error) {
+      console.error('Failed to query vocabulary search:', error)
+      setLoadError('服务端词库查询失败，当前保留上一轮结果。请稍后重试。')
+    } finally {
+      setIsLoadingLibrary(false)
+    }
+  }, [mergeCachedEntries])
+
+  useEffect(() => {
+    const normalized = normalizeKeyword(deferredKeyword)
+    const initialQuery = initialQueryRef.current
+    if (initialQuery && initialQuery.keyword === normalized && initialQuery.source === sourceMode && initialQuery.level === levelFilter && initialQuery.page === page) {
+      initialQueryRef.current = null
+      return
+    }
+
+    void runLibrarySearch({ keyword: normalized, source: sourceMode, level: levelFilter, page })
+  }, [deferredKeyword, levelFilter, page, runLibrarySearch, sourceMode])
+
+  const linkedIds = useMemo(() => Array.from(new Set([...favorites, ...Object.keys(reviewMap), ...recentViewedIds])).filter((id) => !entryMap[id]), [entryMap, favorites, recentViewedIds, reviewMap])
+
+  useEffect(() => {
+    if (linkedIds.length === 0) return
+    let cancelled = false
+    setIsLoadingLinkedEntries(true)
+    void requestEntriesByIds(linkedIds)
+      .then((payload) => {
+        if (cancelled) return
+        mergeCachedEntries(payload.items)
+      })
+      .catch((error) => {
+        if (cancelled) return
+        console.error('Failed to hydrate linked vocabulary entries:', error)
+      })
+      .finally(() => {
+        if (cancelled) return
+        setIsLoadingLinkedEntries(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [linkedIds, mergeCachedEntries])
 
   const speakText = useCallback((text: string) => {
     void speak({ text })
   }, [speak])
 
-  const loadVocabulary = useCallback(async (forceRefresh = false) => {
-    setIsLoadingLibrary(true)
-    setLoadError(null)
-
-    try {
-      let payload = cachedLabPayload
-
-      if (!payload || forceRefresh) {
-        const response = await fetch('/api/lab/vocabulary')
-        if (!response.ok) {
-          throw new Error(`Failed to load vocabulary bank (${response.status})`)
-        }
-
-        payload = (await response.json()) as LabVocabularyPayload
-        cachedLabPayload = payload
-      }
-
-      setVocabAllEntries(mergePreviewWithLive(payload.entries))
-      setVocabStats({
-        ...payload.stats,
-        featured: featuredLabEntries.length,
-      })
-    } catch (error) {
-      console.error('Failed to load vocabulary bank:', error)
-      setLoadError('全词库加载失败，当前先展示高质量示例词卡。你仍然可以收藏、复习和发音。')
-    } finally {
-      setIsLoadingLibrary(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const timeoutId = setTimeout(() => {
-      if (cancelled) return
-      void loadVocabulary()
-    }, 120)
-
-    return () => {
-      cancelled = true
-      clearTimeout(timeoutId)
-    }
-  }, [loadVocabulary])
-
   const favoriteSet = useMemo(() => new Set(favorites), [favorites])
   const dueSet = useMemo(() => new Set(dueTodayIds), [dueTodayIds])
   const reviewSet = useMemo(() => new Set(Object.keys(reviewMap)), [reviewMap])
-  const normalizedKeyword = deferredKeyword.trim().toLowerCase()
-  const stats = vocabStats ?? EMPTY_STATS
-  const libraryEntries = vocabAllEntries.length > 0 ? vocabAllEntries : featuredLabEntries
-  const sourceLabel = SOURCE_OPTIONS.find((option) => option.value === sourceMode)?.label ?? '全词汇'
-  const levelLabel = LEVEL_OPTIONS.find((option) => option.value === levelFilter)?.label ?? '全部等级'
+  const normalizedKeyword = normalizeKeyword(deferredKeyword)
 
-  const filteredLibrary = useMemo(() => {
-    return libraryEntries.filter((item) => {
-      return matchesKeyword(item, normalizedKeyword) && matchesSourceMode(item, sourceMode) && matchesLevel(item, levelFilter)
-    })
-  }, [libraryEntries, normalizedKeyword, sourceMode, levelFilter])
+  const favoriteItems = useMemo(() => favorites.map((id) => entryMap[id]).filter((item): item is VocabEntry => Boolean(item)), [entryMap, favorites])
+  const filteredFavorites = useMemo(() => favoriteItems.filter((item) => matchesKeyword(item, normalizedKeyword) && matchesSource(item, sourceMode) && matchesLevel(item, levelFilter)), [favoriteItems, levelFilter, normalizedKeyword, sourceMode])
+  const reviewItems = useMemo(() => Object.keys(reviewMap).map((id) => entryMap[id]).filter((item): item is VocabEntry => Boolean(item)).sort((left, right) => new Date(reviewMap[left.id]?.dueAt ?? 0).getTime() - new Date(reviewMap[right.id]?.dueAt ?? 0).getTime()), [entryMap, reviewMap])
+  const dueItems = useMemo(() => reviewItems.filter((item) => dueSet.has(item.id)), [dueSet, reviewItems])
+  const filteredReviewItems = useMemo(() => dueItems.filter((item) => matchesKeyword(item, normalizedKeyword) && matchesSource(item, sourceMode) && matchesLevel(item, levelFilter)), [dueItems, levelFilter, normalizedKeyword, sourceMode])
+  const recentViewedItems = useMemo(() => recentViewedIds.map((id) => entryMap[id]).filter((item): item is VocabEntry => Boolean(item)), [entryMap, recentViewedIds])
 
-  const favoriteItemsAll = useMemo(() => {
-    return libraryEntries.filter((item) => favoriteSet.has(item.id))
-  }, [libraryEntries, favoriteSet])
-
-  const filteredFavorites = useMemo(() => {
-    return favoriteItemsAll.filter((item) => {
-      return matchesKeyword(item, normalizedKeyword) && matchesSourceMode(item, sourceMode) && matchesLevel(item, levelFilter)
-    })
-  }, [favoriteItemsAll, normalizedKeyword, sourceMode, levelFilter])
-
-  const reviewQueueItemsAll = useMemo(() => {
-    return libraryEntries
-      .filter((item) => reviewSet.has(item.id))
-      .sort((left, right) => {
-        const leftDue = new Date(reviewMap[left.id]?.dueAt ?? 0).getTime()
-        const rightDue = new Date(reviewMap[right.id]?.dueAt ?? 0).getTime()
-        return leftDue - rightDue
-      })
-  }, [libraryEntries, reviewSet, reviewMap])
-
-  const dueItemsAll = useMemo(() => {
-    return reviewQueueItemsAll.filter((item) => dueSet.has(item.id))
-  }, [reviewQueueItemsAll, dueSet])
-
-  const filteredReviewItems = useMemo(() => {
-    return dueItemsAll.filter((item) => {
-      return matchesKeyword(item, normalizedKeyword) && matchesSourceMode(item, sourceMode) && matchesLevel(item, levelFilter)
-    })
-  }, [dueItemsAll, normalizedKeyword, sourceMode, levelFilter])
-
-  const activeWordCollection = tab === 'library' ? filteredLibrary : filteredFavorites
-  const activeWordCount = activeWordCollection.length
-  const totalPages = Math.max(1, Math.ceil(activeWordCount / PAGE_SIZE))
-  const pagedWordItems = useMemo(() => paginate(activeWordCollection, page), [activeWordCollection, page])
-  const selectedWord = pagedWordItems.find((item) => item.id === selectedWordId) ?? pagedWordItems[0] ?? null
+  const isLibraryTab = tab === 'library'
+  const favoriteTotalPages = Math.max(1, Math.ceil(filteredFavorites.length / PAGE_SIZE))
+  const currentListItems = isLibraryTab ? libraryResponse.items : filteredFavorites.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const currentTotal = isLibraryTab ? libraryResponse.total : filteredFavorites.length
+  const currentTotalPages = isLibraryTab ? libraryResponse.totalPages : favoriteTotalPages
+  const selectedWord = currentListItems.find((item) => item.id === selectedWordId) ?? currentListItems[0] ?? null
   const selectedReview = filteredReviewItems.find((item) => item.id === selectedReviewId) ?? filteredReviewItems[0] ?? null
-  const activeCollectionCount = tab === 'library' ? filteredLibrary.length : tab === 'favorites' ? filteredFavorites.length : filteredReviewItems.length
-  const recentViewedItems = useMemo(() => {
-    return recentViewedIds
-      .map((id) => libraryEntries.find((item) => item.id === id))
-      .filter((item): item is VocabEntry => Boolean(item))
-  }, [libraryEntries, recentViewedIds])
-
-  const openLibraryWord = useCallback((id: string) => {
-    const index = libraryEntries.findIndex((item) => item.id === id)
-    setTab('library')
-    setKeyword('')
-    setSourceMode('all')
-    setLevelFilter('ALL')
-    setPage(index >= 0 ? Math.floor(index / PAGE_SIZE) + 1 : 1)
-    setSelectedWordId(id)
-  }, [libraryEntries])
 
   useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, totalPages])
+    if (page > currentTotalPages) setPage(currentTotalPages)
+  }, [currentTotalPages, page])
 
   useEffect(() => {
     if (tab !== 'library' && tab !== 'favorites') return
-    if (pagedWordItems.length === 0) {
+    if (currentListItems.length === 0) {
       setSelectedWordId(null)
       return
     }
-    if (!pagedWordItems.some((item) => item.id === selectedWordId)) {
-      setSelectedWordId(pagedWordItems[0].id)
+    const pendingId = pendingSelectionIdRef.current
+    if (pendingId && currentListItems.some((item) => item.id === pendingId)) {
+      setSelectedWordId(pendingId)
+      pendingSelectionIdRef.current = null
+      return
     }
-  }, [tab, pagedWordItems, selectedWordId])
+    if (!currentListItems.some((item) => item.id === selectedWordId)) setSelectedWordId(currentListItems[0].id)
+  }, [currentListItems, selectedWordId, tab])
 
   useEffect(() => {
     if (filteredReviewItems.length === 0) {
       setSelectedReviewId(null)
       return
     }
-    if (!filteredReviewItems.some((item) => item.id === selectedReviewId)) {
-      setSelectedReviewId(filteredReviewItems[0].id)
-    }
+    if (!filteredReviewItems.some((item) => item.id === selectedReviewId)) setSelectedReviewId(filteredReviewItems[0].id)
   }, [filteredReviewItems, selectedReviewId])
 
   useEffect(() => {
-    if ((tab === 'library' || tab === 'favorites') && selectedWord) {
-      markViewed(selectedWord.id)
-    }
+    if ((tab === 'library' || tab === 'favorites') && selectedWord) markViewed(selectedWord.id)
   }, [markViewed, selectedWord, tab])
+
+  const sourceLabel = SOURCE_OPTIONS.find((option) => option.value === sourceMode)?.label ?? '全部来源'
+  const levelLabel = LEVEL_OPTIONS.find((option) => option.value === levelFilter)?.label ?? '全部等级'
 
   return (
     <main className="min-h-screen bg-[#f7f2e9] px-4 py-6 md:px-6 md:py-8">
       <div className="mx-auto max-w-7xl space-y-6" style={{ fontFamily: 'var(--font-jost)' }}>
-        <section className="relative overflow-hidden rounded-[36px] border border-[#eadfcb] bg-[linear-gradient(135deg,#fffaf2_0%,#fff0db_45%,#f8ddb1_100%)] p-6 shadow-[0_28px_80px_rgba(128,92,40,0.14)] md:p-8">
-          <div className="pointer-events-none absolute -right-20 top-0 h-48 w-48 rounded-full bg-white/70 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 left-1/3 h-44 w-44 rounded-full bg-[#ffd89e]/40 blur-3xl" />
-
-          <div className="relative grid gap-6 xl:grid-cols-[1.35fr,0.95fr] xl:items-end">
-            <div>
-              <span className="inline-flex rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#a77a37]">
-                Japanese Lab · Search to Review
-              </span>
-              <h1 className="mt-5 text-4xl font-semibold text-[#1f1710] md:text-5xl" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                日语学习实验室
-              </h1>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[#5f4b36] md:text-base">
-                现在会先展示能直接拿来学的完整词卡，然后尽快把更大的多源词库接进来。你可以从搜索开始，也可以直接继续收藏、复习和发音。
-              </p>
-
-              <div className="mt-6 rounded-[28px] border border-white/70 bg-white/75 p-4 shadow-[0_12px_32px_rgba(134,100,50,0.08)] backdrop-blur">
-                <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-[0.28em] text-[#b08244]">Search</span>
-                  <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                    <input
-                      value={keyword}
-                      onChange={(event) => {
-                        setKeyword(event.target.value)
-                        setPage(1)
-                      }}
-                      placeholder="输入日语、假名、中文释义、词性或 English gloss"
-                      className="w-full rounded-[22px] border border-[#e4d2b8] bg-[#fffdf9] px-4 py-3 text-sm text-[#2f2419] outline-none transition placeholder:text-[#a38e73] focus:border-[#caa46e]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => void loadVocabulary(true)}
-                      className="shrink-0 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
-                    >
-                      {isLoadingLibrary ? '接入全词库中...' : '刷新词库'}
-                    </button>
-                  </div>
-                </label>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-          <StatusBadge tone="warm" label={`范围 ${sourceLabel}`} />
-                  <StatusBadge tone="dark" label={`等级 ${levelLabel}`} />
-                  <StatusBadge tone="warm" label={voiceStatusLabel} />
-                  {isLoadingLibrary && <StatusBadge tone="warm" label="更大词库正在后台接入" />}
-                </div>
-                <p className="mt-3 text-sm leading-6 text-[#79624b]">
-                  {vocabStats ? `当前已接入 ${stats.total.toLocaleString()} 条可检索词条。` : labFallbackCatalog.totalDescription}
-                </p>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {labQuickPresets.map((preset) => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => {
-                      setTab('library')
-                      setKeyword(preset.keyword)
-                      setSourceMode(preset.sourceMode as SourceMode)
-                      setLevelFilter(preset.levelFilter as LevelFilter)
-                      setPage(1)
-                    }}
-                    className="rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-[#6a543d] transition hover:bg-[#fff8ef]"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <HeroMetric label="全词库" value={vocabStats ? stats.total.toLocaleString() : labFallbackCatalog.totalLabel} description={labFallbackCatalog.totalDescription} />
-              <HeroMetric label="今日复习" value={dueItemsAll.length.toString()} description="今天到期、应该优先处理的卡片" />
-              <HeroMetric label="今日完成" value={completedTodayCount.toString()} description="今天已经完成反馈的复习张数" />
-              <HeroMetric label="当前范围" value={vocabStats ? getSourceCount(stats, sourceMode).toLocaleString() : sourceMode === 'featured' ? featuredLabEntries.length.toString() : labFallbackCatalog.totalLabel} description={`${sourceLabel} 视角下的可见规模`} />
-            </div>
+        <section className="rounded-[36px] border border-[#eadfcb] bg-[linear-gradient(135deg,#fffaf2_0%,#fff0db_45%,#f8ddb1_100%)] p-6 shadow-[0_28px_80px_rgba(128,92,40,0.14)] md:p-8">
+          <span className="inline-flex rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#a77a37]">Japanese Vocabulary System · Server Search</span>
+          <h1 className="mt-5 text-4xl font-semibold text-[#1f1710] md:text-5xl" style={{ fontFamily: 'var(--font-cormorant)' }}>日语全词库系统</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-[#5f4b36] md:text-base">现在首屏直接来自服务端检索，不再先下载整包词库。你可以按日文、假名、中文、英文、来源与等级搜索，并把结果直接接入收藏、复习与自测。</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <input
+              value={keyword}
+              onChange={(event) => {
+                setKeyword(event.target.value)
+                setPage(1)
+              }}
+              placeholder="输入日语、假名、中文释义、英文释义或词性"
+              className="w-full rounded-[22px] border border-[#e4d2b8] bg-[#fffdf9] px-4 py-3 text-sm text-[#2f2419] outline-none transition placeholder:text-[#a38e73] focus:border-[#caa46e]"
+            />
+            <button
+              type="button"
+              onClick={() => void runLibrarySearch({ keyword: normalizeKeyword(keyword), source: sourceMode, level: levelFilter, page })}
+              className="shrink-0 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
+            >
+              {isLoadingLibrary ? '检索中...' : '重新检索'}
+            </button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Badge tone="dark">服务端检索</Badge>
+            <Badge tone="warm">范围 {sourceLabel}</Badge>
+            <Badge tone="warm">等级 {levelLabel}</Badge>
+            <Badge tone="warm">{voiceStatusLabel}</Badge>
+            {isLoadingLibrary && <Badge tone="neutral">正在刷新结果</Badge>}
+          </div>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <MetricCard label="真实词条" value={libraryResponse.stats.total.toLocaleString()} description="服务端主索引去重后的当前规模" />
+            <MetricCard label="当前命中" value={libraryResponse.total.toLocaleString()} description="当前搜索和筛选条件下的结果数" />
+            <MetricCard label="今日复习" value={dueItems.length.toString()} description="今天到期、应优先处理的词卡" />
+            <MetricCard label="学习队列" value={scheduledCount.toString()} description="已进入收藏或复习体系的词条" />
           </div>
         </section>
 
         <section className="grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
-          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] backdrop-blur md:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Quick Loop</p>
-            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              最小可用学习闭环
-            </h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-4">
-              {['搜索词', '查看词卡', '收藏 / 加入复习', '进入今日复习'].map((item, index) => (
-                <div key={item} className="rounded-[22px] bg-[#fbf7ef] px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#af8a50]">0{index + 1}</p>
-                  <p className="mt-3 text-sm font-medium text-[#332719]">{item}</p>
-                </div>
+          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Sources</p>
+            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>当前数据覆盖</h2>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {libraryResponse.sources.map((source) => (
+                <SourceCard key={source.key} source={source} />
               ))}
             </div>
           </div>
-
-          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] backdrop-blur md:p-6">
+          <div className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Continue</p>
-            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              继续今天的学习
-            </h2>
+            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>今天的学习进度</h2>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <MetricCard label="已收藏" value={favorites.length.toString()} description="已经纳入个人词库的词条" compact />
+              <MetricCard label="已完成" value={completedTodayCount.toString()} description="今天已经完成反馈的复习张数" compact />
+            </div>
             {recentViewedItems[0] ? (
               <div className="mt-5 rounded-[24px] bg-[#fbf7ef] p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-[30px] font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                      {recentViewedItems[0].word}
-                    </p>
-                    <p className="mt-1 text-sm text-[#7a6145]">{recentViewedItems[0].kana || recentViewedItems[0].word}</p>
-                    <p className="mt-3 text-sm leading-7 text-[#4b3b2d]">{getPrimaryMeaning(recentViewedItems[0])}</p>
-                  </div>
-                  <StatusBadge tone="warm" label={getTrackLabel(recentViewedItems[0].track)} />
-                </div>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      openLibraryWord(recentViewedItems[0].id)
-                    }}
-                    className="rounded-full bg-[#201911] px-4 py-2 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
-                  >
-                    打开词卡
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTab('review')
-                      setSelectedReviewId(dueItemsAll[0]?.id ?? null)
-                    }}
-                    className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm font-medium text-[#6c5338] transition hover:bg-[#fff8ef]"
-                  >
-                    进入今日复习
-                  </button>
-                </div>
+                <p className="text-[30px] font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{recentViewedItems[0].word}</p>
+                <p className="mt-1 text-sm text-[#7a6145]">{recentViewedItems[0].kana || recentViewedItems[0].word}</p>
+                <p className="mt-3 text-sm leading-7 text-[#4b3b2d]">{getPrimaryMeaning(recentViewedItems[0])}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    pendingSelectionIdRef.current = recentViewedItems[0].id
+                    setTab('library')
+                    setSourceMode('all')
+                    setLevelFilter('ALL')
+                    setKeyword(recentViewedItems[0].word)
+                    setPage(1)
+                  }}
+                  className="mt-4 rounded-full border border-[#dfcfb7] bg-white px-4 py-2 text-sm font-medium text-[#5b4630] transition hover:border-[#c9af84] hover:bg-[#fff7eb]"
+                >
+                  回到词典查看
+                </button>
               </div>
             ) : (
-              <p className="mt-4 text-sm leading-7 text-[#6c5945]">
-                先打开一张词卡，系统就会开始记录你的最近学习轨迹。
-              </p>
+              <p className="mt-5 text-sm leading-7 text-[#6c5945]">你开始查词、收藏或复习后，这里会记录最近的学习轨迹。</p>
             )}
           </div>
         </section>
 
-        <div className="flex flex-wrap gap-2">
-          {TAB_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => {
-                setTab(item.key)
-                setPage(1)
-              }}
-              className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
-                tab === item.key ? 'bg-[#201911] text-[#fff1da] shadow-[0_10px_25px_rgba(43,28,12,0.18)]' : 'bg-white text-[#6a543d] hover:bg-[#fff6ea]'
-              }`}
-            >
-              {item.label}
-              {item.badge && (
-                <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] ${tab === item.key ? 'bg-[#d6b17b] text-[#201911]' : 'bg-[#f8ecda] text-[#9b7339]'}`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'library' || tab === 'favorites' || tab === 'review' ? (
-          <section className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] backdrop-blur md:p-6">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Study View</p>
-                <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                  {tab === 'library' ? '全词汇词典' : tab === 'favorites' ? '收藏词单' : '今日复习台'}
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-[#6c5945]">
-                  {tab === 'library'
-                    ? '用更接近词典 App 的方式浏览结果，左边快速切词，右边看完整词卡。'
-                    : tab === 'favorites'
-                      ? '把常看、常忘或想重点积累的词集中留在收藏本里，方便反复回看。'
-                      : '先回忆，再显示答案，再给难度反馈，整个过程会更像一轮完整复习。'}
-                </p>
-              </div>
-
+        <section className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)]">
+          <div className="flex flex-wrap gap-2">
+            {TAB_ITEMS.map((item) => (
               <button
+                key={item.key}
                 type="button"
-                onClick={resetAll}
-                className="rounded-[22px] border border-[#e3d2bb] px-4 py-3 text-sm font-medium text-[#6c5338] transition hover:bg-[#fff8ef]"
+                onClick={() => {
+                  setTab(item.key)
+                  setPage(1)
+                }}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition ${tab === item.key ? 'bg-[#201911] text-[#fff1da]' : 'border border-[#e3d2bb] bg-[#fffdf9] text-[#6a543d] hover:bg-[#fff8ef]'}`}
               >
-                清空收藏与复习记录
+                {item.label}
               </button>
+            ))}
+          </div>
+          <div className="mt-5">
+            <p className="text-sm font-semibold text-[#332719]">来源筛选</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {SOURCE_OPTIONS.map((option) => (
+                <Chip
+                  key={option.value}
+                  active={sourceMode === option.value}
+                  onClick={() => {
+                    setSourceMode(option.value)
+                    setPage(1)
+                  }}
+                >
+                  {option.label} · {getSourceCount(libraryResponse, option.value).toLocaleString()}
+                </Chip>
+              ))}
             </div>
-
-            <div className="mt-6 grid gap-5 xl:grid-cols-[1.3fr,0.9fr]">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#af8a50]">词库范围</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {SOURCE_OPTIONS.map((option) => (
-                    <FilterChip
-                      key={option.value}
-                      active={sourceMode === option.value}
-                      label={option.label}
-                      count={vocabStats ? getSourceCount(stats, option.value).toLocaleString() : option.value === 'featured' ? featuredLabEntries.length.toString() : option.value === 'all' ? labFallbackCatalog.totalLabel : '...'}
-                      onClick={() => {
-                        setSourceMode(option.value)
-                        setPage(1)
-                      }}
-                    />
-                  ))}
-                </div>
-
-                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.26em] text-[#af8a50]">等级筛选</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {LEVEL_OPTIONS.map((option) => (
-                    <FilterChip
-                      key={option.value}
-                      active={levelFilter === option.value}
-                      label={option.label}
-                      onClick={() => {
-                        setLevelFilter(option.value)
-                        setPage(1)
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <MiniMetric label="当前命中" value={activeCollectionCount.toString()} description={tab === 'review' ? '本轮待处理的到期复习词' : '当前筛选条件下的可见词条'} />
-                <MiniMetric label="复习队列" value={scheduledCount.toString()} description="已加入间隔复习系统的全部词" />
-                <MiniMetric label="收藏词汇" value={favoriteItemsAll.length.toString()} description="你主动标记过的词" />
-                <MiniMetric label="最近查看" value={recentViewedItems.length.toString()} description="本地记录的最近学习轨迹" />
-              </div>
+          </div>
+          <div className="mt-5">
+            <p className="text-sm font-semibold text-[#332719]">等级筛选</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {LEVEL_OPTIONS.map((option) => (
+                <Chip
+                  key={option.value}
+                  active={levelFilter === option.value}
+                  onClick={() => {
+                    setLevelFilter(option.value)
+                    setPage(1)
+                  }}
+                >
+                  {option.label} · {getLevelCount(libraryResponse, option.value).toLocaleString()}
+                </Chip>
+              ))}
             </div>
-          </section>
-        ) : (
-          <section className="rounded-[32px] border border-[#eadfcb] bg-white/85 p-5 shadow-[0_14px_36px_rgba(125,93,48,0.08)] md:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Learning Mode</p>
-            <h2 className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {tab === 'quiz' ? '词汇自测' : tab === 'grammar' ? '文法速查' : '句型速查'}
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[#6c5945]">
-              {tab === 'quiz'
-                ? `从复习和收藏里抽题，看日语先想中文，再做反馈。当前可用：复习 ${dueItemsAll.length} 条，收藏 ${favoriteItemsAll.length} 条。`
-                : tab === 'grammar'
-                  ? '14 类核心语法保留按需加载，不会拖慢站点首屏。'
-                  : '332 个高频表达也改成了按需加载，适合用来补句型语感。'}
-            </p>
-          </section>
-        )}
+          </div>
+        </section>
 
-        {loadError && (
-          <PanelMessage title="全词库暂时没有完整接入" description={loadError} compact actionLabel="重新加载" onAction={() => void loadVocabulary(true)} />
-        )}
+        {loadError && <EmptyState title="词库查询失败" description={loadError} actionLabel="重新检索" onAction={() => void runLibrarySearch({ keyword: normalizedKeyword, source: sourceMode, level: levelFilter, page })} compact />}
 
         {tab === 'library' || tab === 'favorites' ? (
-          <DictionaryWorkbench
-            items={pagedWordItems}
-            totalCount={activeWordCount}
-            page={page}
-            totalPages={totalPages}
-            selectedId={selectedWordId}
-            selectedItem={selectedWord}
-            onSelect={setSelectedWordId}
-            onPageChange={setPage}
-            favoriteSet={favoriteSet}
-            reviewSet={reviewSet}
-            dueSet={dueSet}
-            onSpeak={speakText}
-            onToggleFavorite={toggleFavorite}
-            onToggleReview={toggleReviewQueue}
-            notice={isLoadingLibrary && !vocabStats ? `完整词库正在接入中，当前先展示 ${featuredLabEntries.length} 张高质量词卡。词库完成后，这里的结果会自动扩展到 ${labFallbackCatalog.totalLabel}。` : undefined}
-            emptyTitle={tab === 'library' ? '没有匹配的词条' : '收藏本里没有命中内容'}
-            emptyDescription={tab === 'library' ? '换一个关键词、词库范围或等级试试看。' : '可以先在词典里点“收藏”，或者调整当前筛选条件。'}
-          />
+          <section className="grid gap-6 xl:grid-cols-[360px,minmax(0,1fr)]">
+            <div className="overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
+              <div className="border-b border-[#f1e6d5] p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Results</p>
+                <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{currentTotal.toLocaleString()} 条结果</h3>
+                <p className="mt-2 text-sm leading-6 text-[#6c5945]">第 {page} / {currentTotalPages} 页，每页 {PAGE_SIZE} 条。{isLibraryTab ? '当前结果直接来自服务端检索。' : '收藏结果来自真实词库回查。'}</p>
+                {!isLibraryTab && isLoadingLinkedEntries && <p className="mt-3 rounded-[18px] bg-[#fbf5e8] px-3 py-2 text-sm leading-6 text-[#7c6243]">正在从服务端词库回查收藏词条。</p>}
+              </div>
+              {currentListItems.length === 0 ? (
+                <div className="p-5">
+                  <EmptyState title={isLibraryTab ? '没有匹配的词条' : '收藏本里没有命中内容'} description={isLibraryTab ? '换一个关键词、来源或等级再试试。' : '可以先在词典里收藏词条，或者调整当前筛选条件。'} compact />
+                </div>
+              ) : (
+                <>
+                  <div className="p-3 xl:max-h-[720px] xl:overflow-y-auto">
+                    {currentListItems.map((item) => (
+                      <ResultListItem key={item.id} item={item} selected={selectedWordId === item.id} isFavorite={favoriteSet.has(item.id)} inReview={reviewSet.has(item.id)} dueToday={dueSet.has(item.id)} onSelect={() => setSelectedWordId(item.id)} />
+                    ))}
+                  </div>
+                  {currentTotalPages > 1 && (
+                    <div className="border-t border-[#f1e6d5] p-4">
+                      <Pagination page={page} totalPages={currentTotalPages} onPageChange={setPage} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="xl:sticky xl:top-28">
+              {selectedWord ? (
+                <WordCard item={selectedWord} isFavorite={favoriteSet.has(selectedWord.id)} inReview={reviewSet.has(selectedWord.id)} dueToday={dueSet.has(selectedWord.id)} onSpeak={speakText} onToggleFavorite={toggleFavorite} onToggleReview={toggleReviewQueue} />
+              ) : (
+                <EmptyState title="选择一条词目" description="左侧列表会展示当前页结果，点开后右侧就会显示完整词卡。" />
+              )}
+            </div>
+          </section>
         ) : tab === 'review' ? (
-          <ReviewWorkbench
-            items={filteredReviewItems}
-            queueCount={scheduledCount}
-            selectedId={selectedReviewId}
-            selectedItem={selectedReview}
-            onSelect={setSelectedReviewId}
-            onSpeak={speakText}
-            onReview={reviewCard}
-          />
+          <section className="grid gap-6 xl:grid-cols-[360px,minmax(0,1fr)]">
+            <div className="space-y-4">
+              <div className="rounded-[32px] border border-[#eadfcb] bg-white p-5 shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Today</p>
+                <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>今日复习工作台</h3>
+                <p className="mt-3 text-sm leading-7 text-[#6c5945]">今天到期 {filteredReviewItems.length} 条，复习队列总计 {scheduledCount} 条。{isLoadingLinkedEntries ? '正在从真实词库回查复习词条。' : '先回忆，再显示答案，再给难度反馈。'}</p>
+              </div>
+              <div className="overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
+                <div className="border-b border-[#f1e6d5] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Queue</p>
+                  <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>到期词列表</h3>
+                </div>
+                {filteredReviewItems.length === 0 ? (
+                  <div className="p-5">
+                    <EmptyState title="今天没有到期词卡" description="如果你已经把今天的复习做完了，可以回到词典继续加词，或者直接去自测里检验收藏本。" compact />
+                  </div>
+                ) : (
+                  <div className="p-3 xl:max-h-[720px] xl:overflow-y-auto">
+                    {filteredReviewItems.map((item) => (
+                      <ResultListItem key={item.id} item={item} selected={selectedReviewId === item.id} isFavorite={favoriteSet.has(item.id)} inReview dueToday onSelect={() => setSelectedReviewId(item.id)} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="xl:sticky xl:top-28">
+              {selectedReview ? (
+                <ReviewCard item={selectedReview} onSpeak={speakText} onReview={reviewCard} />
+              ) : (
+                <EmptyState title="选择一张词卡开始复习" description="左边会列出今天到期的词卡，点开后就能进入完整复习卡。" />
+              )}
+            </div>
+          </section>
         ) : tab === 'quiz' ? (
-          <QuizMode reviewItems={dueItemsAll} favoriteItems={favoriteItemsAll} onRate={reviewCard} onSpeak={speakText} />
+          <QuizMode reviewItems={dueItems} favoriteItems={favoriteItems} onRate={reviewCard} onSpeak={speakText} />
         ) : tab === 'grammar' ? (
           <GrammarTab />
         ) : (
@@ -622,9 +518,19 @@ export default function LabPageClient() {
   )
 }
 
-function HeroMetric({ label, value, description }: { label: string; value: string; description: string }) {
+function SourceCard({ source }: { source: LabSourceSummary }) {
   return (
-    <div className="rounded-[26px] border border-white/70 bg-white/72 p-4 shadow-[0_12px_28px_rgba(123,92,48,0.08)] backdrop-blur">
+    <div className="rounded-[24px] bg-[#fbf7ef] p-4">
+      <p className="text-sm font-medium text-[#8a6d48]">{source.label}</p>
+      <p className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{source.count.toLocaleString()}</p>
+      <p className="mt-2 text-sm leading-6 text-[#6d5a46]">{source.description}</p>
+    </div>
+  )
+}
+
+function MetricCard({ label, value, description, compact = false }: { label: string; value: string; description: string; compact?: boolean }) {
+  return (
+    <div className={`rounded-[26px] border border-white/70 bg-white/72 shadow-[0_12px_28px_rgba(123,92,48,0.08)] backdrop-blur ${compact ? 'p-4' : 'p-4'}`}>
       <p className="text-sm font-medium text-[#8a6d48]">{label}</p>
       <p className="mt-2 text-3xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{value}</p>
       <p className="mt-2 text-sm leading-6 text-[#6d5a46]">{description}</p>
@@ -632,400 +538,66 @@ function HeroMetric({ label, value, description }: { label: string; value: strin
   )
 }
 
-function MiniMetric({ label, value, description }: { label: string; value: string; description: string }) {
-  return (
-    <div className="rounded-[24px] bg-[#fbf7ef] p-4">
-      <p className="text-sm font-medium text-[#8a6d48]">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{value}</p>
-      <p className="mt-2 text-sm leading-6 text-[#6d5a46]">{description}</p>
-    </div>
-  )
-}
-
-function FilterChip({ active, label, count, onClick }: { active: boolean; label: string; count?: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-        active ? 'border-[#1f1710] bg-[#1f1710] text-[#fff1da]' : 'border-[#e3d2bb] bg-[#fffdf9] text-[#6a543d] hover:bg-[#fff6ea]'
-      }`}
-    >
-      {label}
-      {count && (
-        <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] ${active ? 'bg-[#d6b17b] text-[#1f1710]' : 'bg-[#f7ead8] text-[#9b7339]'}`}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}
-
-function DictionaryWorkbench({
-  items,
-  totalCount,
-  page,
-  totalPages,
-  selectedId,
-  selectedItem,
-  onSelect,
-  onPageChange,
-  favoriteSet,
-  reviewSet,
-  dueSet,
-  onSpeak,
-  onToggleFavorite,
-  onToggleReview,
-  notice,
-  emptyTitle,
-  emptyDescription,
-}: {
-  items: VocabEntry[]
-  totalCount: number
-  page: number
-  totalPages: number
-  selectedId: string | null
-  selectedItem: VocabEntry | null
-  onSelect: (id: string) => void
-  onPageChange: (page: number) => void
-  favoriteSet: Set<string>
-  reviewSet: Set<string>
-  dueSet: Set<string>
-  onSpeak: (text: string) => void
-  onToggleFavorite: (id: string) => void
-  onToggleReview: (id: string) => void
-  notice?: string
-  emptyTitle: string
-  emptyDescription: string
-}) {
-  return (
-    <section className="grid gap-6 xl:grid-cols-[360px,minmax(0,1fr)]">
-      <div className="order-2 xl:order-1">
-        <div className="overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
-          <div className="border-b border-[#f1e6d5] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Results</p>
-            <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {totalCount.toLocaleString()} 条结果
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#6c5945]">第 {page} / {totalPages} 页，每页 {PAGE_SIZE} 条。左侧快速切词，右侧查看完整词卡。</p>
-            {notice && (
-              <p className="mt-3 rounded-[18px] bg-[#fbf5e8] px-3 py-2 text-sm leading-6 text-[#7c6243]">
-                {notice}
-              </p>
-            )}
-          </div>
-
-          {items.length === 0 ? (
-            <div className="p-5">
-              <PanelMessage title={emptyTitle} description={emptyDescription} compact />
-            </div>
-          ) : (
-            <>
-              <div className="p-3 xl:max-h-[720px] xl:overflow-y-auto">
-                {items.map((item) => (
-                  <WordListItem
-                    key={item.id}
-                    item={item}
-                    selected={selectedId === item.id}
-                    isFavorite={favoriteSet.has(item.id)}
-                    inReview={reviewSet.has(item.id)}
-                    dueToday={dueSet.has(item.id)}
-                    onSelect={() => onSelect(item.id)}
-                  />
-                ))}
-              </div>
-              {totalPages > 1 && (
-                <div className="border-t border-[#f1e6d5] p-4">
-                  <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="order-1 xl:order-2 xl:sticky xl:top-28">
-        {selectedItem ? (
-          <WordCard
-            item={selectedItem}
-            isFavorite={favoriteSet.has(selectedItem.id)}
-            inReview={reviewSet.has(selectedItem.id)}
-            dueToday={dueSet.has(selectedItem.id)}
-            onSpeak={onSpeak}
-            onToggleFavorite={onToggleFavorite}
-            onToggleReview={onToggleReview}
-          />
-        ) : (
-          <PanelMessage title={emptyTitle} description={emptyDescription} />
-        )}
-      </div>
-    </section>
-  )
-}
-
-function ReviewWorkbench({
-  items,
-  queueCount,
-  selectedId,
-  selectedItem,
-  onSelect,
-  onSpeak,
-  onReview,
-}: {
-  items: VocabEntry[]
-  queueCount: number
-  selectedId: string | null
-  selectedItem: VocabEntry | null
-  onSelect: (id: string) => void
-  onSpeak: (text: string) => void
-  onReview: (id: string, rating: 'again' | 'hard' | 'good' | 'easy') => void
-}) {
-  return (
-    <section className="grid gap-6 xl:grid-cols-[360px,minmax(0,1fr)]">
-      <div className="order-2 space-y-4 xl:order-1">
-        <div className="rounded-[32px] border border-[#eadfcb] bg-white p-5 shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Today</p>
-          <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            今日复习工作台
-          </h3>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <MiniMetric label="待处理" value={items.length.toString()} description="今天已经到期的词卡" />
-            <MiniMetric label="总队列" value={queueCount.toString()} description="已经进入间隔复习的全部词卡" />
-          </div>
-          <p className="mt-4 text-sm leading-7 text-[#6c5945]">推荐节奏是：先看词，脑中回忆，再显示答案，最后给难度反馈。这样比直接扫答案更能稳住记忆。</p>
-        </div>
-
-        <div className="overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white shadow-[0_16px_40px_rgba(125,93,48,0.08)]">
-          <div className="border-b border-[#f1e6d5] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#af8a50]">Queue</p>
-            <h3 className="mt-2 text-2xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              到期词列表
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#6c5945]">点击左边任意一条，就能在右侧进入完整复习卡。</p>
-          </div>
-
-          {items.length === 0 ? (
-            <div className="p-5">
-              <PanelMessage title="今天没有到期词卡" description="如果你已经把今天的复习做完了，可以回到词典继续加词，或者直接去自测里检验收藏本。" compact />
-            </div>
-          ) : (
-            <div className="p-3 xl:max-h-[720px] xl:overflow-y-auto">
-              {items.map((item) => (
-                <ReviewQueueItem key={item.id} item={item} selected={selectedId === item.id} onSelect={() => onSelect(item.id)} />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="order-1 xl:order-2 xl:sticky xl:top-28">
-        {selectedItem ? (
-          <ReviewCard key={selectedItem.id} item={selectedItem} onSpeak={onSpeak} onReview={onReview} />
-        ) : (
-          <PanelMessage title="选择一张词卡开始复习" description="左边会列出今天到期的词卡，点开后就能像词典 App 一样一张张处理。" />
-        )}
-      </div>
-    </section>
-  )
-}
-
-function WordListItem({
-  item,
-  selected,
-  isFavorite,
-  inReview,
-  dueToday,
-  onSelect,
-}: {
-  item: VocabEntry
-  selected: boolean
-  isFavorite: boolean
-  inReview: boolean
-  dueToday: boolean
-  onSelect: () => void
-}) {
+function ResultListItem({ item, selected, isFavorite, inReview, dueToday, onSelect }: { item: VocabEntry; selected: boolean; isFavorite: boolean; inReview: boolean; dueToday: boolean; onSelect: () => void }) {
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`mb-3 w-full rounded-[24px] border p-4 text-left transition ${
-        selected ? 'border-[#d3ae77] bg-[#fff7eb] shadow-[0_12px_28px_rgba(140,103,48,0.12)]' : 'border-[#efe3cf] bg-[#fffdf9] hover:border-[#dcc09a] hover:bg-[#fff8ef]'
-      }`}
+      className={`mb-3 w-full rounded-[24px] border p-4 text-left transition ${selected ? 'border-[#d3ae77] bg-[#fff7eb] shadow-[0_12px_28px_rgba(140,103,48,0.12)]' : 'border-[#efe3cf] bg-[#fffdf9] hover:border-[#dcc09a] hover:bg-[#fff8ef]'}`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[30px] font-semibold leading-none text-[#201911]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {item.word}
-            </span>
+            <span className="text-[28px] font-semibold leading-none text-[#201911]" style={{ fontFamily: 'var(--font-cormorant)' }}>{item.word}</span>
             <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{getDisplayLevel(item.level)}</span>
             <span className="rounded-full bg-[#fff4dd] px-2.5 py-1 text-[11px] font-semibold text-[#9b6d1f]">{getTrackLabel(item.track)}</span>
           </div>
           <p className="mt-2 text-sm text-[#7a6145]">{item.kana || item.word}</p>
-          <p className="mt-3 text-sm leading-6 text-[#544230]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-            {getPrimaryMeaning(item)}
-          </p>
+          <p className="mt-3 text-sm leading-6 text-[#544230]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{getPrimaryMeaning(item)}</p>
         </div>
-
         <div className="flex shrink-0 flex-col items-end gap-2">
-          {isFavorite && <StatusBadge tone="dark" label="收藏" />}
-          {inReview && <StatusBadge tone="warm" label="复习" />}
-          {dueToday && <StatusBadge tone="danger" label="今日" />}
+          {isFavorite && <Badge tone="dark">收藏</Badge>}
+          {inReview && <Badge tone="warm">复习</Badge>}
+          {dueToday && <Badge tone="danger">今日</Badge>}
         </div>
       </div>
     </button>
   )
 }
 
-function ReviewQueueItem({ item, selected, onSelect }: { item: VocabEntry; selected: boolean; onSelect: () => void }) {
+function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button
       type="button"
-      onClick={onSelect}
-      className={`mb-3 w-full rounded-[24px] border p-4 text-left transition ${
-        selected ? 'border-[#d3ae77] bg-[#fff7eb] shadow-[0_12px_28px_rgba(140,103,48,0.12)]' : 'border-[#efe3cf] bg-[#fffdf9] hover:border-[#dcc09a] hover:bg-[#fff8ef]'
-      }`}
+      onClick={onClick}
+      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${active ? 'border-[#1f1710] bg-[#1f1710] text-[#fff1da]' : 'border-[#e3d2bb] bg-[#fffdf9] text-[#6a543d] hover:bg-[#fff6ea]'}`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[28px] font-semibold leading-none text-[#201911]" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {item.word}
-            </span>
-            <span className="rounded-full bg-[#f4efe6] px-2.5 py-1 text-[11px] font-semibold text-[#6e5a40]">{getDisplayLevel(item.level)}</span>
-          </div>
-          <p className="mt-2 text-sm text-[#7a6145]">{item.kana || item.word}</p>
-          <p className="mt-3 text-sm leading-6 text-[#544230]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-            {getPrimaryMeaning(item)}
-          </p>
-        </div>
-
-        <div className="shrink-0">
-          <StatusBadge tone="danger" label="到期" />
-        </div>
-      </div>
+      {children}
     </button>
   )
 }
 
-function StatusBadge({ tone, label }: { tone: 'dark' | 'warm' | 'danger'; label: string }) {
-  const className = tone === 'dark' ? 'bg-[#201911] text-[#fff1da]' : tone === 'warm' ? 'bg-[#ffe6d7] text-[#a24d1a]' : 'bg-[#fff0f0] text-[#b34242]'
-  return <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${className}`}>{label}</span>
+function Badge({ tone, children }: { tone: 'dark' | 'warm' | 'danger' | 'neutral'; children: ReactNode }) {
+  const className = tone === 'dark' ? 'bg-[#201911] text-[#fff1da]' : tone === 'warm' ? 'bg-[#ffe6d7] text-[#a24d1a]' : tone === 'danger' ? 'bg-[#fff0f0] text-[#b34242]' : 'bg-[#edf1f5] text-[#495666]'
+  return <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${className}`}>{children}</span>
 }
 
 function Pagination({ page, totalPages, onPageChange }: { page: number; totalPages: number; onPageChange: (page: number) => void }) {
-  const windowPages = Array.from({ length: totalPages }, (_, index) => index + 1).filter((value) => {
-    if (totalPages <= 7) return true
-    if (value === 1 || value === totalPages) return true
-    return Math.abs(value - page) <= 1
-  })
-
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <button
-        type="button"
-        onClick={() => onPageChange(Math.max(1, page - 1))}
-        disabled={page <= 1}
-        className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm text-[#6a543d] transition hover:bg-[#fff8ef] disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        上一页
-      </button>
-      <div className="flex items-center gap-1">
-        {windowPages.map((value, index) => {
-          const previous = windowPages[index - 1]
-          const showGap = previous && value - previous > 1
-          return (
-            <div key={value} className="flex items-center gap-1">
-              {showGap && <span className="px-1 text-[#b39b7c]">...</span>}
-              <button
-                type="button"
-                onClick={() => onPageChange(value)}
-                className={`min-w-[36px] rounded-full px-3 py-2 text-sm transition ${page === value ? 'bg-[#201911] text-[#fff1da]' : 'text-[#6a543d] hover:bg-[#fff8ef]'}`}
-              >
-                {value}
-              </button>
-            </div>
-          )
-        })}
-      </div>
-      <button
-        type="button"
-        onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-        disabled={page >= totalPages}
-        className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm text-[#6a543d] transition hover:bg-[#fff8ef] disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        下一页
-      </button>
+    <div className="flex items-center justify-center gap-2">
+      <button type="button" onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1} className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm text-[#6a543d] transition hover:bg-[#fff8ef] disabled:cursor-not-allowed disabled:opacity-40">上一页</button>
+      <span className="text-sm text-[#6a543d]">{page} / {totalPages}</span>
+      <button type="button" onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="rounded-full border border-[#e3d2bb] px-4 py-2 text-sm text-[#6a543d] transition hover:bg-[#fff8ef] disabled:cursor-not-allowed disabled:opacity-40">下一页</button>
     </div>
   )
 }
 
-function LibraryLoadingState() {
-  return (
-    <section className="grid gap-6 xl:grid-cols-[360px,minmax(0,1fr)]">
-      <div className="animate-pulse overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white">
-        <div className="border-b border-[#f1e6d5] p-5">
-          <div className="h-3 w-20 rounded-full bg-[#eee3d1]" />
-          <div className="mt-4 h-8 w-40 rounded-full bg-[#f3eadb]" />
-          <div className="mt-3 h-4 w-48 rounded-full bg-[#f6efe4]" />
-        </div>
-        <div className="space-y-3 p-3">
-          {Array.from({ length: 5 }, (_, index) => (
-            <div key={index} className="rounded-[24px] border border-[#f0e7da] bg-[#fffdf9] p-4">
-              <div className="h-7 w-24 rounded-full bg-[#efe4d2]" />
-              <div className="mt-3 h-4 w-20 rounded-full bg-[#f3eadb]" />
-              <div className="mt-4 h-4 w-full rounded-full bg-[#f7f0e6]" />
-              <div className="mt-2 h-4 w-4/5 rounded-full bg-[#f7f0e6]" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="animate-pulse overflow-hidden rounded-[32px] border border-[#eadfcb] bg-white">
-        <div className="border-b border-[#f1e6d5] p-6">
-          <div className="h-3 w-24 rounded-full bg-[#eee3d1]" />
-          <div className="mt-4 h-10 w-48 rounded-full bg-[#efe4d2]" />
-          <div className="mt-3 h-5 w-32 rounded-full bg-[#f3eadb]" />
-          <div className="mt-5 h-6 w-3/4 rounded-full bg-[#f7f0e6]" />
-        </div>
-        <div className="grid gap-4 p-6 md:grid-cols-[1.2fr,0.8fr]">
-          <div className="h-48 rounded-[28px] bg-[#faf5ec]" />
-          <div className="space-y-4">
-            <div className="h-32 rounded-[28px] bg-[#faf5ec]" />
-            <div className="h-32 rounded-[28px] bg-[#1f1a16]" />
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function PanelMessage({
-  title,
-  description,
-  actionLabel,
-  onAction,
-  compact = false,
-}: {
-  title: string
-  description: string
-  actionLabel?: string
-  onAction?: () => void
-  compact?: boolean
-}) {
+function EmptyState({ title, description, actionLabel, onAction, compact = false }: { title: string; description: string; actionLabel?: string; onAction?: () => void; compact?: boolean }) {
   return (
     <div className={`rounded-[32px] border border-dashed border-[#d9c6a9] bg-white/80 text-center shadow-[0_12px_32px_rgba(125,93,48,0.06)] ${compact ? 'p-6' : 'p-10'}`}>
       <h2 className="text-xl font-semibold text-[#1f1710]" style={{ fontFamily: 'var(--font-cormorant)' }}>{title}</h2>
       <p className="mt-3 text-sm leading-7 text-[#6c5945]">{description}</p>
-      {actionLabel && onAction && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="mt-5 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]"
-        >
-          {actionLabel}
-        </button>
-      )}
+      {actionLabel && onAction && <button type="button" onClick={onAction} className="mt-5 rounded-[22px] bg-[#201911] px-5 py-3 text-sm font-medium text-[#fff1da] transition hover:bg-[#342519]">{actionLabel}</button>}
     </div>
   )
 }
