@@ -1,6 +1,6 @@
 'use client'
 
-import type { VocabEntry } from '@/lib/vocabularyBank'
+import type { VocabEntry } from '@/lib/labTypes'
 
 interface WordCardProps {
   item: VocabEntry

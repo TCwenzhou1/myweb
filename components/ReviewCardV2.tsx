@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { VocabEntry } from '@/lib/vocabularyBank'
+import type { VocabEntry } from '@/lib/labTypes'
 import type { ReviewRating } from '@/lib/useStudyStore'
 
 interface ReviewCardProps {
