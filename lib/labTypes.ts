@@ -1,4 +1,4 @@
-export type VocabLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '\u8003\u7814' | '\u9470\u51AA\u723A'
+export type VocabLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研' | '鑰冪爺' | '未分级'
 
 export type VocabTrack =
   | 'core2000'

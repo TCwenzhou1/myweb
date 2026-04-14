@@ -11,10 +11,18 @@ import { useStudyStore } from '@/lib/useStudyStore'
 
 type TabKey = 'library' | 'favorites' | 'review' | 'grammar' | 'pattern' | 'quiz'
 type SourceMode = 'all' | 'featured' | 'core2000' | 'jlpt10k' | 'jmdict' | 'kaoyan3500' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1'
-type LevelFilter = 'ALL' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研'
+type LevelFilter = 'ALL' | 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | '考研' | '未分级'
 
 type LabStats = LabLibraryStats & {
   featured: number
+}
+
+interface RemoteDictionaryMeta {
+  title: string
+  sourceLabel: string
+  revision?: string
+  entryCount: number
+  targetLanguage: string
 }
 
 const PAGE_SIZE = 14
@@ -49,7 +57,7 @@ const SOURCE_OPTIONS: Array<{ value: SourceMode; label: string }> = [
   { value: 'featured', label: '高质量词卡' },
   { value: 'core2000', label: '基础整合库' },
   { value: 'jlpt10k', label: 'JLPT 10K' },
-  { value: 'jmdict', label: 'JMDict 补充' },
+  { value: 'jmdict', label: 'JMDict 全量检索' },
   { value: 'kaoyan3500', label: '考研 3500' },
   { value: 'n5', label: 'N5' },
   { value: 'n4', label: 'N4' },
@@ -66,6 +74,7 @@ const LEVEL_OPTIONS: Array<{ value: LevelFilter; label: string }> = [
   { value: 'N2', label: 'N2' },
   { value: 'N1', label: 'N1' },
   { value: '考研', label: '考研' },
+  { value: '未分级', label: '未分级' },
 ]
 
 const GrammarTab = dynamic(() => import('@/lib/grammarBank').then((mod) => mod.GrammarTab), {
@@ -145,12 +154,12 @@ function matchesLevel(item: VocabEntry, level: LevelFilter) {
   return item.level === level
 }
 
-function getSourceCount(stats: LabStats, mode: SourceMode) {
+function getSourceCount(stats: LabStats, mode: SourceMode, remoteDictionaryCount?: number) {
   if (mode === 'all') return stats.total
   if (mode === 'featured') return stats.featured
   if (mode === 'core2000') return stats.core2000
   if (mode === 'jlpt10k') return stats.jlpt10k
-  if (mode === 'jmdict') return stats.jmdict
+  if (mode === 'jmdict') return remoteDictionaryCount ?? stats.jmdict
   if (mode === 'kaoyan3500') return stats.kaoyan3500
   if (mode === 'n5') return stats.n5
   if (mode === 'n4') return stats.n4
@@ -171,8 +180,16 @@ export default function LabPageClient() {
   const [vocabStats, setVocabStats] = useState<LabStats | null>(null)
   const [isLoadingLibrary, setIsLoadingLibrary] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [remoteDictionaryEntries, setRemoteDictionaryEntries] = useState<VocabEntry[]>([])
+  const [remoteDictionaryCatalog, setRemoteDictionaryCatalog] = useState<Record<string, VocabEntry>>({})
+  const [remoteDictionaryMeta, setRemoteDictionaryMeta] = useState<RemoteDictionaryMeta | null>(null)
+  const [isRemoteDictionaryLoading, setIsRemoteDictionaryLoading] = useState(false)
+  const [remoteDictionaryError, setRemoteDictionaryError] = useState<string | null>(null)
 
   const deferredKeyword = useDeferredValue(keyword)
+  const remoteDictionaryQuery = deferredKeyword.trim()
+  const normalizedKeyword = remoteDictionaryQuery.toLowerCase()
+  const isRemoteDictionaryMode = tab === 'library' && sourceMode === 'jmdict'
   const { speak, voiceStatusLabel } = useSpeech()
   const { favorites, reviewMap, recentViewedIds, dueTodayIds, completedTodayCount, scheduledCount, toggleFavorite, markViewed, toggleReviewQueue, reviewCard, resetAll } = useStudyStore()
 
@@ -224,24 +241,111 @@ export default function LabPageClient() {
     }
   }, [loadVocabulary])
 
+  useEffect(() => {
+    if (!isRemoteDictionaryMode) {
+      setIsRemoteDictionaryLoading(false)
+      setRemoteDictionaryError(null)
+      return
+    }
+
+    if (!remoteDictionaryQuery) {
+      setRemoteDictionaryEntries([])
+      setRemoteDictionaryError(null)
+      return
+    }
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => {
+      setIsRemoteDictionaryLoading(true)
+      setRemoteDictionaryError(null)
+
+      void fetch(`/api/lab/dictionary-search?q=${encodeURIComponent(remoteDictionaryQuery)}&limit=48`, {
+        signal: controller.signal,
+        cache: 'no-store',
+      })
+        .then(async (response) => {
+          const payload = await response.json() as {
+            meta?: RemoteDictionaryMeta | null
+            results?: VocabEntry[]
+            error?: string
+          }
+
+          if (!response.ok) {
+            throw new Error(payload.error || '全量词典检索失败。')
+          }
+
+          const nextResults = payload.results ?? []
+          setRemoteDictionaryEntries(nextResults)
+
+          if (payload.meta) {
+            setRemoteDictionaryMeta(payload.meta)
+          }
+
+          if (nextResults.length > 0) {
+            setRemoteDictionaryCatalog((current) => {
+              const next = { ...current }
+              for (const entry of nextResults) {
+                next[entry.id] = entry
+              }
+              return next
+            })
+          }
+        })
+        .catch((error: unknown) => {
+          if ((error as { name?: string }).name === 'AbortError') return
+          console.error('Failed to search latest dictionary:', error)
+          setRemoteDictionaryEntries([])
+          setRemoteDictionaryError(error instanceof Error ? error.message : '全量词典检索暂时不可用。')
+        })
+        .finally(() => {
+          setIsRemoteDictionaryLoading(false)
+        })
+    }, 180)
+
+    return () => {
+      controller.abort()
+      clearTimeout(timeoutId)
+    }
+  }, [isRemoteDictionaryMode, remoteDictionaryQuery])
+
   const favoriteSet = useMemo(() => new Set(favorites), [favorites])
   const dueSet = useMemo(() => new Set(dueTodayIds), [dueTodayIds])
   const reviewSet = useMemo(() => new Set(Object.keys(reviewMap)), [reviewMap])
-  const normalizedKeyword = deferredKeyword.trim().toLowerCase()
   const stats = vocabStats ?? EMPTY_STATS
   const libraryEntries = vocabAllEntries.length > 0 ? vocabAllEntries : featuredLabEntries
+  const catalogEntries = useMemo(() => {
+    const map = new Map<string, VocabEntry>()
+
+    for (const entry of libraryEntries) {
+      map.set(entry.id, entry)
+    }
+
+    for (const entry of Object.values(remoteDictionaryCatalog)) {
+      if (!map.has(entry.id)) {
+        map.set(entry.id, entry)
+      }
+    }
+
+    return Array.from(map.values())
+  }, [libraryEntries, remoteDictionaryCatalog])
   const sourceLabel = SOURCE_OPTIONS.find((option) => option.value === sourceMode)?.label ?? '全词汇'
   const levelLabel = LEVEL_OPTIONS.find((option) => option.value === levelFilter)?.label ?? '全部等级'
+  const remoteDictionaryCount = remoteDictionaryMeta?.entryCount
 
   const filteredLibrary = useMemo(() => {
+    if (isRemoteDictionaryMode) {
+      if (!remoteDictionaryQuery) return []
+      return remoteDictionaryEntries.filter((item) => matchesLevel(item, levelFilter))
+    }
+
     return libraryEntries.filter((item) => {
       return matchesKeyword(item, normalizedKeyword) && matchesSourceMode(item, sourceMode) && matchesLevel(item, levelFilter)
     })
-  }, [libraryEntries, normalizedKeyword, sourceMode, levelFilter])
+  }, [isRemoteDictionaryMode, levelFilter, libraryEntries, normalizedKeyword, remoteDictionaryEntries, remoteDictionaryQuery, sourceMode])
 
   const favoriteItemsAll = useMemo(() => {
-    return libraryEntries.filter((item) => favoriteSet.has(item.id))
-  }, [libraryEntries, favoriteSet])
+    return catalogEntries.filter((item) => favoriteSet.has(item.id))
+  }, [catalogEntries, favoriteSet])
 
   const filteredFavorites = useMemo(() => {
     return favoriteItemsAll.filter((item) => {
@@ -250,14 +354,14 @@ export default function LabPageClient() {
   }, [favoriteItemsAll, normalizedKeyword, sourceMode, levelFilter])
 
   const reviewQueueItemsAll = useMemo(() => {
-    return libraryEntries
+    return catalogEntries
       .filter((item) => reviewSet.has(item.id))
       .sort((left, right) => {
         const leftDue = new Date(reviewMap[left.id]?.dueAt ?? 0).getTime()
         const rightDue = new Date(reviewMap[right.id]?.dueAt ?? 0).getTime()
         return leftDue - rightDue
       })
-  }, [libraryEntries, reviewSet, reviewMap])
+  }, [catalogEntries, reviewSet, reviewMap])
 
   const dueItemsAll = useMemo(() => {
     return reviewQueueItemsAll.filter((item) => dueSet.has(item.id))
@@ -278,19 +382,33 @@ export default function LabPageClient() {
   const activeCollectionCount = tab === 'library' ? filteredLibrary.length : tab === 'favorites' ? filteredFavorites.length : filteredReviewItems.length
   const recentViewedItems = useMemo(() => {
     return recentViewedIds
-      .map((id) => libraryEntries.find((item) => item.id === id))
+      .map((id) => catalogEntries.find((item) => item.id === id))
       .filter((item): item is VocabEntry => Boolean(item))
-  }, [libraryEntries, recentViewedIds])
+  }, [catalogEntries, recentViewedIds])
 
   const openLibraryWord = useCallback((id: string) => {
-    const index = libraryEntries.findIndex((item) => item.id === id)
+    const index = catalogEntries.findIndex((item) => item.id === id)
     setTab('library')
     setKeyword('')
     setSourceMode('all')
     setLevelFilter('ALL')
     setPage(index >= 0 ? Math.floor(index / PAGE_SIZE) + 1 : 1)
     setSelectedWordId(id)
-  }, [libraryEntries])
+  }, [catalogEntries])
+
+  const dictionaryNotice = isRemoteDictionaryMode
+    ? remoteDictionaryError
+      ? `全量词典检索失败：${remoteDictionaryError}`
+      : !remoteDictionaryQuery
+        ? 'JMDict 全量词典已经改成服务端按需检索。输入日语、假名或 English gloss 后再返回最相关结果，避免把 20 万级词库整包塞进前端。'
+        : isRemoteDictionaryLoading
+          ? `正在从 ${remoteDictionaryMeta?.title ?? '最新词典'} 检索相关词条...`
+          : remoteDictionaryMeta
+            ? `当前连接 ${remoteDictionaryMeta.title}，共 ${remoteDictionaryMeta.entryCount.toLocaleString()} 条词条，结果来自服务端实时筛选。`
+            : undefined
+    : isLoadingLibrary && !vocabStats
+      ? `完整词库正在接入中，当前先展示 ${featuredLabEntries.length} 张高质量词卡。词库完成后，这里的结果会自动扩展到 ${labFallbackCatalog.totalLabel}。`
+      : undefined
 
   useEffect(() => {
     if (page > totalPages) {
@@ -371,9 +489,14 @@ export default function LabPageClient() {
                   <StatusBadge tone="dark" label={`等级 ${levelLabel}`} />
                   <StatusBadge tone="warm" label={voiceStatusLabel} />
                   {isLoadingLibrary && <StatusBadge tone="warm" label="更大词库正在后台接入" />}
+                  {isRemoteDictionaryLoading && <StatusBadge tone="warm" label="最新词典检索中" />}
                 </div>
                 <p className="mt-3 text-sm leading-6 text-[#79624b]">
-                  {vocabStats ? `当前已接入 ${stats.total.toLocaleString()} 条可检索词条。` : labFallbackCatalog.totalDescription}
+                  {isRemoteDictionaryMode && remoteDictionaryMeta
+                    ? `当前全量词典源为 ${remoteDictionaryMeta.title}，共 ${remoteDictionaryMeta.entryCount.toLocaleString()} 条词条，按关键词即时检索。`
+                    : vocabStats
+                      ? `当前已接入 ${stats.total.toLocaleString()} 条可检索词条。`
+                      : labFallbackCatalog.totalDescription}
                 </p>
               </div>
 
@@ -401,7 +524,7 @@ export default function LabPageClient() {
               <HeroMetric label="全词库" value={vocabStats ? stats.total.toLocaleString() : labFallbackCatalog.totalLabel} description={labFallbackCatalog.totalDescription} />
               <HeroMetric label="今日复习" value={dueItemsAll.length.toString()} description="今天到期、应该优先处理的卡片" />
               <HeroMetric label="今日完成" value={completedTodayCount.toString()} description="今天已经完成反馈的复习张数" />
-              <HeroMetric label="当前范围" value={vocabStats ? getSourceCount(stats, sourceMode).toLocaleString() : sourceMode === 'featured' ? featuredLabEntries.length.toString() : labFallbackCatalog.totalLabel} description={`${sourceLabel} 视角下的可见规模`} />
+              <HeroMetric label="当前范围" value={vocabStats ? getSourceCount(stats, sourceMode, remoteDictionaryCount).toLocaleString() : sourceMode === 'featured' ? featuredLabEntries.length.toString() : labFallbackCatalog.totalLabel} description={`${sourceLabel} 视角下的可见规模`} />
             </div>
           </div>
         </section>
@@ -527,7 +650,15 @@ export default function LabPageClient() {
                       key={option.value}
                       active={sourceMode === option.value}
                       label={option.label}
-                      count={vocabStats ? getSourceCount(stats, option.value).toLocaleString() : option.value === 'featured' ? featuredLabEntries.length.toString() : option.value === 'all' ? labFallbackCatalog.totalLabel : '...'}
+                      count={vocabStats
+                        ? getSourceCount(stats, option.value, option.value === 'jmdict' ? remoteDictionaryCount : undefined).toLocaleString()
+                        : option.value === 'featured'
+                          ? featuredLabEntries.length.toString()
+                          : option.value === 'all'
+                            ? labFallbackCatalog.totalLabel
+                            : option.value === 'jmdict'
+                              ? '全量'
+                              : '...'}
                       onClick={() => {
                         setSourceMode(option.value)
                         setPage(1)
@@ -596,9 +727,19 @@ export default function LabPageClient() {
             onSpeak={speakText}
             onToggleFavorite={toggleFavorite}
             onToggleReview={toggleReviewQueue}
-            notice={isLoadingLibrary && !vocabStats ? `完整词库正在接入中，当前先展示 ${featuredLabEntries.length} 张高质量词卡。词库完成后，这里的结果会自动扩展到 ${labFallbackCatalog.totalLabel}。` : undefined}
-            emptyTitle={tab === 'library' ? '没有匹配的词条' : '收藏本里没有命中内容'}
-            emptyDescription={tab === 'library' ? '换一个关键词、词库范围或等级试试看。' : '可以先在词典里点“收藏”，或者调整当前筛选条件。'}
+            notice={dictionaryNotice}
+            emptyTitle={tab === 'library'
+              ? isRemoteDictionaryMode && !remoteDictionaryQuery
+                ? '输入关键词开始检索'
+                : '没有匹配的词条'
+              : '收藏本里没有命中内容'}
+            emptyDescription={tab === 'library'
+              ? isRemoteDictionaryMode && !remoteDictionaryQuery
+                ? 'JMDict 全量词典只在你输入关键词后按需返回结果，这样不会拖慢实验室页的首次加载。'
+                : isRemoteDictionaryMode && remoteDictionaryError
+                  ? remoteDictionaryError
+                  : '换一个关键词、词库范围或等级试试看。'
+              : '可以先在词典里点“收藏”，或者调整当前筛选条件。'}
           />
         ) : tab === 'review' ? (
           <ReviewWorkbench
