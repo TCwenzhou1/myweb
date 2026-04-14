@@ -67,6 +67,12 @@ export interface GameProof {
   nextMilestone: string
 }
 
+export interface GameRoadmapItem {
+  title: string
+  description: string
+  status: string
+}
+
 export interface AboutCapability {
   title: string
   description: string
@@ -328,6 +334,12 @@ export const gameProofs: GameProof[] = [
     nextMilestone: '补出第一版截图、录屏和开发日志入口。',
   },
 ]
+
+export const gameRoadmap: GameRoadmapItem[] = gameProofs.map((proof) => ({
+  title: proof.title,
+  description: proof.snapshot,
+  status: proof.stage,
+}))
 
 export const aboutCapabilities: AboutCapability[] = [
   {
