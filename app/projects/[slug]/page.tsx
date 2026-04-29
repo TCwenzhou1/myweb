@@ -7,8 +7,13 @@ export function generateStaticParams() {
   return projectCases.map((project) => ({ slug: project.slug }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const project = getProjectBySlug(params.slug)
+interface ProjectDetailPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: ProjectDetailPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const project = getProjectBySlug(slug)
 
   if (!project) {
     return {
@@ -22,8 +27,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   }
 }
 
-export default function ProjectDetailPage({ params }: { params: { slug: string } }) {
-  const project = getProjectBySlug(params.slug)
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
+  const { slug } = await params
+  const project = getProjectBySlug(slug)
 
   if (!project) {
     notFound()

@@ -216,6 +216,48 @@ export const projectCases: ProjectCase[] = [
     nextStep:
       '继续补强项目详情内容、Lab 的学习闭环和 Games 的原型证据，让网站既有风格，也越来越像一个成熟的个人产品。',
   },
+  {
+    slug: 'company-agent-office',
+    title: '公司 Agent 办公室模拟器',
+    headline: '把组织职责、事项升级、员工电脑和领导对话放进同一个 3D 可视化工作台。',
+    description:
+      '这是一个面向 AI 工作流和组织协作的交互原型。它用第一人称办公室、老板电脑、员工任务屏幕和部门领导对话，把“事情如何在组织里流转”做成可以直接体验的网页 demo。',
+    tags: ['Vite', 'React', 'Three.js', 'Zustand', 'Vercel Functions'],
+    status: 'active',
+    year: '2026',
+    period: '2026',
+    role: '产品原型 / 前端实现 / AI 接入安全改造',
+    demo: '/company-agent-office/index.html',
+    background:
+      '很多 AI agent 展示只停留在聊天框或任务列表里，很难让人直观看到组织边界、上报链路和不同角色之间的协作关系。这个原型把公司运行过程空间化，让老板视角和员工视角能在同一个场景中切换。',
+    problem:
+      '如果只展示一个 agent 回复，访客看不到任务来源、阻塞原因和决策链路；如果只做普通 dashboard，又缺少沉浸感和可记忆的体验。核心问题是如何把组织流程、AI 对话和可视化交互合成一个清楚的产品原型。',
+    solution:
+      '方案用 3D 办公室承载空间关系，用老板电脑承载管理视图，用员工电脑承载交付物和任务状态，用领导对话承载 AI 分析。上线前把 API Key 从浏览器端迁移到 Vercel 服务端代理，保证网页公开部署时不会泄露密钥。',
+    architecture: [
+      'React Three Fiber 负责办公室场景、第一人称移动和可点击工位',
+      'Zustand 负责员工、任务、事件、对话和模拟时间状态',
+      'Vercel API Route 作为模型代理，浏览器只请求站内接口，不保存 API Key',
+      '项目详情页和可交互 demo 集成到个人站 Projects 板块',
+    ],
+    challenges: [
+      '3D 场景体积较大，需要拆包，避免拖慢个人站首屏入口',
+      'AI Key 不能留在 localStorage 或浏览器请求里，必须迁移到服务端环境变量',
+      '事件生成逻辑需要面对空数据和未来场景扩展，不能只依赖当前静态数据正确',
+    ],
+    outcomes: [
+      '形成了可公开访问的组织 agent 可视化 demo，可以从 Projects 详情页直接打开',
+      '主入口 JS 通过懒加载拆包从约 1.16 MB 降到约 185 KB，3D 场景独立加载',
+      '新增回归测试覆盖 API 设置持久化和事件生成防崩溃逻辑',
+    ],
+    contributions: [
+      '完成 3D 办公室、管理面板、员工电脑和领导对话的整体产品结构',
+      '把模型调用改造成 Vercel 服务端代理，避免公开网页泄露密钥',
+      '整理部署文档、环境变量说明和基础回归测试，让 demo 能进入长期站点维护',
+    ],
+    nextStep:
+      '继续把组织模拟从规则驱动扩展到更真实的任务输入和多角色决策，同时补充更清晰的访客引导，让它从技术 demo 进一步变成可讲述的 AI 产品案例。',
+  },
 ]
 
 export const featuredProject = projectCases.find((project) => project.featured) ?? projectCases[0]
