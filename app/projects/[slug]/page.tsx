@@ -1,15 +1,21 @@
 ﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArchiveCard, CinematicSection, PageHeader, C, FONTS, alpha } from '@/components/CinematicUI'
+import { ArchiveCard, CinematicSection, PageHeader } from '@/components/CinematicUI'
+import { C, FONTS, alpha } from '@/components/cinematicTokens'
 import { getProjectBySlug, projectCases, projectStatusLabelMap } from '@/lib/siteContent'
 
 export function generateStaticParams() {
   return projectCases.map((project) => ({ slug: project.slug }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const project = getProjectBySlug(params.slug)
+interface ProjectDetailPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: ProjectDetailPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const project = getProjectBySlug(slug)
 
   if (!project) {
     return {
@@ -23,8 +29,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   }
 }
 
-export default function ProjectDetailPage({ params }: { params: { slug: string } }) {
-  const project = getProjectBySlug(params.slug)
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
+  const { slug } = await params
+  const project = getProjectBySlug(slug)
 
   if (!project) {
     notFound()

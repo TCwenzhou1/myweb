@@ -24,7 +24,7 @@ const cormorant = Cormorant_Garamond({
 const siteUrl = 'https://www.tcwenzhou.site'
 
 export const viewport: Viewport = {
-  themeColor: '#F8F5EE',
+  themeColor: '#F5F1E8',
   colorScheme: 'light',
 }
 

@@ -1,4 +1,4 @@
-import type { VocabEntry } from './vocabularyBank'
+import type { VocabEntry } from './labTypes'
 
 export const featuredLabEntries: VocabEntry[] = [
   {

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { ArchiveCard, CinematicSection, PageHeader, C, FONTS, alpha } from '@/components/CinematicUI'
 import { gameProofs } from '@/lib/siteContent'

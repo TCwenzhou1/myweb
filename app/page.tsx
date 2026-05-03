@@ -1,5 +1,4 @@
-﻿import HeroSection from '@/components/HeroCards'
-import HomeOverviewV2 from '@/components/HomeOverviewV2'
+import HomePoster from '@/components/HomePoster'
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -29,8 +28,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HeroSection />
-      <HomeOverviewV2 />
+      <HomePoster />
     </>
   )
 }

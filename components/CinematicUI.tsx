@@ -1,60 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-
-// ─── 统一配色 ─────────────────────────────────────────────────────────────────
-const C = {
-  bg:           '#F8F5EE',
-  bgWarm:       '#F2EDE3',
-  bgDeep:       '#E8E2D6',
-  ink:          '#0F0E10',
-  inkMid:       '#2A282C',
-  inkDim:       '#5C585E',
-  inkFaint:     '#9A9599',
-
-  gold:         '#A88B55',
-  goldRich:     '#C4A265',
-  goldChamp:    '#D4BC8A',
-  goldPale:     '#E8DCC4',
-
-  cardIvory:    '#FAF8F3',
-  cardShadow:   '#D8D0C0',
-}
-
-// ─── HEX → RGBA 转换工具（避免 8位 HEX 兼容性问题）────────────────────────────
-// 用法：alpha(C.goldChamp, 0.25) → 'rgba(212,188,138,0.25)'
-function hexToRgb(hex: string): [number, number, number] {
-  const h = hex.replace('#', '')
-  return [
-    parseInt(h.substring(0, 2), 16),
-    parseInt(h.substring(2, 4), 16),
-    parseInt(h.substring(4, 6), 16),
-  ]
-}
-
-function alpha(hex: string, a: number): string {
-  const [r, g, b] = hexToRgb(hex)
-  return `rgba(${r},${g},${b},${a})`
-}
-
-// ─── 统一字体 ─────────────────────────────────────────────────────────────────
-const FONTS = {
-  display: '"Cormorant Garamond", "Bodoni Moda", "Times New Roman", Georgia, serif',
-  body:    '"Jost", "Inter", system-ui, sans-serif',
-}
-
-// ─── 电影级缓动曲线 ─────────────────────────────────────────────────────────────────
-// 这些曲线让动画更像电影运镜：柔和启动、流畅推进、自然落稳
-const EASE = {
-  // 标准推进 - 用于大多数元素进入
-  standard: 'cubic-bezier(0.16, 1, 0.3, 1)',
-  // 柔和进入 - 用于标题和重要元素
-  gentle: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-  // 快速对焦 - 用于hover响应
-  focus: 'cubic-bezier(0.33, 1, 0.68, 1)',
-  // 丝滑退出 - 用于元素离开
-  exit: 'cubic-bezier(0.55, 0, 1, 0.45)',
-}
+import { C, EASE, FONTS, alpha } from './cinematicTokens'
 
 // ─── 场景编号 Props ─────────────────────────────────────────────────────────────────
 interface SceneLabel {
@@ -351,7 +298,7 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
         ...style,
         position: 'relative',
         background: C.cardIvory,
-        border: `0.5px solid ${hovered ? C.goldChamp : 'rgba(200,190,168,0.5)'}`,
+        border: `0.5px solid ${hovered ? C.goldChamp : alpha(C.cardShadow, 0.54)}`,
         borderRadius: '12px',
         padding: 'clamp(24px, 3vw, 36px)',
         opacity: visible ? 1 : 0,
@@ -359,8 +306,8 @@ export function ArchiveCard({ children, className = '', style, hoverable = true,
           ? `translateY(${hovered ? '-3px' : '0'})`
           : 'translateY(24px)',
         boxShadow: hovered
-          ? `0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), 0 0 0 0.5px ${alpha(C.goldPale, 0.25)}`
-          : `0 2px 8px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)`,
+          ? `0 18px 46px ${alpha(C.cardShadow, 0.34)}, 0 4px 10px rgba(35,28,22,0.05), 0 0 0 0.5px ${alpha(C.goldPale, 0.28)}`
+          : `0 8px 22px ${alpha(C.cardShadow, 0.16)}, 0 1px 3px rgba(35,28,22,0.04)`,
         transition: `
           opacity 0.9s ${EASE.standard} ${delay}ms,
           transform 0.9s ${EASE.standard} ${delay}ms,
