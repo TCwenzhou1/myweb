@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import AgentSquadConsole from '@/components/AgentSquadConsole'
 import { ArchiveCard, CinematicSection, PageHeader, C, FONTS, alpha } from '@/components/CinematicUI'
 import { projectStatusLabelMap } from '@/lib/siteContent'
 import type { ProjectCase } from '@/lib/siteContent'
@@ -145,6 +146,12 @@ export default function ProjectDetailContent({ project }: { project: ProjectCase
             </ArchiveCard>
           </CinematicSection>
         </div>
+
+        {project.slug === 'company-agent-office' && (
+          <CinematicSection delay={320}>
+            <AgentSquadConsole />
+          </CinematicSection>
+        )}
 
         <CinematicSection delay={340}>
           <ArchiveCard hoverable={false} style={{ marginTop: '24px' }}>
