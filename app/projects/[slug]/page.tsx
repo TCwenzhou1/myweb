@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import AgentSquadConsole from '@/components/AgentSquadConsole'
 import { ArchiveCard, CinematicSection, PageHeader } from '@/components/CinematicUI'
 import { C, FONTS, alpha } from '@/components/cinematicTokens'
 import { getProjectBySlug, projectCases, projectStatusLabelMap } from '@/lib/siteContent'
@@ -176,6 +177,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </ArchiveCard>
           </CinematicSection>
         </div>
+
+        {project.slug === 'company-agent-office' && (
+          <CinematicSection delay={320}>
+            <AgentSquadConsole />
+          </CinematicSection>
+        )}
 
         <CinematicSection delay={340}>
           <ArchiveCard hoverable={false} style={{ marginTop: '24px' }}>
