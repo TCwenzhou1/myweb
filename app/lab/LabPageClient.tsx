@@ -18,6 +18,7 @@ type LabStats = LabLibraryStats & {
 }
 
 interface RemoteDictionaryMeta {
+  id: 'jitendex' | 'jmdict-simplified' | 'tracked-bank'
   title: string
   sourceLabel: string
   revision?: string
@@ -57,7 +58,7 @@ const SOURCE_OPTIONS: Array<{ value: SourceMode; label: string }> = [
   { value: 'featured', label: '高质量词卡' },
   { value: 'core2000', label: '基础整合库' },
   { value: 'jlpt10k', label: 'JLPT 10K' },
-  { value: 'jmdict', label: 'JMDict 全量检索' },
+  { value: 'jmdict', label: 'JMDict 按需检索' },
   { value: 'kaoyan3500', label: '考研 3500' },
   { value: 'n5', label: 'N5' },
   { value: 'n4', label: 'N4' },
@@ -168,6 +169,16 @@ function getSourceCount(stats: LabStats, mode: SourceMode, remoteDictionaryCount
   return stats.n1
 }
 
+function getRemoteDictionaryDescription(meta: RemoteDictionaryMeta) {
+  const count = meta.entryCount.toLocaleString()
+
+  if (meta.id === 'tracked-bank') {
+    return `当前使用仓库内 JMDict/JLPT 补充词库，共 ${count} 条词条，结果来自服务端即时筛选。`
+  }
+
+  return `当前连接 ${meta.title}，共 ${count} 条词条，结果来自服务端即时筛选。`
+}
+
 export default function LabPageClient() {
   const [tab, setTab] = useState<TabKey>('library')
   const [keyword, setKeyword] = useState('')
@@ -271,7 +282,7 @@ export default function LabPageClient() {
           }
 
           if (!response.ok) {
-            throw new Error(payload.error || '全量词典检索失败。')
+            throw new Error(payload.error || '词典检索失败。')
           }
 
           const nextResults = payload.results ?? []
@@ -295,7 +306,7 @@ export default function LabPageClient() {
           if ((error as { name?: string }).name === 'AbortError') return
           console.error('Failed to search latest dictionary:', error)
           setRemoteDictionaryEntries([])
-          setRemoteDictionaryError(error instanceof Error ? error.message : '全量词典检索暂时不可用。')
+          setRemoteDictionaryError(error instanceof Error ? error.message : '词典检索暂时不可用。')
         })
         .finally(() => {
           setIsRemoteDictionaryLoading(false)
@@ -398,13 +409,13 @@ export default function LabPageClient() {
 
   const dictionaryNotice = isRemoteDictionaryMode
     ? remoteDictionaryError
-      ? `全量词典检索失败：${remoteDictionaryError}`
+      ? `词典检索失败：${remoteDictionaryError}`
       : !remoteDictionaryQuery
-        ? 'JMDict 全量词典已经改成服务端按需检索。输入日语、假名或 English gloss 后再返回最相关结果，避免把 20 万级词库整包塞进前端。'
+        ? 'JMDict 检索已经改成服务端按需返回。输入日语、假名或 English gloss 后再显示最相关结果，避免把大词库整包塞进前端。'
         : isRemoteDictionaryLoading
           ? `正在从 ${remoteDictionaryMeta?.title ?? '最新词典'} 检索相关词条...`
           : remoteDictionaryMeta
-            ? `当前连接 ${remoteDictionaryMeta.title}，共 ${remoteDictionaryMeta.entryCount.toLocaleString()} 条词条，结果来自服务端实时筛选。`
+            ? getRemoteDictionaryDescription(remoteDictionaryMeta)
             : undefined
     : isLoadingLibrary && !vocabStats
       ? `完整词库正在接入中，当前先展示 ${featuredLabEntries.length} 张高质量词卡。词库完成后，这里的结果会自动扩展到 ${labFallbackCatalog.totalLabel}。`
@@ -493,7 +504,7 @@ export default function LabPageClient() {
                 </div>
                 <p className="mt-3 text-sm leading-6 text-[#79624b]">
                   {isRemoteDictionaryMode && remoteDictionaryMeta
-                    ? `当前全量词典源为 ${remoteDictionaryMeta.title}，共 ${remoteDictionaryMeta.entryCount.toLocaleString()} 条词条，按关键词即时检索。`
+                    ? getRemoteDictionaryDescription(remoteDictionaryMeta)
                     : vocabStats
                       ? `当前已接入 ${stats.total.toLocaleString()} 条可检索词条。`
                       : labFallbackCatalog.totalDescription}
@@ -657,7 +668,7 @@ export default function LabPageClient() {
                           : option.value === 'all'
                             ? labFallbackCatalog.totalLabel
                             : option.value === 'jmdict'
-                              ? '全量'
+                              ? '按需'
                               : '...'}
                       onClick={() => {
                         setSourceMode(option.value)
@@ -735,7 +746,7 @@ export default function LabPageClient() {
               : '收藏本里没有命中内容'}
             emptyDescription={tab === 'library'
               ? isRemoteDictionaryMode && !remoteDictionaryQuery
-                ? 'JMDict 全量词典只在你输入关键词后按需返回结果，这样不会拖慢实验室页的首次加载。'
+                ? 'JMDict 词库只在你输入关键词后按需返回结果，这样不会拖慢实验室页的首次加载。'
                 : isRemoteDictionaryMode && remoteDictionaryError
                   ? remoteDictionaryError
                   : '换一个关键词、词库范围或等级试试看。'
