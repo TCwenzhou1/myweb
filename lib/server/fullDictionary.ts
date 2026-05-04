@@ -70,28 +70,44 @@ function scoreEntry(entry: SearchableDictionaryEntry, query: string, queryLower:
   return score
 }
 
+function compareRankedEntries(
+  left: { entry: SearchableDictionaryEntry; score: number },
+  right: { entry: SearchableDictionaryEntry; score: number },
+) {
+  if (right.score !== left.score) return right.score - left.score
+  if (left.entry.word.length !== right.entry.word.length) return left.entry.word.length - right.entry.word.length
+  return left.entry.id.localeCompare(right.entry.id)
+}
+
 export async function searchLatestJapaneseDictionary(query: string, limit = 40) {
   const trimmedQuery = normalizeWhitespace(query)
   const safeLimit = Math.min(Math.max(limit, 1), 80)
-  const dictionary = await loadDictionary()
 
   if (!trimmedQuery) {
     return {
-      meta: dictionary.meta,
+      meta: null,
       results: [] as VocabEntry[],
     }
   }
 
+  const dictionary = await loadDictionary()
   const queryLower = trimmedQuery.toLowerCase()
-  const ranked = dictionary.entries
-    .map((entry) => ({ entry, score: scoreEntry(entry, trimmedQuery, queryLower) }))
-    .filter((item) => item.score > 0)
-    .sort((left, right) => {
-      if (right.score !== left.score) return right.score - left.score
-      if (left.entry.word.length !== right.entry.word.length) return left.entry.word.length - right.entry.word.length
-      return left.entry.id.localeCompare(right.entry.id)
-    })
-    .slice(0, safeLimit)
+
+  const ranked: Array<{ entry: SearchableDictionaryEntry; score: number }> = []
+
+  for (const entry of dictionary.entries) {
+    const score = scoreEntry(entry, trimmedQuery, queryLower)
+    if (score <= 0) continue
+
+    ranked.push({ entry, score })
+    ranked.sort(compareRankedEntries)
+
+    if (ranked.length > safeLimit) {
+      ranked.pop()
+    }
+  }
+
+  const results = ranked
     .map(({ entry }) => {
       const { meaningSearch: _meaningSearch, ...result } = entry
       return result
@@ -99,6 +115,6 @@ export async function searchLatestJapaneseDictionary(query: string, limit = 40) 
 
   return {
     meta: dictionary.meta,
-    results: ranked,
+    results,
   }
 }
