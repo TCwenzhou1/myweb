@@ -134,6 +134,49 @@ export const projectCases: ProjectCase[] = [
       '继续补充更完整的规则覆盖、稳定评估脚本和更清晰的对战可视化，让项目从研究实验进一步靠近可展示的系统作品。',
   },
   {
+    slug: 'reverse-sanguosha-runtime-audit',
+    title: 'Reverse Sanguosha 安全加固审计',
+    headline: '把一份解包 Electron 游戏推进到可审计、可验证、可网页试玩的安全边界样本。',
+    description:
+      '这个案例同时展示逆向接管、Electron 安全加固、动态烟测和网页可玩运行时。重点不是先改玩法，而是证明复杂桌面游戏可以被拆出清晰边界，并逐步迁移到更安全的浏览器适配层。',
+    tags: ['Electron', 'Next.js', 'Security Audit', 'Runtime Bridge', 'Dynamic Probe'],
+    status: 'active',
+    year: '2026',
+    period: '2026',
+    role: '安全审计 / 运行时接管 / 网页集成 / 动态验证',
+    demo: '/reverse-sanguosha/play',
+    background:
+      '项目来源是一份解包后的无名杀 Electron runtime。原始目标是先接管工程、建立可审计基线，再逐步把 renderer 对 Node、remote 和文件 API 的依赖收束到明确边界里。',
+    problem:
+      'Electron 游戏常见风险是 renderer 拥有过宽的 Node 能力，文件 API 和桌面能力混在一起，后续任何玩法或扩展改动都难以判断安全影响。这个项目需要先把安全边界、验证证据和回滚路径建立起来。',
+    solution:
+      '先提交本地 Git 可审计基线，再按 Slice 推进 preload bridge、hardened profile、browser adapter 和动态 smoke。网站侧只保留 iframe 展示，完整游戏资源和文件 API 交给独立 game 子域服务。',
+    architecture: [
+      'Reverse 工程保留为独立仓库，记录安全加固提交和动态探针报告',
+      'hardened profile 通过 narrow preload bridge 暴露有限桌面能力，不向 renderer 暴露 Node、process 或 remote',
+      'reverse-sanguosha-web-server 独立服务 1GB 级游戏资源、浏览器文件 API 和每个访客的 session 覆盖层',
+      'MYweb 只通过 NEXT_PUBLIC_REVERSE_SANGUOSHA_GAME_URL 嵌入 game 子域，不把游戏资源打进主站包',
+    ],
+    challenges: [
+      '不能把分析产物污染进原始 runtime，也不能用 git add . 把解包大目录一次性塞进仓库',
+      '浏览器 adapter 依赖 /readFile、/getFileList、/writeFile 等 API，不能简单静态托管 index.html',
+      '完整资源超过 1GB，公网部署必须使用独立资源服务或 game 子域，而不是放进 Vercel 主站部署包',
+    ],
+    outcomes: [
+      '完成本地可审计 Git 基线，并提交 preload bridge、renderer fallback 和 hardened boot path 三个切片',
+      'hardened profile 已确认 profile=hardened、adapter=browser、bridge=true，且 window.require/process 不暴露',
+      '独立 game server smoke 通过，Web 运行时诊断稳定为 profile=web、adapter=browser、bridge=false',
+      'MYweb 新增网页可玩入口，主站只承担案例展示和 iframe 承载，不再服务游戏文件 API',
+    ],
+    contributions: [
+      '建立 workspace 与 runtime 边界，避免审计文档、探针和补丁草稿污染游戏目录',
+      '设计并实现 narrow bridge、hardened profile 与 CDP runtime diagnostic',
+      '把安全审计成果整理成网站案例，并补出可玩入口连接工程证据和用户体验',
+    ],
+    nextStep:
+      '下一阶段把 reverse-sanguosha-web-server 部署到 game.tcwenzhou.site，并把生产主站环境变量指向该子域。',
+  },
+  {
     slug: 'ai-mail-automation',
     title: 'AI 自动化邮件处理系统',
     headline: '把重复性的邮件分流、分类和回复草拟，整理成一条能被接入业务流的半自动流程。',

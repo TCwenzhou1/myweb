@@ -27,6 +27,8 @@ node_modules
 .workbuddy/
 .codex/
 .codex-main-sync/
+.playwright-mcp/
+playwright-mcp-artifacts/
 skill-helper.js
 **/skills-quick-reference.md
 

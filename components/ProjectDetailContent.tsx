@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import AgentSquadConsole from '@/components/AgentSquadConsole'
 import { ArchiveCard, CinematicSection, PageHeader, C, FONTS, alpha } from '@/components/CinematicUI'
+import ReverseSanguoshaPlayer from '@/components/ReverseSanguoshaPlayer'
 import { projectStatusLabelMap } from '@/lib/siteContent'
 import type { ProjectCase } from '@/lib/siteContent'
 
@@ -150,6 +151,12 @@ export default function ProjectDetailContent({ project }: { project: ProjectCase
         {project.slug === 'company-agent-office' && (
           <CinematicSection delay={320}>
             <AgentSquadConsole />
+          </CinematicSection>
+        )}
+
+        {project.slug === 'reverse-sanguosha-runtime-audit' && (
+          <CinematicSection delay={320}>
+            <ReverseSanguoshaPlayer />
           </CinematicSection>
         )}
 
